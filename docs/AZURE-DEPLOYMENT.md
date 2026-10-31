@@ -1,8 +1,8 @@
 # Azure demo deployment
 
-The Node demo is hosted at `https://paytrace-recover-sagitta.azurewebsites.net/` on the existing Linux Basic B1 App Service plan `provenance-broker-plan` in resource group `provenance-pilot-rg`. It shares that plan's capacity with other apps. The attempted dedicated free F1 plan was rejected because this subscription has zero F1 VM quota; it was not created. The empty resource group from that attempt was removed.
+The Node demo is hosted at `https://paytrace-recover-sagitta.azurewebsites.net/` on the existing Linux Free F1 App Service plan `shared-free-plan` in resource group `provenance-pilot-rg`. The separate reference course service shares this plan. This plan can sleep and has limited shared capacity; expect cold starts during a judge walkthrough. Confirm the current plan in Azure before relying on this document for deployment or cost decisions.
 
-The app uses Node 24 LTS, `npm start`, Always On, and `/home/data/courselatch.sqlite` for the single-instance demo database. Keep the app at one instance: SQLite and the in-process lock are not suitable for scale-out. The public Sites URL remains a browser simulation; the Azure URL serves the Node backend. Start a review at `/judge.html` to distinguish those paths.
+The app uses Node 24 LTS, `npm start`, and `/home/data/courselatch.sqlite` for the single-instance demo database. Always On is not available on the current Free plan. Keep the app at one instance: SQLite and the in-process lock are not suitable for scale-out. The public Sites URL remains a browser simulation; the Azure URL serves the Node backend. Start a review at `/judge.html` to distinguish those paths.
 
 ## Connected sandbox setup
 
