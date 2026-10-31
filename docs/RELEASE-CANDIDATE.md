@@ -14,6 +14,8 @@ Keep the current `COURSE_ACCESS_URL` and `COURSE_ACCESS_API_KEY` adapter and the
 
 ## Connected acceptance sequence
 
+Before a connected run, use `npm run hosted:preflight -- https://YOUR-HOST/ --require-connected`. This read-only check verifies the public routes and that PayPal, AI, course access, and Workflows are configured. It does not prove a checkout, task execution, access grant, or lesson delivery. Run it again after deployment; a missing route is a release failure.
+
 1. Configure the PayPal **sandbox** client ID and secret, the matching webhook ID, the course service, the AI model, and Render Workflow secrets on the server. Use private hosting settings; never put secrets in the browser or repository. Run connection checks, which prove reachability only.
 2. Sign in as a verified Admin or Manager. Create one **sandbox** case, complete a PayPal sandbox checkout with a sandbox buyer, and inspect the fresh captured order, learner, course, amount, and currency. Do not use a sample case.
 3. Run the four-specialist model review, inspect citations and objections, rehearse the exact access grant, then approve it as the merchant. Run the separate Render recovery task. Check that the course service recorded one grant and that the protected lesson opens.

@@ -13,7 +13,8 @@
   "workflows": "node workflows/index.mjs",
   "ai:smoke": "node scripts/ai-smoke.mjs",
   "ai:eval": "node scripts/ai-eval.mjs",
-  "acceptance:check": "node scripts/connected-acceptance.mjs",
+    "acceptance:check": "node scripts/connected-acceptance.mjs",
+    "hosted:preflight": "node scripts/hosted-preflight.mjs",
   "course:smoke": "node scripts/course-smoke.mjs",
   "backup": "node --env-file-if-exists=.env server/backup.mjs",
   "restore": "node --env-file-if-exists=.env server/restore.mjs"
