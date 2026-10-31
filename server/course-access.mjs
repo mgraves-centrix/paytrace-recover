@@ -21,7 +21,7 @@ export function courseAccessClient(env, fetcher = fetch) {
         ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {})
       },
       body: JSON.stringify(data),
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(20000)
     });
     if (!response.ok) throw Error(`Course access service returned HTTP ${response.status}.`);
     return response.json();
