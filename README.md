@@ -6,7 +6,7 @@ PayTrace Recover helps merchants resolve cases where a customer paid but didn’
 
 The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
 
-The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features on the integration branch; reporting candidates cannot authorize a course grant.
+The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features; reporting candidates cannot authorize a course grant.
 
 The local presentation route is `/` → `/story.html` → `/focus.html?from=story` → a private customer case link. The guided story and merchant workspace are separate examples, so their case state does not transfer. In the browser demo, the handoff opens Maya's seeded Focus case; on the server, it opens the merchant's own case queue. See the [screen-by-screen story](docs/DEMO-STORY.md).
 
@@ -29,6 +29,8 @@ The guided story now hands viewers into the merchant workspace. The judge page s
 The [focused recovery experience](docs/TODAY-EXPERIENCE.md) brings decisions, waiting customers, and unfinished verification into a simple Today view; adds a merchant decision brief and customer-visible update time; flags possible shared incidents; and includes an [interactive fictional walkthrough](dist/demo.html) from purchase to customer confirmation. The walkthrough is a sample, while connected outcomes still require the run report.
 
 The case desk now adds an [agent challenge room, recovery flight recorder, and incident scope](docs/CASE-INTELLIGENCE.md). They expose saved objections and source records, separate payment, approval, access write, lesson proof, and customer confirmation, and show which sandbox cases form a possible shared incident. These views explain existing evidence; they do not authorize a grant or prove a shared root cause.
+
+The [access assurance layer](docs/ACCESS-ASSURANCE.md) adds a private buyer-browser receipt for the protected lesson, a visible PayPal-payment-to-access delivery target, and an incident detective that refreshes source checks and optionally adds cited AI perspectives. Browser receipt, technical proof, and customer confirmation remain separate facts. Incident checks are read-only and do not approve a batch grant.
 
 The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
 

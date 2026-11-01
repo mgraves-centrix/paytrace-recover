@@ -7,12 +7,14 @@ import {prioritize} from './prioritization.mjs';
 import {createBackup} from './backups.mjs';
 import {identityProvider} from './authn.mjs';
 import {detectIncident,rehearseAutopilot,disputePacket} from '../dist/intelligence-lab.mjs';
+import {incidentDetective} from '../dist/access-assurance.mjs';
+import {analyzeIncident} from './incident-analysis.mjs';
 import {discoverPurchases} from './paypal-discovery.mjs';
 import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {timingSafeEqual} from 'node:crypto';import {openStore} from './store.mjs';import {createService} from './service.mjs';
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../dist');
 export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./data/courselatch.sqlite'),options={}){
  const paypal=options.paypal||paypalClient(env,options.fetcher||fetch);
- const service=createService(store,env,{paypal,probe:async token=>{const address=server.address();if(!address||typeof address==='string')throw Error('Content service unavailable.');const r=await fetch(`http://127.0.0.1:${address.port}/api/learner/content`,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('Protected content could not be retrieved.');return r.json();}}),attempts=new Map();const originPolicy=originConfig(env),publicUrl=originPolicy.publicUrl;
+ const service=createService(store,env,{paypal,course:options.course,probe:async token=>{const address=server.address();if(!address||typeof address==='string')throw Error('Content service unavailable.');const r=await fetch(`http://127.0.0.1:${address.port}/api/learner/content`,{headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(5000)});if(!r.ok)throw Error('Protected content could not be retrieved.');return r.json();}}),attempts=new Map();const originPolicy=originConfig(env),publicUrl=originPolicy.publicUrl;
  const auth=identityProvider({...env,PUBLIC_URL:publicUrl.href},store.accounts,{fetcher:options.fetcher||fetch,verifyToken:options.verifyToken});
  if(auth.required&&!(env.COURSE_ACCESS_URL&&env.COURSE_ACCESS_API_KEY))throw Error('Verified merchant mode requires a separate course-access connector.');
  store.center.configure(env.AUDIT_HMAC_KEY);
@@ -69,7 +71,8 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
     const token=req.headers.cookie?.split(';').map(s=>s.trim()).find(s=>s.startsWith('pt_customer='))?.slice(12);let identity;try{identity=store.support.authenticate(token);}catch{return json(401,{error:'Open your private link or request a new one to view this case.'});}
     const expected=body.caseId||url.searchParams.get('caseId');if(expected&&expected!==identity.case_id)return json(409,{error:'A different customer case is open in this browser. Reopen the private link for this case before continuing.'});
     if(route==='/api/customer/case'&&req.method==='GET')return json(200,store.support.view(identity.owner,identity.case_id));
-    if(route==='/api/customer/lesson'&&req.method==='GET')return json(200,await service.customerLesson(identity.owner,identity.case_id));
+    if(route==='/api/customer/lesson'&&req.method==='GET'){const lesson=await service.customerLesson(identity.owner,identity.case_id);return json(200,{...lesson,browserChallenge:store.support.issueBrowserChallenge(identity.owner,identity.case_id,lesson.body,token)});}
+    if(route==='/api/customer/browser-proof'&&req.method==='POST')return json(200,store.support.acknowledgeBrowserLesson(identity.owner,identity.case_id,body.token,body.digest,token));
     if(route==='/api/customer/self-check'&&req.method==='POST'){
      if(!store.durable.allow('customer-self-check:'+identity.owner+':'+identity.case_id,3))return json(429,{error:'Please wait a minute before checking again.'});
      return json(200,await service.customerSelfCheck(identity.owner,identity.case_id));
@@ -132,6 +135,15 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/intelligence/discover'&&req.method==='GET'){
     if(!session.operator)return json(403,{error:'Unlock the merchant session to scan PayPal reporting.'});
     return json(200,await discoverPurchases(store.listCases(session.id),env,options.fetcher||fetch));
+   }
+   if(route==='/api/intelligence/incident/probe'&&req.method==='POST'){
+    if(!session.operator)return json(403,{error:'Unlock the merchant session to investigate an incident.'});
+    const incident=detectIncident(store.listCases(session.id));
+    if(!incident.active)return json(409,{error:'No current sandbox cluster qualifies for incident checks.'});
+    if(!store.durable.allow('incident-probe:'+session.id,1))return json(429,{error:'Wait a minute before running another incident check.'});
+    const results=await Promise.all(incident.caseIds.slice(0,5).map(async caseId=>{let state='unavailable';try{state=(await service.customerSelfCheck(session.id,caseId)).state;}catch{}return {caseId,state};}));
+    const report=incidentDetective(incident,results);
+    try{return json(200,await analyzeIncident(report,env,options.fetcher||fetch));}catch{return json(200,{...report,notice:'Model readout unavailable; fixed evidence checks remain visible.'});}
    }
    if(route==='/api/intelligence/packet'&&req.method==='GET'){
     if(!session.operator)return json(403,{error:'Unlock the merchant session to prepare a case packet.'});
