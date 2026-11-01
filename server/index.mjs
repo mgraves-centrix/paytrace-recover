@@ -52,10 +52,11 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
   if(route==='/runtime.js'){const config={backend:true,authRequired:auth.required,paypal:!!(env.PAYPAL_CLIENT_ID&&env.PAYPAL_CLIENT_SECRET),paypalClientId:env.PAYPAL_CLIENT_ID||'',courseAccess:!!(env.COURSE_ACCESS_URL&&env.COURSE_ACCESS_API_KEY),ai:!!(env.OPENAI_API_KEY&&env.OPENAI_MODEL),workflows:!!(env.RENDER_API_KEY&&env.WORKFLOW_SECRET&&env.RENDER_INVESTIGATE_TASK&&env.RENDER_RECOVER_TASK)};res.writeHead(200,{'Content-Type':'text/javascript','Cache-Control':'no-store'});return res.end('window.COURSELATCH_RUNTIME='+JSON.stringify(config)+';')}
   if(route.startsWith('/api/')){
    if(!['GET','POST'].includes(req.method))return json(405,{error:'Method not allowed.'});
-   const internal=route==='/api/internal/stage';
+   const internal=route==='/api/internal/stage',trustedIntake=route==='/api/intake/purchase';
    if(internal&&!equal(req.headers.authorization,'Bearer '+env.WORKFLOW_SECRET))return json(401,{error:'Workflow authentication required.'});
    if(internal&&!env.WORKFLOW_SECRET)return json(401,{error:'Workflow authentication required.'});
-   if(req.method==='POST'&&!internal&&!originPolicy.allows(req.headers.origin))return json(403,{error:'Same-origin request required.'});
+   if(req.method==='POST'&&!internal&&!trustedIntake&&!originPolicy.allows(req.headers.origin))return json(403,{error:'Same-origin request required.'});
+   if(trustedIntake&&req.headers.origin)return json(403,{error:'Store intake is server-to-server only.'});
    let body={};if(req.method==='POST'){if(String(req.headers['content-type']).split(';')[0].trim().toLowerCase()!=='application/json')return json(415,{error:'JSON required.'});const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>20000)return json(413,{error:'Request too large.'});chunks.push(chunk);}try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'))}catch{return json(400,{error:'Invalid JSON.'})}if(!body||typeof body!=='object'||Array.isArray(body))return json(400,{error:'A JSON object is required.'});}
    const accountToken=req.headers.cookie?.split(';').map(x=>x.trim()).find(x=>x.startsWith('pt_account='))?.slice(11);
    const account=accountToken?store.accounts.authenticate(accountToken):null;
@@ -64,6 +65,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/auth/accept'&&req.method==='POST'){if(!account)return json(401,{error:'Verified sign-in required.'});return json(200,store.accounts.accept(accountToken,body.token));}
    if(route==='/api/auth/workspace'&&req.method==='POST'){if(!account)return json(401,{error:'Verified sign-in required.'});store.accounts.select(accountToken,body.owner);return json(200,{ok:true});}
    if(internal){if(req.method!=='POST')return json(405,{error:'POST required.'});const result=await service.stage(body.sessionId,body.stage,body.jobId);return json(200,result)}
+   if(trustedIntake){if(req.method!=='POST')return json(405,{error:'POST required.'});const bearer=req.headers.authorization?.startsWith('Bearer ')?req.headers.authorization.slice(7):null,owner=store.intakeOwner(bearer);if(!owner)return json(401,{error:'Trusted store authentication required.'});if(!store.durable.allow('trusted-intake:'+owner,20))return json(429,{error:'Store intake rate limit reached.'});const result=await service.intakePurchase(owner,body);return json(result.status==='created'?201:200,result);}
    if(route.startsWith('/api/customer/')){
     const key='customer:'+req.socket.remoteAddress,rate=attempts.get(key)||{count:0,until:Date.now()+60000};if(Date.now()>rate.until){rate.count=0;rate.until=Date.now()+60000;}rate.count++;attempts.set(key,rate);if(rate.count>120)return json(429,{error:'Please wait a minute before trying again.'});
     if(route==='/api/customer/request-link'&&req.method==='POST')return json(200,store.support.requestLink(body.reference,body.email));
@@ -101,6 +103,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(member||auth.required){teamRole=auth.required?account.role:member.role;requirePermission(teamRole,permissionFor(route,req.method,body));session={...session,operator:session.operator&&['admin','manager'].includes(teamRole)};}
    if(route==='/api/state'&&req.method==='GET')return json(200,{state:session.state,operator:session.operator});
    if(route==='/api/identity'&&req.method==='GET')return json(200,{actor:account?.email||member?.label||'Demo workspace owner',role:account?.role||member?.role||'admin',operator:session.operator,productionAuthentication:auth.required});
+   if(route==='/api/intake/key'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});return json(200,store.intakeKeyStatus(session.id));}
    if(route==='/api/team'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view team access.'});return json(200,{items:auth.required?store.accounts.members(session.id):store.center.members(session.id)});}
    if(route==='/api/analytics'&&req.method==='GET')return json(200,recoveryAnalytics(store.listCases(session.id),Object.fromEntries(url.searchParams)));
    if(route==='/api/notifications'&&req.method==='GET'){store.center.tick(session.id);return json(200,{items:store.center.notifications(session.id)});}
@@ -158,6 +161,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/run-report'&&req.method==='GET')return json(200,service.runReport(session.id));
    if(route==='/api/lesson'&&req.method==='GET'){try{return json(200,await service.lesson(session.id))}catch{return json(403,{error:'Course access is locked.'})}}
    if(req.method!=='POST')return json(405,{error:'POST required.'});
+   if(route==='/api/intake/key'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});const key=store.rotateIntakeKey(session.id);store.center.audit(session.id,{action:'store-intake.rotate-key',detail:'Previous store intake key revoked.'});return json(200,{key,notice:'Copy this key to the store server now. It is shown once and replaces the previous key.'});}
    if(route==='/api/team/invite'){if(!session.operator)return json(403,{error:'Unlock the operator session to invite team members.'});const invite=auth.required?store.accounts.invite(session.id,{email:body.email||body.label,role:body.role,ttlHours:body.ttlHours}):store.center.invite(session.id,body);store.center.audit(session.id,{actor:account?.userId||member?.label||'owner',role:teamRole||'admin',action:'team.invite',detail:invite.role});return json(200,{...invite,url:new URL(auth.required?'/account.html#invite='+encodeURIComponent(invite.token):'/recovery.html#team='+encodeURIComponent(invite.token),publicUrl).href});}
    if(route==='/api/team/revoke'){if(!session.operator)return json(403,{error:'Unlock the operator session to revoke team access.'});if(auth.required)store.accounts.revoke(session.id,body.id);else store.center.revoke(session.id,body.id);store.center.audit(session.id,{actor:account?.userId||member?.label||'owner',role:teamRole||'admin',action:'team.revoke'});return json(200,{ok:true});}
    if(route==='/api/notifications/read'){if(!session.operator)return json(403,{error:'Unlock the operator session to manage notifications.'});store.center.markRead(session.id,body.id);return json(200,{ok:true});}

@@ -22,7 +22,8 @@ export function openStore(file){
  CREATE TABLE IF NOT EXISTS paypal_webhook_events (id TEXT PRIMARY KEY, owner TEXT NOT NULL, case_id TEXT NOT NULL, processed_at TEXT NOT NULL);`);
  db.exec(`CREATE TABLE IF NOT EXISTS demo_workspaces (owner TEXT PRIMARY KEY, created INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS demo_creation_limits (key TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(key,bucket));
- CREATE TABLE IF NOT EXISTS access_intents (owner TEXT NOT NULL, case_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,case_id));`);
+ CREATE TABLE IF NOT EXISTS access_intents (owner TEXT NOT NULL, case_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,case_id));
+ CREATE TABLE IF NOT EXISTS trusted_intake_keys (owner TEXT PRIMARY KEY, digest TEXT NOT NULL, created_at TEXT NOT NULL);`);
  db.exec('CREATE TABLE IF NOT EXISTS case_preferences (owner TEXT NOT NULL,case_id TEXT NOT NULL,priority TEXT NOT NULL,revision INTEGER NOT NULL,updated TEXT NOT NULL,PRIMARY KEY(owner,case_id));');
  try{db.exec("ALTER TABLE sessions ADD COLUMN mode TEXT NOT NULL DEFAULT 'demo'")}catch(e){if(!/duplicate column name/.test(e.message))throw e;}
  db.exec('PRAGMA busy_timeout=5000');
@@ -60,6 +61,9 @@ export function openStore(file){
   backupTo:destination=>backup(db,destination),
   databaseCheck:()=>db.prepare('PRAGMA quick_check').get().quick_check==='ok',
   create,createPublicDemo,get,save,saveCase:savePortfolioCase,listCases,caseById,
+  intakeKeyStatus(owner){return {configured:!!db.prepare('SELECT 1 FROM trusted_intake_keys WHERE owner=?').get(owner)};},
+  rotateIntakeKey(owner){if(!get(owner))throw Error('Workspace not found.');const key=randomBytes(32).toString('base64url');db.prepare('INSERT INTO trusted_intake_keys VALUES (?,?,?) ON CONFLICT(owner) DO UPDATE SET digest=excluded.digest,created_at=excluded.created_at').run(owner,hash(key),new Date().toISOString());return key;},
+  intakeOwner(key){if(typeof key!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(key))return null;return db.prepare('SELECT owner FROM trusted_intake_keys WHERE digest=?').get(hash(key))?.owner||null;},
   accessIntent(owner,caseId){const row=db.prepare('SELECT value FROM access_intents WHERE owner=? AND case_id=?').get(owner,caseId);return row?JSON.parse(row.value):null;},
   saveAccessIntent(owner,caseId,value){durable.guard(owner);caseById(owner,caseId);db.prepare('INSERT INTO access_intents VALUES (?,?,?) ON CONFLICT(owner,case_id) DO UPDATE SET value=excluded.value').run(owner,caseId,put(value));},
   readAccess(owner,s){caseById(owner,s.id);const a=db.prepare('SELECT * FROM course_access WHERE owner=? AND case_id=?').get(owner,s.id);return a?{userId:a.learner,courseId:a.course,active:true,captureId:a.capture}:{userId:s.order.userId,courseId:s.order.courseId,active:false,captureId:null};},
