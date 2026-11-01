@@ -3,11 +3,14 @@ import {esc,when} from './customer-shared.mjs';
 export function emailStatus(state){return ({
  'needs-email':['Purchase email needed','Register the verified purchase email before sending a new invitation.'],
  pending:['Queued','The server has queued this notification. Delivery is not confirmed.'],
- 'not-configured':['Email setup needed','The portal message is saved. Configure email and send a fresh invitation.'],
+ 'not-configured':['Email setup needed','The portal message is saved. Configure email; the queued attempt will be retried.'],
  sending:['Sending','The provider request is in progress. Delivery is not confirmed.'],
  'accepted-by-provider':['Accepted by email provider','Provider acceptance does not prove inbox delivery.'],
  failed:['Email attempt failed','Check email setup, then send a fresh invitation.'],
- 'delivery-unknown':['Delivery unconfirmed','The request was interrupted. Check provider activity before sending another invitation.']
+ 'delivery-unknown':['Delivery unconfirmed','The request was interrupted. The server will retry with the same request ID; check provider activity before sending a separate invitation.'],
+ 'retry-pending':['Retry scheduled','The provider did not accept this attempt. The server will retry with the same request ID; delivery is unconfirmed.'],
+ 'needs-manual-review':['Manual review needed','Automatic retries stopped. Check provider activity before sending another invitation.'],
+ cancelled:['Notification cancelled','This pending automatic follow-up will not be sent.']
  })[state]||['Status unavailable','Refresh email activity to check this attempt.'];}
 
 export function resolutionSteps(state,support){return [
@@ -32,5 +35,5 @@ export function mountSupportPolish(panel,state,support){
  function update(){const internal=kind.value==='internal';preview.classList.toggle('private-preview',internal);preview.innerHTML=`<div><strong>${internal?'Private note preview':'Customer message preview'}</strong><span>${internal?'Visible to admins only':'Visible in the private customer portal'}</span></div><p>${esc(input.value.trim()||'Your message will appear here as you write.')}</p><small>${input.value.length} / 2,000 characters · ${internal?'No customer notification':'Email delivery depends on notification status'}</small>`;submit.textContent=internal?'Save private note':kind.value==='request'?'Send information request':'Send to customer';templates.hidden=internal;templates.querySelectorAll('button').forEach(b=>b.disabled=input.disabled);}
  input.addEventListener('input',update);kind.addEventListener('change',update);
  templates.querySelectorAll('button').forEach(button=>button.onclick=()=>{if(input.disabled)return;const text=replyTemplates(support)[Number(button.dataset.template)][1];input.value=(input.value.trim()?input.value+'\n\n'+text:text).slice(0,2000);input.dispatchEvent(new Event('input'));input.focus();});update();
- const activity=document.createElement('details');activity.className='support-delivery';activity.innerHTML=`<summary>Notification status · ${support.notifications.length} recorded attempts</summary><p>Portal messages and email notifications are separate. A saved message does not establish email delivery.</p>${support.notifications.slice(-5).reverse().map(n=>{const [title,detail]=emailStatus(n.state);return `<article><strong>${esc(title)}</strong><time>${esc(when(n.at))}</time><p>${esc(detail)}</p></article>`;}).join('')||'<p>No email attempts recorded yet.</p>'}`;resolution.after(activity);
+ const activity=document.createElement('details');activity.className='support-delivery';activity.innerHTML=`<summary>Notification status · ${support.notifications.length} records</summary><p>Portal messages and email notifications are separate. A saved message does not establish email delivery.</p>${support.notifications.slice(-5).reverse().map(n=>{const [title,detail]=emailStatus(n.state);return `<article><strong>${esc(title)}</strong><time>${esc(when(n.at))}</time><p>${esc(detail)}</p></article>`;}).join('')||'<p>No email notifications recorded yet.</p>'}`;resolution.after(activity);
 }

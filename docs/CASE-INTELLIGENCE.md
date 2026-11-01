@@ -1,0 +1,9 @@
+# Case intelligence views
+
+The Focus case desk has three views built from saved case records. They are merchant-facing explanations, not new approval or payment paths.
+
+- **Agent challenge room:** shows each recorded objection, whether it is open or answered, the saved resolution, and source records frozen at review time. A changed evidence fingerprint hides stale conclusions and asks for a new investigation. Scripted reviews remain labeled as scripted; an open challenge or failed deterministic check does not become a “ready” AI decision.
+- **Recovery flight recorder:** separates completed payment, current specialist review, exact preview, approval, access write or zero-write restoration, current lesson proof, and customer confirmation. It updates the customer stage after the private conversation loads. A Render run ID means a task was accepted or recorded; it does not establish success. Sample browser checks are labeled separately from external protected-lesson proof.
+- **Incident scope:** when three or more saved completed PayPal sandbox captures for one course have missing access inside 30 minutes, the dashboard and affected cases show the cluster. The view lists only pseudonymous case IDs, timestamps, review status, and write count. It is a possible shared incident, not a cause diagnosis; automatic grants remain paused and each case still needs fresh exact evidence and authorization.
+
+For a demo, open a case with an unresolved identity objection to show the challenge room, then a reviewed case to show answered challenges. The flight recorder fills as each action finishes. Incident scope requires three qualifying sandbox cases; sample portfolio records do not impersonate live payments. All three views are read-only. The connected run report remains the release evidence for real PayPal, Render, and course-service behavior.
