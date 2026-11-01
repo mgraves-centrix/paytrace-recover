@@ -10,4 +10,4 @@ Open `/intelligence.html` from the merchant Focus workspace. The page requires a
 
 ## Verification
 
-Run `npm test`. The new tests cover incident detection and grant pause, policy rehearsal without mutation, reporting permission failure and PII omission, private customer checking without a grant, merchant route access, and packet redaction. A connected PayPal reporting scan and a completed buyer-to-lesson recovery still require live sandbox acceptance. The public Azure deployment must be updated from the current pull request before this screen appears there.
+Run `npm test`. The new tests cover incident detection and grant pause, policy rehearsal without mutation, reporting permission failure and PII omission, private customer checking without a grant, merchant route access, and packet redaction. A connected PayPal reporting scan and a completed buyer-to-lesson recovery still require live sandbox acceptance. The public Azure sandbox demo includes this screen; that deployment does not itself prove a connected recovery.
