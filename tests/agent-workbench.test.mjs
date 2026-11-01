@@ -1,15 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCase,simulatePayment,investigate,rehearse,approve,applyRepair,verify} from '../dist/core.mjs';
-import {agentBrief} from '../dist/focus-agent-workbench.mjs';
+import {agentBrief,agentDecisionPath} from '../dist/focus-agent-workbench.mjs';
 import {openStore} from '../server/store.mjs';
 import {createApp} from '../server/index.mjs';
 
 test('decision brief distinguishes supported preview, blocked purchase, and stale review',()=>{
  const ready=investigate(simulatePayment(createCase()));let brief=agentBrief(ready);assert.equal(brief.tone,'ready');assert.match(brief.next,/Preview/);assert.ok(brief.confirmed.includes('Completed payment'));
  const blocked=investigate(simulatePayment(createCase('conflict')));brief=agentBrief(blocked);assert.equal(brief.tone,'blocked');assert.ok(brief.open.some(text=>text.includes('Correct order')));
+ assert.match(brief.next,/PayPal order reference/);
+ const missing=investigate(simulatePayment(createCase('missing')));brief=agentBrief(missing);
+ assert.equal(brief.tone,'needs-evidence');assert.deepEqual(brief.confirmed,[]);assert.match(brief.next,/Restore the PayPal payment record/);
+ assert.equal(agentDecisionPath(missing)[1].status,'waiting');
  ready.capture.amount=1;brief=agentBrief(ready);assert.equal(brief.tone,'stale');assert.deepEqual(brief.confirmed,[]);
  const recovered=rehearse(investigate(simulatePayment(createCase())));approve(recovered,recovered.rehearsal.id);applyRepair(recovered);brief=agentBrief(recovered);assert.match(brief.next,/Do not repeat/);verify(recovered);assert.match(agentBrief(recovered).title,/verified/);
+});
+
+test('decision path distinguishes sample review, current AI review, stale evidence and verification',()=>{
+ const state=investigate(simulatePayment(createCase()));
+ let path=agentDecisionPath(state);
+ assert.equal(path[0].status,'complete');assert.match(path[0].detail,/Sample/);
+ assert.equal(path[2].status,'sample');assert.equal(path[3].status,'waiting');assert.equal(path[4].status,'waiting');
+ state.analysis={mode:'model'};state.review.mode='model';path=agentDecisionPath(state);assert.equal(path[2].status,'complete');
+ state.capture.amount=1;path=agentDecisionPath(state);assert.equal(path[1].status,'hold');assert.equal(path[2].status,'waiting');
+ const repaired=rehearse(investigate(simulatePayment(createCase())));approve(repaired,repaired.rehearsal.id);applyRepair(repaired);verify(repaired);
+ path=agentDecisionPath(repaired);assert.equal(path[3].status,'complete');assert.equal(path[4].status,'complete');
+ const staleApproval=rehearse(investigate(simulatePayment(createCase())));approve(staleApproval,staleApproval.rehearsal.id);
+ staleApproval.capture.amount=1;path=agentDecisionPath(staleApproval);assert.equal(path[3].status,'waiting');assert.match(path[3].detail,/out of date/);
 });
 
 test('agent follow-up endpoint requires same-origin operator session and a current model review',async()=>{
