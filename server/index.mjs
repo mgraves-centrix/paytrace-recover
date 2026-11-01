@@ -23,7 +23,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
   const url=new URL(req.url,publicUrl);const route=url.pathname;
   res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
   if(publicUrl.protocol==='https:')res.setHeader('Strict-Transport-Security','max-age=31536000');
-  if(['/account.html','/recovery.html','/intelligence.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  if(['/account.html','/recovery.html','/intelligence.html','/focus.html','/customer.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(route==='/auth/config')return json(200,auth.config());
   if(route==='/auth/login'&&req.method==='GET'){
    if(!store.durable.allow('login:'+req.socket.remoteAddress,30))return json(429,{error:'Too many sign-in attempts. Wait a minute.'});
