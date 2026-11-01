@@ -13,6 +13,9 @@ test('email labels and suggested replies do not overstate delivery or access',()
  assert.match(emailStatus('accepted-by-provider')[1],/does not prove/);
  assert.match(emailStatus('delivery-unknown')[0],/unconfirmed/);
  assert.match(emailStatus('not-configured')[0],/setup needed/);
+ assert.match(emailStatus('not-configured')[1],/retried/);
+ assert.match(emailStatus('retry-pending')[0],/Retry scheduled/);
+ assert.match(emailStatus('needs-manual-review')[1],/retries stopped/);
  assert.match(replyTemplates({verified:false})[0][1],/still open/);
  assert.doesNotMatch(replyTemplates({verified:false})[0][1],/check has passed/);
  assert.match(replyTemplates({verified:true})[0][1],/let us know whether it works/);

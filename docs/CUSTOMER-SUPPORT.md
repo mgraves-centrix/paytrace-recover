@@ -31,10 +31,13 @@ Email activity states:
 - `not-configured`: email credentials/sender missing; nothing sent.
 - `sending`: an attempt began; a server interruption can leave this unresolved.
 - `accepted-by-provider`: the provider accepted the request; **not proof of inbox delivery**.
-- `failed`: provider rejected the attempt.
-- `delivery-unknown`: network failure; receipt is uncertain.
+- `retry-pending`: provider rate limit or temporary failure; the server retries the same request ID.
+- `failed`: provider rejected the attempt permanently; no automatic retry.
+- `delivery-unknown`: network failure; receipt is uncertain and the server retries the same request ID.
+- `needs-manual-review`: five attempts or the 23-hour retry window elapsed; automatic retries stop.
+- `cancelled`: a pending automatic follow-up was cancelled before delivery.
 
-There is no automatic retry of failed, unknown, unconfigured, or interrupted deliveries. After resolving setup, send a fresh invitation explicitly. Provider delivery/bounce webhooks and a richer retry console remain future work. Notification text and recipient are stored in SQLite; secret link tokens are hashed, and the link is created only for the send attempt. The provider request has an idempotency key.
+Pending, temporarily rejected, interrupted, and unconfigured attempts are retried by the durable outbox when the server is running and configuration is available. An interrupted send is uncertain: the same provider idempotency key and private-link body are reused, so do not send a separate invitation without checking provider activity. Permanently failed and manual-review attempts do not retry automatically. Provider delivery/bounce webhooks and a richer retry console remain future work. Notification text and recipient are stored in SQLite; secret link tokens are hashed, and the link is created only for the send attempt. The provider request has an idempotency key.
 
 ## Boundaries and checks
 
