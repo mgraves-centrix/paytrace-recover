@@ -28,6 +28,8 @@ The guided story now hands viewers into the merchant workspace. The judge page s
 
 The [focused recovery experience](docs/TODAY-EXPERIENCE.md) brings decisions, waiting customers, and unfinished verification into a simple Today view; adds a merchant decision brief and customer-visible update time; flags possible shared incidents; and includes an [interactive fictional walkthrough](dist/demo.html) from purchase to customer confirmation. The walkthrough is a sample, while connected outcomes still require the run report.
 
+The case desk now adds an [agent challenge room, recovery flight recorder, and incident scope](docs/CASE-INTELLIGENCE.md). They expose saved objections and source records, separate payment, approval, access write, lesson proof, and customer confirmation, and show which sandbox cases form a possible shared incident. These views explain existing evidence; they do not authorize a grant or prove a shared root cause.
+
 The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
 
 The first working example is a paid course with missing access. The app checks the evidence, rehearses the smallest correction on a copy, asks the merchant to approve the exact change, applies it once, and checks the outcome. Memberships and downloads are future directions to validate, not supported connectors.

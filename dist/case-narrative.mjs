@@ -115,7 +115,8 @@ export function mountCaseChapter(root, s, support = null, options = {}) {
   card.querySelector('[data-chapter-target]')?.addEventListener('click', event => {
     const kind = event.currentTarget.dataset.chapterTarget;
     if (kind === 'refresh') { root.querySelector('[data-action="refresh"]')?.click(); return; }
-    const selector = {communication:'.support-panel', evidence:'.case-evidence-column', decision:'.case-decision-column', receipt:'.story-outcome-panel'}[kind];
+    if (kind === 'communication') root.querySelector('.case-conversation-disclosure')?.setAttribute('open', '');
+    const selector = {communication:'.case-conversation-disclosure', evidence:'.case-evidence-column', decision:'.case-decision-column', receipt:'.story-outcome-panel'}[kind];
     const target = selector && root.querySelector(selector);
     if (!target) return;
     target.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
