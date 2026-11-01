@@ -20,6 +20,13 @@ test('merchant policy is off by default, requires operator, and needs configured
 
 test('eligible sandbox case is granted once and verified after a model review',async()=>{const f=fixture();try{await f.svc.setAutopilot(f.id,{enabled:true,maxAmountCents:15000,dailyLimit:2});await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id),s=f.db.get(f.id).state;assert.equal(result.status,'verified');assert.equal(s.phase,'verified');assert.equal(s.approval.mode,'policy');assert.equal(s.writes,1);assert.equal(f.grants(),1);assert.equal((await f.svc.autoTriage(f.id)).status,'nothing-due');assert.equal(f.grants(),1);}finally{f.db.close();}});
 
+test('possible shared incident pauses automatic grants but leaves investigation available',async()=>{const f=fixture();try{
+ await f.svc.setAutopilot(f.id,{enabled:true,maxAmountCents:15000,dailyLimit:3});
+ for(const suffix of ['A','B']){const s=structuredClone(f.db.get(f.id).state);s.id='CL-INCIDENT-'+suffix;s.order.id=s.id;s.capture.id='CAP-'+s.id;s.capture.orderId=s.id;s.paypalOrderId='PP-'+suffix;f.db.saveCase(f.id,s);}
+ await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id);
+ assert.equal(result.status,'incident-paused');assert.equal(f.grants(),0);
+ }finally{f.db.close();}});
+
 test('mismatched capture holds the case with zero automatic grants',async()=>{const f=fixture({mismatch:true});try{await f.svc.setAutopilot(f.id,{enabled:true,maxAmountCents:15000,dailyLimit:2});await f.svc.scan(f.id);await f.svc.autoTriage(f.id);assert.equal(f.grants(),0);assert.equal(f.db.get(f.id).state.writes,0);}finally{f.db.close();}});
 
 test('failed lesson verification retries reads without a second grant',async()=>{const f=fixture({probeFails:true});try{await f.svc.setAutopilot(f.id,{enabled:true,maxAmountCents:15000,dailyLimit:2});await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id);assert.equal(result.status,'verification-pending');assert.equal(f.grants(),1);const s=f.db.get(f.id).state;s.automation.nextAttemptAt=new Date(0).toISOString();f.db.save(f.id,s);const retried=await f.svc.autoTriage(f.id);assert.equal(retried.status,'verification-pending');assert.equal(f.grants(),1);assert.equal(f.db.get(f.id).state.writes,1);}finally{f.db.close();}});

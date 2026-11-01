@@ -1,0 +1,6 @@
+.customer-self-check{background:linear-gradient(145deg,#eaf4ff,#fff 72%);border:1px solid #c6dcf6}
+.customer-self-check h2{margin:8px 0 6px;color:#082b66}
+.customer-self-check>p{font-size:13px;line-height:1.6;color:#405d78}
+.customer-self-check button{width:100%;margin:12px 0 8px}
+.customer-self-result{min-height:38px;display:grid;gap:5px;font-size:12px;line-height:1.5;color:#153f70}
+.customer-self-result small{color:#5f7894}

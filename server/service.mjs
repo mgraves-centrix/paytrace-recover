@@ -10,6 +10,7 @@ import {diagnose,validateGrace} from '../dist/diagnosis.mjs';
 import {buildRunReport} from '../dist/run-report.mjs';
 import {withRecoverySpan,noteSpecialistProgress} from './recovery-trace.mjs';
 import {expireWorkflow,workflowTimeout} from './workflow-lifecycle.mjs';
+import {detectIncident} from '../dist/intelligence-lab.mjs';
 export function createService(store,env=process.env,{fetcher=fetch,paypal=paypalClient(env,fetcher),probe,access=(owner,s)=>store.readAccess(owner,s),course=courseAccessClient(env,fetcher)}={}){
  const timeoutMs=workflowTimeout(env);
  const verificationMaxAgeMs=verificationAge(env);
@@ -68,12 +69,30 @@ export function createService(store,env=process.env,{fetcher=fetch,paypal=paypal
  }
  function lesson(id){const s=store.get(id)?.state;if(!s)throw Error('No session.');if(s.paymentHold)throw Error('Payment is on hold.');return external(s)?course.probe(s):store.lesson(id);}
  async function customerLesson(id,caseId){const s=store.caseById(id,caseId);if(s.paymentHold)throw Error('Payment is on hold.');if(!external(s))return store.support.lesson(id,caseId);if(!proofIsCurrent(s)||s.evidenceAvailable===false||Object.values(s.sources||{}).some(x=>x?.status==='unavailable'))throw Error('Access is still being checked.');const value=await course.probe(s);if(value?.accessible!==true||value.userId!==s.order.userId||value.courseId!==s.order.courseId||value.captureId!==s.capture.id||value.contentId!=='light-lesson-01'||typeof value.body!=='string'||value.body.length<=20)throw Error('Protected course content could not be confirmed.');return {accessible:true,title:value.title||'Your purchased lesson',body:value.body,lesson:value.lesson||'Purchased lesson',contentId:value.contentId};}
+ async function customerSelfCheck(id,caseId){
+  const s=store.caseById(id,caseId),checkedAt=new Date().toISOString();
+  const result=(state,detail)=>({state,detail,checkedAt,accessChanged:false});
+  if(s.intakeMode!=='sandbox'||s.capture?.source==='sample')return result('sample','This sample cannot check a live PayPal payment or course account.');
+  if(!course)return result('unavailable','The course service is not connected. Your case remains open for merchant review.');
+  if(!s.paypalOrderId||!s.capture)return result('awaiting-payment','The purchase is still being confirmed. You do not need to pay again.');
+  try{
+   const capture=await paypal.refresh(s),o=s.order;
+   if(capture.status!=='COMPLETED'||capture.id!==s.capture.id||capture.orderId!==o.id||capture.userId!==o.userId||capture.courseId!==o.courseId||capture.amount!==o.amount||capture.currency!==o.currency)return result('payment-review','The payment needs merchant review before access can be confirmed.');
+   const current={...s,capture},access=await course.check(current);
+   if(!access.active)return result('missing-access','The payment is confirmed, but course access is still missing. The merchant can see your case.');
+   if(access.captureId!==capture.id)return result('payment-review','Access belongs to a different payment. The merchant needs to review it.');
+   const lesson=await course.probe({...current,entitlement:access});
+   if(lesson?.accessible!==true||lesson.userId!==o.userId||lesson.courseId!==o.courseId||lesson.captureId!==capture.id||lesson.contentId!=='light-lesson-01'||typeof lesson.body!=='string'||lesson.body.length<=20)return result('checking','Access is present, but the purchased lesson could not be confirmed yet.');
+   return result('access-available','Your purchased lesson opened in a fresh check. Please try it on your device and tell the merchant if you still need help. Case progress updates after verification is recorded.');
+  }catch{return result('unavailable','We could not complete a fresh check right now. Your case is still open; please try again later.');}
+ }
  async function verifyFresh(id,caseId=store.get(id).state.id){const s=store.caseById(id,caseId);let available=true;try{await fresh(s,id)}catch{available=false}store.saveCase(id,s);if(s.scenario==='read-error'&&s.reads===0)available=false;if(s.paymentHold)available=false;let resource=null,access=false,transport;if(external(s)){transport='external-course-service';if(!s.paymentHold)try{resource=await course.probe(s)}catch{}}else{transport=probe?'authenticated-http':'scoped-content-adapter';const token=store.mintLearnerToken(id,s.id,30000);try{resource=probe?await probe(token):store.readLearnerToken(token)}catch{}finally{store.revokeLearnerToken(token);}}access=!s.paymentHold&&resource?.accessible===true&&resource.userId===s.order.userId&&resource.courseId===s.order.courseId&&resource.captureId===s.capture?.id&&resource.contentId==='light-lesson-01'&&typeof resource.body==='string'&&resource.body.length>20;s.verificationMaxAgeMs=verificationMaxAgeMs;verify(s,{paymentAvailable:available,lessonAvailable:access,transport,resource:access?{contentId:resource.contentId,userId:resource.userId,courseId:resource.courseId}:null});if(s.proof?.passed){s.firstVerifiedAt ||= s.proof.at;s.lastPassingVerification={at:s.proof.at,transport};}store.saveCase(id,s);return s}
  async function scan(id,{graceMinutes}={}){return store.lock(id,async()=>{if(graceMinutes!==undefined)store.setGrace(id,validateGrace(graceMinutes));const cases=store.listCases(id);for(const s of cases){reconcileWorkflow(s,id);if(s.job?.pending)continue;const before=fingerprint(s);if(s.capture?.source==='paypal-sandbox'){try{await fresh(s,id);}catch{}}if(before!==fingerprint(s)&&s.review){s.approval=null;s.rehearsal=null;s.proof=null;s.phase='stale';}}
    scanCases(cases,{graceMinutes:store.grace(id)});for(const s of cases)store.saveCase(id,s);return {cases,graceMinutes:store.grace(id),checkedAt:new Date().toISOString()};});}
  const autopilotReady=()=>!!(env.PAYPAL_CLIENT_ID&&env.PAYPAL_CLIENT_SECRET&&env.COURSE_ACCESS_URL&&env.COURSE_ACCESS_API_KEY&&env.OPENAI_API_KEY&&env.OPENAI_MODEL&&course);
  function setAutopilot(id,input){if(!store.get(id)?.operator)throw Error('Unlock the operator session first.');if(typeof input?.enabled!=='boolean'||!Number.isInteger(input.maxAmountCents)||input.maxAmountCents<1||input.maxAmountCents>50000||!Number.isInteger(input.dailyLimit)||input.dailyLimit<1||input.dailyLimit>10)throw Error('Use a valid amount and a daily limit from 1 to 10.');if(input.enabled&&!autopilotReady())throw Error('Connect PayPal sandbox, the course access service, and AI before enabling automatic repair.');const policy={enabled:input.enabled,courseId:COURSE.id,maxAmountCents:input.maxAmountCents,dailyLimit:input.dailyLimit,id:randomUUID(),updatedAt:new Date().toISOString()};return store.setAutopilot(id,policy);}
  async function autoRecoverReady(id,s,policy){
+  if(detectIncident(store.listCases(id)).active)return {status:'incident-paused',caseId:s.id};
   if(!policy.enabled||!autopilotReady()||!store.get(id)?.operator)return {status:'awaiting-merchant',caseId:s.id};
   if(s.automation?.policyCheckedId===policy.id)return {status:s.automation?.status||'awaiting-merchant',caseId:s.id};
   const eligible=!s.paymentHold&&s.intakeMode==='sandbox'&&s.capture?.source==='paypal-sandbox'&&external(s)&&s.review?.mode==='model'&&s.analysis?.mode==='model'&&reviewIsCurrent(s)&&s.review.outcome==='ready'&&s.review.objections.every(o=>o.status==='resolved')&&s.phase==='investigated'&&s.writes===0&&!s.entitlement.active&&s.order.courseId===policy.courseId&&s.order.amount<=policy.maxAmountCents&&s.order.currency==='USD'&&s.order.userId===s.currentAccountId;
@@ -245,7 +264,7 @@ export function createService(store,env=process.env,{fetcher=fetch,paypal=paypal
   caseInfo:(id,caseId)=>traced('case-read',id,()=>caseInfo(id,caseId)),
   action:(id,body)=>traced(['investigate','rehearse','approve','repair','verify'].includes(body?.action)?body.action:'other',id,()=>action(id,body)),
   stage:(id,step,jobId)=>traced('workflow-'+step,id,()=>stage(id,step,jobId)),
-  lesson,customerLesson,
+  lesson,customerLesson,customerSelfCheck,
   paypalCreate:(id,caseId)=>traced('paypal-create',id,()=>paypalCreate(id,caseId)),
   paypalCapture:(id,orderId,caseId)=>traced('paypal-capture',id,()=>paypalCapture(id,orderId,caseId)),
   paypalWebhook:event=>withRecoverySpan('paypal-webhook',event?.resource?.supplementary_data?.related_ids?.order_id,()=>paypalWebhook(event)),

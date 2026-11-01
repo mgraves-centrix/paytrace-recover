@@ -6,6 +6,8 @@ import {recoveryAnalytics,requirePermission,permissionFor,masked} from './recove
 import {prioritize} from './prioritization.mjs';
 import {createBackup} from './backups.mjs';
 import {identityProvider} from './authn.mjs';
+import {detectIncident,rehearseAutopilot,disputePacket} from '../dist/intelligence-lab.mjs';
+import {discoverPurchases} from './paypal-discovery.mjs';
 import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {timingSafeEqual} from 'node:crypto';import {openStore} from './store.mjs';import {createService} from './service.mjs';
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../dist');
 export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./data/courselatch.sqlite'),options={}){
@@ -19,7 +21,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
   const url=new URL(req.url,publicUrl);const route=url.pathname;
   res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
   if(publicUrl.protocol==='https:')res.setHeader('Strict-Transport-Security','max-age=31536000');
-  if(['/account.html','/recovery.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  if(['/account.html','/recovery.html','/intelligence.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(route==='/auth/config')return json(200,auth.config());
   if(route==='/auth/login'&&req.method==='GET'){
    if(!store.durable.allow('login:'+req.socket.remoteAddress,30))return json(429,{error:'Too many sign-in attempts. Wait a minute.'});
@@ -68,6 +70,10 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
     const expected=body.caseId||url.searchParams.get('caseId');if(expected&&expected!==identity.case_id)return json(409,{error:'A different customer case is open in this browser. Reopen the private link for this case before continuing.'});
     if(route==='/api/customer/case'&&req.method==='GET')return json(200,store.support.view(identity.owner,identity.case_id));
     if(route==='/api/customer/lesson'&&req.method==='GET')return json(200,await service.customerLesson(identity.owner,identity.case_id));
+    if(route==='/api/customer/self-check'&&req.method==='POST'){
+     if(!store.durable.allow('customer-self-check:'+identity.owner+':'+identity.case_id,3))return json(429,{error:'Please wait a minute before checking again.'});
+     return json(200,await service.customerSelfCheck(identity.owner,identity.case_id));
+    }
     if(route==='/api/customer/message'&&req.method==='POST')return json(200,store.support.mutate(identity.owner,identity.case_id,body));
     return json(404,{error:'Endpoint not found.'});
    }
@@ -116,6 +122,23 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    }
    if(route==='/api/case/priority'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to manage case priority.'});return json(200,store.casePriority(session.id,url.searchParams.get('caseId')));}
    if(route==='/api/autopilot'&&req.method==='GET')return json(200,{policy:store.autopilot(session.id),ready:service.autopilotReady()});
+   if(route==='/api/intelligence'&&req.method==='GET'){
+    if(!session.operator)return json(403,{error:'Unlock the merchant session to inspect case intelligence.'});
+    const policy=store.autopilot(session.id),max=Number(url.searchParams.get('maxAmountCents')||policy.maxAmountCents),limit=Number(url.searchParams.get('dailyLimit')||policy.dailyLimit);
+    if(!Number.isInteger(max)||max<1||max>50000||!Number.isInteger(limit)||limit<1||limit>10)return json(400,{error:'Use a policy amount from 1 to 50000 cents and daily limit from 1 to 10.'});
+    const cases=store.listCases(session.id),preview={...policy,maxAmountCents:max,dailyLimit:limit};
+    return json(200,{incident:detectIncident(cases),policy:preview,rehearsal:rehearseAutopilot(cases,preview),caseOptions:cases.map(s=>({id:s.id,phase:s.phase,source:s.capture?.source==='paypal-sandbox'?'sandbox':'sample'}))});
+   }
+   if(route==='/api/intelligence/discover'&&req.method==='GET'){
+    if(!session.operator)return json(403,{error:'Unlock the merchant session to scan PayPal reporting.'});
+    return json(200,await discoverPurchases(store.listCases(session.id),env,options.fetcher||fetch));
+   }
+   if(route==='/api/intelligence/packet'&&req.method==='GET'){
+    if(!session.operator)return json(403,{error:'Unlock the merchant session to prepare a case packet.'});
+    const id=url.searchParams.get('caseId');if(!id)return json(400,{error:'Choose a case first.'});
+    const s=store.caseById(session.id,id),customer=store.support.view(session.id,id,true);
+    return json(200,disputePacket(s,customer));
+   }
    if(route==='/api/connection-check'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session before testing configured connections.'});return json(200,await checkConnection(url.searchParams.get('kind'),env));}
    const expectedCase=url.searchParams.get('caseId');if(['/api/draft','/api/receipt','/api/run-report','/api/lesson'].includes(route)&&expectedCase&&expectedCase!==session.state.id)return json(409,{error:'The selected case changed. Reopen it from the queue before continuing.'});
    if(route==='/api/draft'&&req.method==='GET')return json(200,service.draft(session.id));
