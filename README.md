@@ -26,6 +26,8 @@ The judge walkthrough now offers a single short route through the sample story a
 
 The guided story now hands viewers into the merchant workspace. The judge page shows current configuration separately from completed case evidence; the Connections page tracks four pre-Render checkpoints. Sandbox intake requires valid PayPal credentials and a completed connected test. Activity can be searched and filtered with full dates, while the customer view distinguishes the latest case message from the last merchant reply. The case view presents one specialist evidence section instead of repeating the same four findings.
 
+The [focused recovery experience](docs/TODAY-EXPERIENCE.md) brings decisions, waiting customers, and unfinished verification into a simple Today view; adds a merchant decision brief and customer-visible update time; flags possible shared incidents; and includes an [interactive fictional walkthrough](dist/demo.html) from purchase to customer confirmation. The walkthrough is a sample, while connected outcomes still require the run report.
+
 The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
 
 The first working example is a paid course with missing access. The app checks the evidence, rehearses the smallest correction on a copy, asks the merchant to approve the exact change, applies it once, and checks the outcome. Memberships and downloads are future directions to validate, not supported connectors.

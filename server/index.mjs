@@ -114,10 +114,10 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/support'&&req.method==='GET')return json(200,store.support.view(session.id,url.searchParams.get('caseId'),true));
    if(route==='/api/case'&&req.method==='GET')return json(200,await service.caseInfo(session.id,url.searchParams.get('caseId')));
    if(route==='/api/operations'&&req.method==='GET')return json(200,{cases:store.listCases(session.id),graceMinutes:store.grace(session.id)});
-   if(route==='/api/workspace'&&req.method==='GET')return json(200,workspaceOverview(store.listCases(session.id),{preferences:store.preferences(session.id),reminders:store.support.reminders(session.id),followups:store.support.inbox(session.id),graceMinutes:store.grace(session.id)}));
+   if(route==='/api/workspace'&&req.method==='GET')return json(200,workspaceOverview(store.listCases(session.id),{preferences:store.preferences(session.id),reminders:store.support.reminders(session.id),followups:store.support.inbox(session.id),promises:store.support.promises(session.id),graceMinutes:store.grace(session.id)}));
    if(route==='/api/workspace/export'&&req.method==='GET'){
     if(!session.operator)return json(403,{error:'Unlock the operator session before exporting the queue.'});
-    const csv=workspaceCsv(workspaceOverview(store.listCases(session.id),{preferences:store.preferences(session.id),reminders:store.support.reminders(session.id),followups:store.support.inbox(session.id),graceMinutes:store.grace(session.id)}));
+    const csv=workspaceCsv(workspaceOverview(store.listCases(session.id),{preferences:store.preferences(session.id),reminders:store.support.reminders(session.id),followups:store.support.inbox(session.id),promises:store.support.promises(session.id),graceMinutes:store.grace(session.id)}));
     res.writeHead(200,{'Content-Type':'text/csv; charset=utf-8','Content-Disposition':'attachment; filename="paytrace-queue.csv"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(csv);
    }
    if(route==='/api/case/priority'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to manage case priority.'});return json(200,store.casePriority(session.id,url.searchParams.get('caseId')));}

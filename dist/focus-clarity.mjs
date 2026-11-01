@@ -2,6 +2,8 @@ import {crew,findings,reviewIsCurrent,evidenceSnapshot} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
 import {esc,when} from './customer-shared.mjs';
 import {mountPulse,mountPriority} from './workspace-widgets.mjs';
+import {detectIncident} from './intelligence-lab.mjs';
+import {decisionCardMarkup} from './decision-card.mjs';
 
 export function agentRunView(s){
  const run=s?.agentRun;if(!run)return null;
@@ -28,13 +30,15 @@ export function priorities(cases){return [
  {title:'Evidence needs attention',detail:'Resolve a gap before changing access',items:cases.filter(s=>['blocked','needs-evidence','stale','review-failed'].includes(s.phase)&&!s.job?.pending),tone:'purple'}
  ];}
 
-export function mountClarity(root,s,{cases=[],screen='cases',busy=false,uncertain=false}={}){
+export function mountClarity(root,s,{cases=[],screen='cases',busy=false,uncertain=false,operator=false}={}){
  if(!s){
   const overview=root.querySelector('.overview');if(screen!=='cases'||!overview)return;
   const section=document.createElement('section');section.className='clarity-priorities';section.setAttribute('aria-label','Recovery priorities');
-  section.innerHTML=priorities(cases).map(group=>`<button class="priority-card ${group.tone}" ${busy||!group.items.length?'disabled':''} ${group.items.length?`data-case="${esc(group.items[0].id)}"`:''}><span class="priority-number">${group.items.length}</span><span><strong>${group.title}</strong><small>${group.detail}</small><em>${group.items.length?'Open first case →':'No cases waiting here'}</em></span></button>`).join('');overview.after(section);mountPulse(root,{cases,backend:window.COURSELATCH_RUNTIME?.backend===true,busy,uncertain,onSelect:caseId=>root.dispatchEvent(new CustomEvent('paytrace-select-case',{detail:caseId}))});return;
+  section.innerHTML=priorities(cases).map(group=>`<button class="priority-card ${group.tone}" ${busy||!group.items.length?'disabled':''} ${group.items.length?`data-case="${esc(group.items[0].id)}"`:''}><span class="priority-number">${group.items.length}</span><span><strong>${group.title}</strong><small>${group.detail}</small><em>${group.items.length?'Open first case →':'No cases waiting here'}</em></span></button>`).join('');overview.after(section);mountPulse(root,{cases,backend:window.COURSELATCH_RUNTIME?.backend===true,busy,uncertain,operator,onSelect:caseId=>root.dispatchEvent(new CustomEvent('paytrace-select-case',{detail:caseId}))});
+  const incident=detectIncident(cases);if(incident.active){const banner=document.createElement('section');banner.className='merchant-incident';banner.setAttribute('role','status');banner.innerHTML=`<div><span class="eyebrow">POSSIBLE SHARED INCIDENT</span><h2>${incident.count} paid purchases are missing access.</h2><p>They involve the same course within 30 minutes. Automatic grants are paused; review each payment and entitlement before deciding what happened.</p></div><a class="button" href="intelligence.html">Inspect pattern →</a>`;root.querySelector('.desk-heading')?.after(banner);}return;
  }
  const head=root.querySelector('.sheet-head'),main=root.querySelector('.case-evidence-column');if(!head||!main)return;
+ const rail=root.querySelector('.case-decision-column');if(rail){const card=document.createElement('div');card.innerHTML=decisionCardMarkup(s,{uncertain});rail.prepend(card.firstElementChild);}
  mountPriority(root,s,{backend:window.COURSELATCH_RUNTIME?.backend===true,busy,uncertain});
  const handoff=caseHandoff(s,uncertain),banner=document.createElement('section');banner.className='clarity-handoff '+handoff.tone;
  const last=s.events?.at(-1);

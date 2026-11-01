@@ -2,12 +2,12 @@ import {mountReminderPanel} from './focus-actions.mjs';
 import {mountSupportPolish} from './support-polish.mjs';
 import {mountInbox,mountTimeline} from './communication-desk.mjs';
 import {esc,conversation,request} from './customer-shared.mjs';
-function mountUpdatePromise(panel,caseId,current){
+function mountUpdatePromise(root,panel,caseId,current){
  const form=document.createElement('form');form.className='customer-update-form';
- form.innerHTML=`<span class="eyebrow">CUSTOMER-VISIBLE UPDATE</span><h3>Tell them when to expect news.</h3><p>This time appears on the private customer page. It does not send a message or promise that access will be restored.</p><label for="customer-update-time">Next progress update</label><input id="customer-update-time" type="datetime-local" required><div class="support-actions"><button class="button primary" type="submit">Save update time</button><button class="button" type="button" data-clear-update>Clear time</button></div><p role="status"></p>`;
- panel.append(form);const input=form.querySelector('input'),status=form.querySelector('[role=status]');
- if(current){input.value=new Date(Date.parse(current)-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);status.textContent='Customer sees this update time.';}
- async function save(dueAt){form.querySelectorAll('button').forEach(b=>b.disabled=true);status.textContent='Saving update time…';try{const result=await request('/api/support/update-promise',{caseId,dueAt});status.textContent=result.nextUpdateAt?'Saved. The customer page now shows '+new Date(result.nextUpdateAt).toLocaleString()+'.':'Update time cleared from the customer page.';}catch(e){status.textContent=e.message;}finally{form.querySelectorAll('button').forEach(b=>b.disabled=false);}}
+ form.innerHTML=`<span class="eyebrow">CUSTOMER UPDATE PROMISE</span><h3>When will ${esc(root.querySelector('.case-customer strong')?.textContent||'the customer')} hear next?</h3><p>Owner: merchant · This time appears in the private customer case. It is a progress update, not a promise of restored access or an email delivery guarantee.</p><label for="customer-update-time">Next progress update</label><input id="customer-update-time" type="datetime-local" required><div class="support-actions"><button class="button primary" type="submit">Save update time</button><button class="button" type="button" data-clear-update>Clear time</button></div><p role="status"></p>`;
+ const rail=root.querySelector('.case-decision-column'),summary=rail?.querySelector('.summary');if(summary)summary.before(form);else panel.prepend(form);const input=form.querySelector('input'),status=form.querySelector('[role=status]');
+ if(current){input.value=new Date(Date.parse(current)-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);status.textContent='Next update: '+new Date(current).toLocaleString()+'.';}else status.textContent='No update time set yet.';
+ async function save(dueAt){form.querySelectorAll('button').forEach(b=>b.disabled=true);status.textContent='Saving update time…';try{const result=await request('/api/support/update-promise',{caseId,dueAt});status.textContent=result.nextUpdateAt?'Saved. Next customer-visible update: '+new Date(result.nextUpdateAt).toLocaleString()+'.':'Update time cleared from the customer page.';}catch(e){status.textContent=e.message;}finally{form.querySelectorAll('button').forEach(b=>b.disabled=false);}}
  form.onsubmit=e=>{e.preventDefault();const date=new Date(input.value);if(!Number.isFinite(date.valueOf())){status.textContent='Choose a valid time.';return;}save(date.toISOString());};
  form.querySelector('[data-clear-update]').onclick=()=>save(null);
 }
@@ -27,7 +27,7 @@ export function mountSupport(root,s,{backend,onSelect}){
  panel.querySelector('#support-link').onclick=()=>perform({action:'link'},r=>{const box=panel.querySelector('#support-link-result');box.textContent='Private link — share only with the verified purchaser: ';const a=document.createElement('a');a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=r.url;a.className='private-link';box.append(a);});
  panel.querySelector('#support-invite').onclick=()=>perform({action:'invite'},r=>feedback().textContent=r.message);
  panel.querySelector('#support-revoke').onclick=()=>perform({action:'revoke'});
- mountSupportPolish(panel,s,d);mountUpdatePromise(panel,s.id,d.nextUpdateAt);mountReminderPanel(root,d,()=>{});
+ mountSupportPolish(panel,s,d);mountUpdatePromise(root,panel,s.id,d.nextUpdateAt);mountReminderPanel(root,d,()=>{});
  }
  panel.innerHTML='<p role="status">Loading customer conversation…</p>';api().then(d=>{if(panel.isConnected)show(d);}).catch(e=>{panel.textContent='Customer conversation unavailable. '+e.message;const b=document.createElement('button');b.className='button';b.textContent='Retry conversation';b.onclick=()=>api().then(show).catch(e=>panel.firstChild.textContent=e.message);panel.append(b);});
 }
