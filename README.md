@@ -6,6 +6,8 @@ PayTrace Recover helps merchants resolve cases where a customer paid but didn’
 
 The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
 
+The [Recovery Passport](docs/RECOVERY-PASSPORT.md) gives merchants a source-linked case receipt and customers a private, simpler timeline. It separates payment, investigation, a recorded correction, current protected-lesson proof, buyer-browser receipt, and customer confirmation. A Render run appears with its saved stage states only when one actually exists.
+
 The [Merchant Connection Studio](docs/TRUSTED-STORE-INTAKE.md) lets an operator map a store's purchase JSON to PayTrace's trusted intake contract, preview the result, and activate the mapping only after a fresh matching PayPal sandbox capture. AI can suggest field names without seeing buyer or payment values. The store must still send events from its server; this is not a claim that an independent store is already connected.
 
 The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features; reporting candidates cannot authorize a course grant.

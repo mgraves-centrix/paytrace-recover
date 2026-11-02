@@ -26,7 +26,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
   const url=new URL(req.url,publicUrl);const route=url.pathname;
   res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
   if(publicUrl.protocol==='https:')res.setHeader('Strict-Transport-Security','max-age=31536000');
-  if(['/account.html','/recovery.html','/intelligence.html','/customer.html','/connection-studio.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  if(['/account.html','/recovery.html','/intelligence.html','/customer.html','/connection-studio.html','/passport.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(['/focus.html','/store-demo.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://www.paypal.com https://www.paypalobjects.com; connect-src 'self' https://www.paypal.com https://www.sandbox.paypal.com; frame-src https://www.paypal.com https://www.sandbox.paypal.com; style-src 'self' 'unsafe-inline' https://www.paypalobjects.com; img-src 'self' data: https://www.paypal.com https://www.paypalobjects.com; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(route==='/auth/config')return json(200,auth.config());
   if(route==='/auth/login'&&req.method==='GET'){
@@ -177,10 +177,11 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
     return json(200,disputePacket(s,customer));
    }
    if(route==='/api/connection-check'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session before testing configured connections.'});return json(200,await checkConnection(url.searchParams.get('kind'),env));}
-   const expectedCase=url.searchParams.get('caseId');if(['/api/draft','/api/receipt','/api/run-report','/api/lesson'].includes(route)&&expectedCase&&expectedCase!==session.state.id)return json(409,{error:'The selected case changed. Reopen it from the queue before continuing.'});
+   const expectedCase=url.searchParams.get('caseId');if(['/api/draft','/api/receipt','/api/run-report','/api/passport','/api/lesson'].includes(route)&&expectedCase&&expectedCase!==session.state.id)return json(409,{error:'The selected case changed. Reopen it from the queue before continuing.'});
    if(route==='/api/draft'&&req.method==='GET')return json(200,service.draft(session.id));
    if(route==='/api/receipt'&&req.method==='GET')return json(200,service.receipt(session.id));
    if(route==='/api/run-report'&&req.method==='GET')return json(200,service.runReport(session.id));
+   if(route==='/api/passport'&&req.method==='GET')return json(200,store.support.passport(session.id,session.state.id,true));
    if(route==='/api/lesson'&&req.method==='GET'){try{return json(200,await service.lesson(session.id))}catch{return json(403,{error:'Course access is locked.'})}}
    if(req.method!=='POST')return json(405,{error:'POST required.'});
    if(route==='/api/intake/key'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});const key=store.rotateIntakeKey(session.id);store.center.audit(session.id,{action:'store-intake.rotate-key',detail:'Previous store intake key revoked.'});return json(200,{key,notice:'Copy this key to the store server now. It is shown once and replaces the previous key.'});}
