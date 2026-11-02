@@ -40,7 +40,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    try{const token=await auth.complete({state:url.searchParams.get('state'),code:url.searchParams.get('code'),binding});res.setHeader('Set-Cookie',[auth.cookie('pt_account',token,28800),auth.cookie('pt_login','',0,'/auth')]);res.writeHead(302,{Location:'/account.html','Cache-Control':'no-store'});return res.end();}
    catch{res.setHeader('Set-Cookie',auth.cookie('pt_login','',0,'/auth'));return json(403,{error:'Verified sign-in did not complete. Start again with a fresh MFA login.'});}
   }
-  if(route==='/health')return json(200,{ok:true});
+  if(route==='/health'){try{const healthy=store.databaseCheck();return json(healthy?200:503,{ok:healthy})}catch{return json(503,{ok:false,error:'Database integrity check failed.'})}}
   if(route==='/api/paypal/webhook'){
    if(req.method!=='POST')return json(405,{error:'POST required.'});
    if(!env.PAYPAL_WEBHOOK_ID||!env.PAYPAL_CLIENT_ID||!env.PAYPAL_CLIENT_SECRET)return json(503,{error:'PayPal sandbox webhook is not configured.'});

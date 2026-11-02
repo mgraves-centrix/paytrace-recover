@@ -11,7 +11,9 @@ import {accountStore} from './account-store.mjs';
 export function openStore(file){
  if(file!==':memory:')mkdirSync(dirname(file),{recursive:true});
  const db=new DatabaseSync(file),locks=new Map();
- db.exec(`PRAGMA journal_mode=WAL;
+ // Azure App Service /home is shared storage. SQLite WAL requires a local filesystem.
+ const journal=file.startsWith('/home/')?'DELETE':'WAL';
+ db.exec(`PRAGMA journal_mode=${journal};
  CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, value TEXT NOT NULL, operator INTEGER NOT NULL DEFAULT 0, updated INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS cases (owner TEXT NOT NULL, id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,id));
  CREATE TABLE IF NOT EXISTS monitor_settings (owner TEXT PRIMARY KEY, grace INTEGER NOT NULL DEFAULT 5);
