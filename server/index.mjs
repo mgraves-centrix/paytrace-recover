@@ -11,6 +11,7 @@ import {incidentDetective} from '../dist/access-assurance.mjs';
 import {analyzeIncident} from './incident-analysis.mjs';
 import {discoverPurchases} from './paypal-discovery.mjs';
 import {demoStore} from './demo-store.mjs';
+import {autonomyOverview} from './autonomy-overview.mjs';
 import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {timingSafeEqual} from 'node:crypto';import {openStore} from './store.mjs';import {createService} from './service.mjs';
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../dist');
 export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./data/courselatch.sqlite'),options={}){
@@ -119,6 +120,17 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/history'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view case history.'});return json(200,{items:store.center.timeline(session.id,url.searchParams.get('caseId'))});}
    if(route==='/api/prioritization'&&req.method==='GET')return json(200,await prioritize(store.listCases(session.id),{env,fetcher:options.fetcher||fetch}));
    if(route==='/api/automation'&&req.method==='GET')return json(200,store.center.settings(session.id));
+   if(route==='/api/autonomy'&&req.method==='GET'){
+    const saved=store.autopilot(session.id),simulate=url.searchParams.has('simulate');
+    let policy=saved;
+    if(simulate){
+     const amount=Number(url.searchParams.get('maxAmountCents')),limit=Number(url.searchParams.get('dailyLimit'));
+     if(!Number.isInteger(amount)||amount<1||amount>50000||!Number.isInteger(limit)||limit<1||limit>10)return json(400,{error:'Choose an amount from 1 to 50000 cents and a daily limit from 1 to 10.'});
+     policy={...saved,enabled:url.searchParams.get('enabled')==='true',maxAmountCents:amount,dailyLimit:limit};
+    }
+    const worker=store.durable.status('worker'),backup=store.durable.status('backup');
+    return json(200,{...autonomyOverview(store.listCases(session.id),policy,{ready:service.autopilotReady(),workflows:!!(env.RENDER_API_KEY&&env.WORKFLOW_SECRET&&env.RENDER_INVESTIGATE_TASK&&env.RENDER_RECOVER_TASK),backup,database:store.databaseCheck(),worker:!!worker&&Date.now()-Date.parse(worker.at)<150000}),simulated:simulate});
+   }
    if(route==='/api/audit'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view audit records.'});return json(200,store.center.auditLog(session.id,Object.fromEntries(url.searchParams)));}
    if(route==='/api/providers'&&req.method==='GET')return json(200,{paypal:{configured:!!(env.PAYPAL_CLIENT_ID&&env.PAYPAL_CLIENT_SECRET),webhookConfigured:!!env.PAYPAL_WEBHOOK_ID}});
    if(route==='/api/operations/status'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view operations.'});const worker=store.durable.status('worker'),backup=store.durable.status('backup');return json(200,{database:store.databaseCheck(),worker:{running:!!worker&&Date.now()-Date.parse(worker.at)<150000,lastRun:worker?.at||null},backup,liveAcceptance:{verified:false,reason:'Connected acceptance has not been recorded.'},authentication:{configured:auth.configured,mfaRequired:auth.config().requireMfa},courseConnector:!!(env.COURSE_ACCESS_URL&&env.COURSE_ACCESS_API_KEY),audit:{keyed:!!env.AUDIT_HMAC_KEY,checkpoint:null},deployment:auth.required?'Verified merchant mode. Connected sandbox acceptance is still pending.':'Sandbox demonstration. Production identity and connected acceptance are pending.',jobs:store.durable.jobs().filter(job=>!job.owner||job.owner===session.id),events:store.durable.events()});}
