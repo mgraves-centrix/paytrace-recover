@@ -38,9 +38,11 @@ Reference: [OpenAI Structured Outputs](https://developers.openai.com/api/docs/gu
 
 ## 4. Render web service
 
-Connect Render to the public [PayTrace Recover repository](https://github.com/sagitta414/paytrace-recover). The supplied `render.yaml` describes one Node web service and persistent disk. Review Render's current costs before creating resources; no Render service was created by this build.
+Connect Render to the public [PayTrace Recover repository](https://github.com/sagitta414/paytrace-recover). The supplied `render.yaml` describes an optional second Node web service and persistent disk. Review Render's current costs before creating resources. The Azure-hosted demo does not require this web service.
 
 Use build command `npm ci`, start command `npm start`, Node 24+, and `DATABASE_PATH=/var/data/courselatch.sqlite`. Set `PUBLIC_URL` to the web service's exact HTTPS URL. Configure secrets through Render's environment settings. Keep one web instance because the SQLite database and session lock are local to it.
+
+**Startup error: `Verified sign-in is required. Configure OIDC_ISSUER and OIDC_CLIENT_ID.`** Render sets `NODE_ENV=production` for Node services at runtime. PayTrace intentionally fails closed in that mode until a verified OIDC provider with MFA is configured. The preceding `.env not found` message is informational: Render environment variables do not require a checked-in `.env` file. If you are keeping the Azure web app, use the Workflow-only Blueprint in section 5 instead of deploying this extra web service. If you intentionally want a separate production Render web app, configure `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `AUTH_REQUIRED=true`, `OIDC_REQUIRE_MFA=true`, an exact HTTPS `PUBLIC_URL`, and the provider's `/auth/callback` redirect before redeploying. Do not turn off production authentication merely to clear the startup error.
 
 ## 5. Render Workflows
 
