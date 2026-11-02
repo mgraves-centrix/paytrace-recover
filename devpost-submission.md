@@ -59,7 +59,7 @@ Security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3 (th
 
 ## Demo Video
 
-TODO: Record a short video. Suggested sequence: buyer sees a locked lesson after payment; merchant opens the case and checks PayPal/course evidence; four specialists explain their recommendation; merchant approves one narrow grant; protected lesson opens; customer sees the update and confirms. Show the run report's connected/demo labels and avoid implying Render ran until a real Workflow run is captured.
+TODO: Record a video under three minutes, upload it publicly to YouTube, and put its URL in the submission form. Show the product functioning in a browser. Suggested sequence: buyer sees a locked lesson after payment; merchant opens the case and checks PayPal/course evidence; four specialists explain their recommendation; merchant approves one narrow grant; protected lesson opens; customer sees the update and confirms. Show the run report's connected/demo labels and avoid implying Render ran until a real Workflow run is captured. Use only media and marks you have permission to include.
 
 ## Screenshot Shot List
 
@@ -81,6 +81,6 @@ The code-level security fixes have a green PR and the paired Azure apps were upd
 - Current all-files coverage is about 87% lines and 82% branches, below the 90% review target.
 - The public merchant workspace is a sandbox demo; verified merchant OIDC and a commercial LMS integration are not configured.
 
-## TODO Official Form Fields
+## Official Submission Check
 
-The official Devpost form and current event requirements have not been checked through the Devpost connection in this project. Add exact required fields, video URL, final screenshots, team information, and any requested Codex session ID after checking the live form. Do not present this draft as a submitted entry.
+The [event overview](https://paypalaihackathon.devpost.com/) and [official rules](https://paypalaihackathon.devpost.com/rules) list a deadline of **November 12, 2026 at 12:00 p.m. Pacific**. The entry needs a functional demo or complete local run instructions, a public open-source repository with source and license, a text description explaining features and tools, and a public YouTube demo video under three minutes. This repository has an MIT `LICENSE`, source, and local run instructions; the hosted demo is live. The video and complete connected recovery recording are still outstanding. Confirm the form's exact fields, team information, and any sponsor-specific requirements in Devpost before submitting. This is a draft, not a submitted entry.
