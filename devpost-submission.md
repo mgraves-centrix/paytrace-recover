@@ -44,7 +44,7 @@ The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-in
 1. Open the [judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) and follow the labeled fictional sample.
 2. Open the [merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html). The Connections view shows which providers are configured; configuration is not an end-to-end pass.
 3. For a connected test, create a sandbox case, complete a PayPal sandbox buyer checkout, run investigation, inspect the cited findings, rehearse and approve the exact grant, apply it, then verify the protected lesson. Download the run report and open the private customer tracker.
-4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The latest branch passed 282 automated tests; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
+4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The latest branch passed 288 automated tests; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
 5. Run `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/` to check public routes and provider configuration. It does not prove a checkout or grant.
 
 ## Public Demo Link
