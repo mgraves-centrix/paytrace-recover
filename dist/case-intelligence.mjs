@@ -1,6 +1,7 @@
 import {checks,crew,reviewIsCurrent} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
 import {detectIncident} from './intelligence-lab.mjs';
+import {mountMerchantPromise,refreshMerchantPromise} from './access-assurance-ui.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const time=value=>value&&Number.isFinite(Date.parse(value))?new Date(value).toLocaleString():'Not recorded';
@@ -61,9 +62,10 @@ export function mountCaseIntelligence(root,s,{cases=[],backend=false}={}){
  const scope=incidentScope(cases);
  if(!s){if(!scope.active)return;const old=root.querySelector('.merchant-incident');const panel=document.createElement('section');panel.className='ci-incident';panel.setAttribute('aria-label','Shared incident scope');panel.innerHTML=incidentMarkup(scope);if(old)old.replaceWith(panel);else root.querySelector('.desk-heading')?.after(panel);return;}
  const main=root.querySelector('.case-evidence-column'),heading=main?.querySelector('.case-column-title');if(!main||!heading)return;
+ mountMerchantPromise(root,s);
  const flight=document.createElement('div');flight.className='ci-flight-mount';flight.innerHTML=flightMarkup(flightRecorderModel(s));heading.after(flight);
  const disagreement=disagreementModel(s),panel=document.createElement('details');panel.className='ci-disagreement'+(disagreement.open.length?' has-open':'');panel.setAttribute('aria-label','Specialist challenges and disagreements');if(disagreement.open.length)panel.open=true;panel.innerHTML=`<summary><span><span class="eyebrow">AGENT CHALLENGE ROOM</span><strong>${disagreement.open.length?'Resolve the open challenge before acting':'Inspect specialist challenges'}</strong><small>${disagreement.mode==='model'?'AI-assisted review':disagreement.mode==='scripted'?'Scripted demo review':'Awaiting review'} · ${disagreement.open.length} open</small></span><span aria-hidden="true">+</span></summary><div class="ci-disagreement-body"><p>A cited source identifies a saved record; it does not prove every conclusion.</p>${challengeMarkup(disagreement)}</div>`;flight.after(panel);
  if(scope.active&&scope.caseIds.includes(s.id)){const incident=document.createElement('details');incident.className='ci-incident ci-incident-case';incident.innerHTML=`<summary>Possible shared incident · ${scope.count} purchases</summary>${incidentMarkup(scope,s.id)}`;panel.after(incident);}
 }
 
-export function refreshFlightRecorder(root,s,support){const mount=root.querySelector('.ci-flight-mount');if(mount)mount.innerHTML=flightMarkup(flightRecorderModel(s,support),!!mount.querySelector('.ci-flight')?.open);}
+export function refreshFlightRecorder(root,s,support){const mount=root.querySelector('.ci-flight-mount');if(mount)mount.innerHTML=flightMarkup(flightRecorderModel(s,support),!!mount.querySelector('.ci-flight')?.open);refreshMerchantPromise(root,support);}

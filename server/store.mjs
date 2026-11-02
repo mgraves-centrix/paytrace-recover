@@ -11,7 +11,9 @@ import {accountStore} from './account-store.mjs';
 export function openStore(file){
  if(file!==':memory:')mkdirSync(dirname(file),{recursive:true});
  const db=new DatabaseSync(file),locks=new Map();
- db.exec(`PRAGMA journal_mode=WAL;
+ // Azure App Service /home is shared storage. SQLite WAL requires a local filesystem.
+ const journal=file.startsWith('/home/')?'DELETE':'WAL';
+ db.exec(`PRAGMA journal_mode=${journal};
  CREATE TABLE IF NOT EXISTS sessions (id TEXT PRIMARY KEY, value TEXT NOT NULL, operator INTEGER NOT NULL DEFAULT 0, updated INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS cases (owner TEXT NOT NULL, id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,id));
  CREATE TABLE IF NOT EXISTS monitor_settings (owner TEXT PRIMARY KEY, grace INTEGER NOT NULL DEFAULT 5);
@@ -22,7 +24,10 @@ export function openStore(file){
  CREATE TABLE IF NOT EXISTS paypal_webhook_events (id TEXT PRIMARY KEY, owner TEXT NOT NULL, case_id TEXT NOT NULL, processed_at TEXT NOT NULL);`);
  db.exec(`CREATE TABLE IF NOT EXISTS demo_workspaces (owner TEXT PRIMARY KEY, created INTEGER NOT NULL);
  CREATE TABLE IF NOT EXISTS demo_creation_limits (key TEXT NOT NULL, bucket INTEGER NOT NULL, count INTEGER NOT NULL, PRIMARY KEY(key,bucket));
- CREATE TABLE IF NOT EXISTS access_intents (owner TEXT NOT NULL, case_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,case_id));`);
+ CREATE TABLE IF NOT EXISTS access_intents (owner TEXT NOT NULL, case_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,case_id));
+ CREATE TABLE IF NOT EXISTS trusted_intake_keys (owner TEXT PRIMARY KEY, digest TEXT NOT NULL, created_at TEXT NOT NULL);
+ CREATE TABLE IF NOT EXISTS connector_mappings (owner TEXT PRIMARY KEY, value TEXT NOT NULL, revision INTEGER NOT NULL, active INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, activated_at TEXT);
+ CREATE TABLE IF NOT EXISTS demo_store_checkouts (owner TEXT NOT NULL, request_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,request_id));`);
  db.exec('CREATE TABLE IF NOT EXISTS case_preferences (owner TEXT NOT NULL,case_id TEXT NOT NULL,priority TEXT NOT NULL,revision INTEGER NOT NULL,updated TEXT NOT NULL,PRIMARY KEY(owner,case_id));');
  try{db.exec("ALTER TABLE sessions ADD COLUMN mode TEXT NOT NULL DEFAULT 'demo'")}catch(e){if(!/duplicate column name/.test(e.message))throw e;}
  db.exec('PRAGMA busy_timeout=5000');
@@ -39,7 +44,7 @@ export function openStore(file){
   if(!a||s.paymentHold||!canOpenLesson(s)||learner!==s.order.userId||course!==s.order.courseId||a.learner!==learner||a.course!==course||a.capture!==s.capture.id)throw Error('Course access is locked or belongs to another learner.');
   return {accessible:true,userId:learner,courseId:course,captureId:a.capture,contentId:'light-lesson-01',lesson:'See the light',title:'Find the light before the frame.',body:'Find a window with soft, indirect daylight. Place an everyday object beside it. Make three frames: facing the light, beside it, and against it.'};
  }
- const support=customerSupport(db,{caseById,content});
+ const support=customerSupport(db,{caseById,content,grace:owner=>db.prepare('SELECT grace FROM monitor_settings WHERE owner=?').get(owner)?.grace||5});
  const durable=durability(db);
  const center=recoveryCenter(db,{getCase:caseById,listCases,support,grace:owner=>db.prepare('SELECT grace FROM monitor_settings WHERE owner=?').get(owner)?.grace||5});
  function create(){const id=randomUUID(),state=simulatePayment(createCase('match','CL-'+randomUUID().slice(0,12)));db.prepare("INSERT INTO sessions(id,value,operator,updated,mode) VALUES (?,?,0,?,'demo')").run(id,put(state),Date.now());init(id);return {id,state,operator:false};}
@@ -60,6 +65,14 @@ export function openStore(file){
   backupTo:destination=>backup(db,destination),
   databaseCheck:()=>db.prepare('PRAGMA quick_check').get().quick_check==='ok',
   create,createPublicDemo,get,save,saveCase:savePortfolioCase,listCases,caseById,
+  intakeKeyStatus(owner){return {configured:!!db.prepare('SELECT 1 FROM trusted_intake_keys WHERE owner=?').get(owner)};},
+  rotateIntakeKey(owner){if(!get(owner))throw Error('Workspace not found.');const key=randomBytes(32).toString('base64url');db.prepare('INSERT INTO trusted_intake_keys VALUES (?,?,?) ON CONFLICT(owner) DO UPDATE SET digest=excluded.digest,created_at=excluded.created_at').run(owner,hash(key),new Date().toISOString());return key;},
+  intakeOwner(key){if(typeof key!=='string'||!/^[A-Za-z0-9_-]{43}$/.test(key))return null;return db.prepare('SELECT owner FROM trusted_intake_keys WHERE digest=?').get(hash(key))?.owner||null;},
+  connectorMapping(owner){if(!get(owner))throw Error('Workspace not found.');const row=db.prepare('SELECT value,revision,active,updated_at AS updatedAt,activated_at AS activatedAt FROM connector_mappings WHERE owner=?').get(owner);return row?{mapping:JSON.parse(row.value),revision:row.revision,active:!!row.active,updatedAt:row.updatedAt,activatedAt:row.activatedAt}:{mapping:null,revision:0,active:false,updatedAt:null,activatedAt:null};},
+  saveConnectorMapping(owner,mapping,expectedRevision){durable.guard(owner);const current=this.connectorMapping(owner);if(!Number.isInteger(expectedRevision)||current.revision!==expectedRevision){const e=Error('The mapping changed in another tab. Reload before saving.');e.status=409;throw e;}const at=new Date().toISOString();db.prepare('INSERT INTO connector_mappings VALUES (?,?,?,0,?,NULL) ON CONFLICT(owner) DO UPDATE SET value=excluded.value,revision=excluded.revision,active=0,updated_at=excluded.updated_at,activated_at=NULL').run(owner,put(mapping),current.revision+1,at);return this.connectorMapping(owner);},
+  activateConnectorMapping(owner,expectedRevision){durable.guard(owner);const current=this.connectorMapping(owner);if(!current.mapping||current.revision!==expectedRevision){const e=Error('The mapping changed during the PayPal check. Reload and verify again.');e.status=409;throw e;}db.prepare('UPDATE connector_mappings SET active=1,activated_at=? WHERE owner=? AND revision=?').run(new Date().toISOString(),owner,expectedRevision);return this.connectorMapping(owner);},
+  demoCheckout(owner,requestId){const row=db.prepare('SELECT value FROM demo_store_checkouts WHERE owner=? AND request_id=?').get(owner,requestId);return row?JSON.parse(row.value):null;},
+  saveDemoCheckout(owner,requestId,value){durable.guard(owner);db.prepare('INSERT INTO demo_store_checkouts VALUES (?,?,?) ON CONFLICT(owner,request_id) DO UPDATE SET value=excluded.value').run(owner,requestId,put(value));},
   accessIntent(owner,caseId){const row=db.prepare('SELECT value FROM access_intents WHERE owner=? AND case_id=?').get(owner,caseId);return row?JSON.parse(row.value):null;},
   saveAccessIntent(owner,caseId,value){durable.guard(owner);caseById(owner,caseId);db.prepare('INSERT INTO access_intents VALUES (?,?,?) ON CONFLICT(owner,case_id) DO UPDATE SET value=excluded.value').run(owner,caseId,put(value));},
   readAccess(owner,s){caseById(owner,s.id);const a=db.prepare('SELECT * FROM course_access WHERE owner=? AND case_id=?').get(owner,s.id);return a?{userId:a.learner,courseId:a.course,active:true,captureId:a.capture}:{userId:s.order.userId,courseId:s.order.courseId,active:false,captureId:null};},

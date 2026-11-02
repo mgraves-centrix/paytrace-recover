@@ -1,0 +1,12 @@
+import {accessPromise} from './access-assurance.mjs';
+
+const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const date=value=>value?new Date(value).toLocaleString():'Not set';
+const tone=state=>['overdue','identity-review','payment-hold'].includes(state)?'attention':['buyer-browser-reached','customer-confirmed'].includes(state)?'success':'neutral';
+export function promiseMarkup(model,{customer=false}={}){
+ const deadline=model.deadlineAt?`<span><b>Target</b>${esc(date(model.deadlineAt))}</span>`:'';
+ return `<section class="access-promise ${tone(model.state)}" aria-label="Payment to access promise"><span class="${customer?'customer-eyebrow':'eyebrow'}">PAYMENT → ACCESS PROMISE</span><div class="access-promise-main"><div><h2>${esc(model.state==='overdue'?'Access needs attention':model.state==='buyer-browser-reached'?'Lesson reached your browser':model.state==='customer-confirmed'?'Access confirmed':model.state==='technical-proof'?'Technical check passed':'Tracking the access outcome')}</h2><p>${esc(model.explanation)}</p></div><strong class="access-promise-state">${esc(model.state.replaceAll('-',' '))}</strong></div><div class="access-promise-points"><span><b>Source</b>${model.source==='sample'?'Sample story':'PayPal sandbox case'}</span>${deadline}<span><b>Technical proof</b>${model.technicalProofAt?esc(date(model.technicalProofAt)):'Not current'}</span><span><b>Buyer browser</b>${model.browserProofAt?esc(date(model.browserProofAt)):'Not checked'}</span></div><small>Based on saved case records. This target is a monitoring window, not a payment guarantee. A browser receipt does not replace customer confirmation.</small></section>`;
+}
+export function mountCustomerPromise(root,view){const hero=root.querySelector('.customer-hero');if(hero&&view.accessPromise)hero.insertAdjacentHTML('afterend',promiseMarkup(view.accessPromise,{customer:true}));}
+export function mountMerchantPromise(root,s){const target=root.querySelector('.case-evidence-column');if(!target)return;const model=accessPromise(s,{graceMinutes:s.monitor?.graceMinutes||5});target.insertAdjacentHTML('afterbegin',promiseMarkup(model));}
+export function refreshMerchantPromise(root,view){const panel=root.querySelector('.case-evidence-column .access-promise');if(panel&&view?.accessPromise)panel.outerHTML=promiseMarkup(view.accessPromise);}

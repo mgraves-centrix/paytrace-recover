@@ -6,7 +6,11 @@ PayTrace Recover helps merchants resolve cases where a customer paid but didn’
 
 The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
 
-The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features on the integration branch; reporting candidates cannot authorize a course grant.
+The [Recovery Passport](docs/RECOVERY-PASSPORT.md) gives merchants a source-linked case receipt and customers a private, simpler timeline. It separates payment, investigation, a recorded correction, current protected-lesson proof, buyer-browser receipt, and customer confirmation. A Render run appears with its saved stage states only when one actually exists.
+
+The [Merchant Connection Studio](docs/TRUSTED-STORE-INTAKE.md) lets an operator map a store's purchase JSON to PayTrace's trusted intake contract, preview the result, and activate the mapping only after a fresh matching PayPal sandbox capture. AI can suggest field names without seeing buyer or payment values. The store must still send events from its server; this is not a claim that an independent store is already connected.
+
+The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features; reporting candidates cannot authorize a course grant.
 
 The local presentation route is `/` → `/story.html` → `/focus.html?from=story` → a private customer case link. The guided story and merchant workspace are separate examples, so their case state does not transfer. In the browser demo, the handoff opens Maya's seeded Focus case; on the server, it opens the merchant's own case queue. See the [screen-by-screen story](docs/DEMO-STORY.md).
 
@@ -29,6 +33,8 @@ The guided story now hands viewers into the merchant workspace. The judge page s
 The [focused recovery experience](docs/TODAY-EXPERIENCE.md) brings decisions, waiting customers, and unfinished verification into a simple Today view; adds a merchant decision brief and customer-visible update time; flags possible shared incidents; and includes an [interactive fictional walkthrough](dist/demo.html) from purchase to customer confirmation. The walkthrough is a sample, while connected outcomes still require the run report.
 
 The case desk now adds an [agent challenge room, recovery flight recorder, and incident scope](docs/CASE-INTELLIGENCE.md). They expose saved objections and source records, separate payment, approval, access write, lesson proof, and customer confirmation, and show which sandbox cases form a possible shared incident. These views explain existing evidence; they do not authorize a grant or prove a shared root cause.
+
+The [access assurance layer](docs/ACCESS-ASSURANCE.md) adds a private buyer-browser receipt for the protected lesson, a visible PayPal-payment-to-access delivery target, and an incident detective that refreshes source checks and optionally adds cited AI perspectives. Browser receipt, technical proof, and customer confirmation remain separate facts. Incident checks are read-only and do not approve a batch grant.
 
 The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
 
@@ -57,6 +63,11 @@ Open http://127.0.0.1:4358. It works without credentials in server-demo mode. To
 See [integration setup](docs/SETUP.md), [product scope](docs/PRODUCT.md), [demo script](docs/DEMO_SCRIPT.md), and [seller research kit](docs/SELLER_RESEARCH.md).
 
 The [development plan](docs/DEVELOPMENT_PLAN.md) sequences the Render and AG Studio build, live integration checks, and the later merchant pilot.
+
+The Recovery Center now includes **Autonomy control**. It explains each case's next step and the current database, worker, connection, restore-probe, and Render signals. Its policy simulator is read-only: changing the amount, daily limit, or enabled toggle in that screen does not save a policy, call PayPal, or grant access. The merchant sets a real policy in Focus → Connections. A completed sandbox capture from the demo store or trusted store intake queues a scan; the durable worker watches the delivery window, refreshes provider evidence, and runs AI analysis. A policy-eligible case can receive one bounded repair after fresh checks and a saved preview. A payment hold, incident, uncertain write, or failed verification cannot trigger a repeat grant. Customer progress messages are emitted when the case reaches review, completed evidence review, access-write verification, or verified access; email delivery remains a separate observable attempt.
+
+This is an operating view, not a claim that all connected services passed acceptance. The existing six-signal run report remains the source of truth for a connected demonstration. Render Workflows and encrypted backup/restore must show as configured and tested before describing them as live. See [Connected demo checklist](docs/CONNECTED-DEMO.md) for setup and proof steps.
+The Azure backup helper at `scripts/configure-azure-backups.ps1` creates a private encryption key only when none exists and places encrypted backups under `/home/data/backups`. The worker runs a restore probe with each backup. That path is on the same App Service storage as the demo database, so an independent off-site copy is still needed for disaster recovery.
 
 The [integration decisions](docs/INTEGRATION-DECISIONS.md) describe the Darius work brought into this branch and the chosen merchant-identity and course-connector boundaries. The [Recovery Center](docs/RECOVERY-CENTER.md) adds analytics, verification receipts, alerts, follow-up automation, audit records, and scoped team access. The [release-candidate runbook](docs/RELEASE-CANDIDATE.md) covers verified sign-in and connected acceptance.
 
