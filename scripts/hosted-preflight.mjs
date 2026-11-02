@@ -15,7 +15,7 @@ async function get(path){
  }catch(error){console.log(`${path}: unavailable (${error.name==='TimeoutError'?'timeout':'request failed'})`);passed=false;return null;}
 }
 
-const paths=['/health','/judge.html','/focus.html','/recovery.html','/account.html','/customer.html','/runtime.js'];
+const paths=['/health','/judge.html','/focus.html','/store-demo.html','/recovery.html','/account.html','/customer.html','/runtime.js'];
 const responses=await Promise.all(paths.map(get));
 const runtime=responses.at(-1);
 if(runtime){

@@ -2,6 +2,10 @@
 
 PayTrace Recover can open a case when a store reports a captured PayPal sandbox purchase for the reference digital course. The store provides the buyer-to-course mapping; PayTrace independently rereads the PayPal order and capture before accepting the payment as complete. Intake creates a case and queues investigation. It does **not** grant access or bypass the existing approval and verification rules.
 
+## Try the merchant-operated demo store
+
+Open **Connections → Run demo store checkout**, or visit `/store-demo.html`. Unlock merchant controls, enter a fictional buyer name and a test inbox, then use a **PayPal sandbox buyer account** to approve the $128.00 checkout. The app creates a stable case ID in the PayPal order, captures the approved order, and passes the purchase mapping through the same trusted intake service used by the external-store endpoint. After PayTrace rereads the sandbox capture, the new case opens in the recovery desk. A canceled or pending checkout creates no case; retries use the saved order. This storefront is a simulator hosted inside PayTrace, not evidence that an independent merchant store has been integrated.
+
 ## Set up
 
 1. Open **Connections** in the merchant workspace and unlock merchant controls.
