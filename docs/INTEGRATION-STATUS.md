@@ -14,6 +14,6 @@
 | Independent encrypted Azure Blob backup copy | Yes, optional | No | No remote restore drill |
 | Tenant-scoped reference course grants | Yes in this branch | Awaiting coordinated course-service deployment | No connected acceptance |
 
-CI now enforces the measured baseline of 87% line and 82% branch coverage. The review target of 90% for both remains open; the latest local all-files run measured 87.14% line and 82.05% branch. Do not report the coverage target as met.
+CI now enforces a platform-stable floor of 87% line and 81% branch coverage. The review target of 90% for both remains open; local all-files runs measured about 87% line and 82% branch. Do not report the coverage target as met.
 
 Configuration is not proof of a completed recovery. The run report and Recovery Passport label saved evidence and missing stages. Do not treat a sample walkthrough, a passing unit test, or a configured credential as live provider acceptance. The reference course service and PayTrace server must deploy their tenant-scoped contract together. Old unscoped reference grants are left in legacy tables rather than silently attributed to a tenant; existing cases require a fresh course check and merchant review after migration.

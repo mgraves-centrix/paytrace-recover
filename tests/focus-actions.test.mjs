@@ -26,6 +26,16 @@ test('course connection check reads a new entitlement without granting access',a
  const result=await checkConnection('access',env,fetcher);assert.equal(result.state,'connected');assert.deepEqual(paths,['/v1/access/check']);assert.ok(!JSON.stringify(result).includes('private-test-key'));
  const denied=await checkConnection('access',env,async()=>({ok:false,status:401}));assert.equal(denied.state,'failed');
 });
+test('connection checks fail closed when a configured provider is unavailable or returns unexpected access',async()=>{
+ const env={COURSE_ACCESS_URL:'https://course.example.test/',COURSE_ACCESS_API_KEY:'private-test-key'};
+ const unexpected=await checkConnection('access',env,async(_url,options)=>{const body=JSON.parse(options.body);return {ok:true,status:200,json:async()=>({tenantId:body.tenantId,userId:body.userId,courseId:body.courseId,active:true,captureId:'other'})};});
+ assert.equal(unexpected.state,'failed');
+ const offline=await checkConnection('access',env,async()=>{throw Error('offline')});
+ assert.equal(offline.state,'unavailable');
+ const render=await checkConnection('render',{RENDER_API_KEY:'test',RENDER_INVESTIGATE_TASK:'investigate',RENDER_RECOVER_TASK:'recover',WORKFLOW_SECRET:'test'},async()=>({status:503}));
+ assert.equal(render.state,'failed');
+ assert.equal((await checkConnection('unknown',{},async()=>{throw Error('must not call')})).state,'failed');
+});
 test('connection check HTTP requires operator and reminder writes require matching origin',async()=>{
  const db=openStore(':memory:'),app=createApp({PUBLIC_URL:'http://localhost'},db);await new Promise(r=>app.server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+app.server.address().port;
  try{const state=await fetch(base+'/api/state'),cookie=state.headers.get('set-cookie').split(';')[0],body=await state.json();const check=await fetch(base+'/api/connection-check?kind=paypal',{headers:{Cookie:cookie}});assert.equal(check.status,403);
