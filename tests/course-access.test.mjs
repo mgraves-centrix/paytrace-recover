@@ -80,20 +80,20 @@ test('HTTP adapter pins identities and reuses a stable grant idempotency key', a
     calls.push({url:String(url),headers:options.headers,body:JSON.parse(options.body)});
     const x=JSON.parse(options.body);
     if(String(url).endsWith('/grants'))active=true;
-    if(String(url).endsWith('/lesson-probe'))return Response.json({accessible:active,userId:x.userId,courseId:x.courseId,captureId:x.captureId,contentId:'light-lesson-01',body:'Protected lesson content from another service.'});
-    return Response.json({userId:x.userId,courseId:x.courseId,active,captureId:active?x.captureId:null});
+    if(String(url).endsWith('/lesson-probe'))return Response.json({accessible:active,tenantId:x.tenantId,userId:x.userId,courseId:x.courseId,captureId:x.captureId,contentId:'light-lesson-01',body:'Protected lesson content from another service.'});
+    return Response.json({tenantId:x.tenantId,userId:x.userId,courseId:x.courseId,active,captureId:active?x.captureId:null});
   };
   const client=courseAccessClient({COURSE_ACCESS_URL:'https://courses.example/v1/../',COURSE_ACCESS_API_KEY:'test-key'},fetcher);
   const s={id:'CL-1',order:{userId:'learner-1',courseId:'course-1'},capture:{id:'CAP-1',status:'COMPLETED',source:'paypal-sandbox'}};
-  assert.equal((await client.check(s)).active,false);
-  assert.equal((await client.grant(s)).active,true);
-  assert.equal((await client.probe(s)).accessible,true);
+  assert.equal((await client.check(s,'tenant-a')).active,false);
+  assert.equal((await client.grant(s,undefined,'tenant-a')).active,true);
+  assert.equal((await client.probe(s,'tenant-a')).accessible,true);
   assert.equal(calls[1].headers['Idempotency-Key'],'paytrace:CL-1:CAP-1');
   assert.equal(calls[1].headers.Authorization,'Bearer test-key');
   assert.equal(calls[1].body.userId,'learner-1');
   assert.throws(()=>courseAccessClient({COURSE_ACCESS_URL:'http://courses.example',COURSE_ACCESS_API_KEY:'secret'}),/HTTPS/);
   const wrong=courseAccessClient({COURSE_ACCESS_URL:'https://courses.example',COURSE_ACCESS_API_KEY:'secret'},async()=>Response.json({userId:'other',courseId:'course-1',active:true,captureId:'CAP-1'}));
-  await assert.rejects(wrong.check(s),/mismatched/);
+  await assert.rejects(wrong.check(s,'tenant-a'),/mismatched/);
 });
 
 test('reference course service stores one independent grant and protects lesson content', async () => {
@@ -103,19 +103,21 @@ test('reference course service stores one independent grant and protects lesson 
     const url=`http://127.0.0.1:${server.address().port}`;
     const client=courseAccessClient({COURSE_ACCESS_URL:url,COURSE_ACCESS_API_KEY:'local-private-test-key'});
     const s={id:'CL-case',order:{userId:'learner-1',courseId:'course-1'},capture:{id:'CAP-1',status:'COMPLETED',source:'paypal-sandbox'}};
-    assert.equal((await client.check(s)).active,false);
-    await assert.rejects(client.probe(s),/HTTP 403/);
-    await client.grant(s);await client.grant(s);
-    assert.equal((await client.check(s)).active,true);
-    assert.equal((await client.probe(s)).accessible,true);
+    assert.equal((await client.check(s,'tenant-a')).active,false);
+    await assert.rejects(client.probe(s,'tenant-a'),/HTTP 403/);
+    await client.grant(s,undefined,'tenant-a');await client.grant(s,undefined,'tenant-a');
+    assert.equal((await client.check(s,'tenant-a')).active,true);
+    assert.equal((await client.probe(s,'tenant-a')).accessible,true);
     const refunded={...s,capture:{...s.capture,status:'REFUNDED'}};
-    assert.equal((await client.suspend(refunded)).active,false);
-    assert.equal((await client.suspend(refunded)).active,false);
-    assert.equal((await client.check(s)).active,false);
-    await assert.rejects(client.probe(s),/HTTP 403/);
-    await assert.rejects(client.grant(s),/HTTP 409/);
+    assert.equal((await client.suspend(refunded,undefined,'tenant-a')).active,false);
+    assert.equal((await client.suspend(refunded,undefined,'tenant-a')).active,false);
+    assert.equal((await client.check(s,'tenant-a')).active,false);
+    await assert.rejects(client.probe(s,'tenant-a'),/HTTP 403/);
+    await assert.rejects(client.grant(s,undefined,'tenant-a'),/HTTP 409/);
     const wrong={...s,order:{...s.order,userId:'other'}};
-    await assert.rejects(client.check(wrong),/HTTP 409/);
+    await assert.rejects(client.check(wrong,'tenant-a'),/HTTP 409/);
+    const otherTenant=await client.check({...s,order:{...s.order,userId:'learner-2'}},'tenant-b');
+    assert.equal(otherTenant.active,false);
     const unauthorized=await fetch(url+'/v1/access/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({caseId:s.id,userId:s.order.userId,courseId:s.order.courseId,captureId:s.capture.id})});
     assert.equal(unauthorized.status,401);
   } finally {await new Promise(resolve=>server.close(resolve));close();}
@@ -158,8 +160,8 @@ test('fresh refunded capture suspends the exact course entitlement and keeps the
    status='REFUNDED';await svc.scan(id);
    const held=db.caseById(id,created.state.id),client=courseAccessClient(env);
    assert.equal(held.paymentHold.status,'REFUNDED');assert.equal(held.paymentHold.externalSuspended,true);
-   assert.equal((await client.check(held)).active,false);
-   await assert.rejects(client.probe(held),/HTTP 403/);
+   assert.equal((await client.check(held,id)).active,false);
+   await assert.rejects(client.probe(held,id),/HTTP 403/);
    await assert.rejects(svc.customerLesson(id,held.id),/Payment is on hold/);
    await assert.rejects(svc.action(id,{action:'repair'}));
   }finally{await new Promise(resolve=>server.close(resolve));close();db.close();}

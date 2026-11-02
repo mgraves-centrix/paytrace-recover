@@ -44,3 +44,11 @@ test('backup refuses missing encryption and a public output directory',async()=>
     await assert.rejects(createBackup(store,{BACKUP_DIR:'./dist',BACKUP_ENCRYPTION_KEY:randomBytes(32).toString('base64')}),/outside the public/);
   }finally{store.close();}
 });
+test('off-host copy uploads only encrypted backup and reports failure without a false success',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'paytrace-offhost-')),store=openStore(join(dir,'live.sqlite'));
+ const env={BACKUP_DIR:dir,BACKUP_ENCRYPTION_KEY:randomBytes(32).toString('base64'),BACKUP_BLOB_CONTAINER_URL:'https://independent.blob.core.windows.net/paytrace-backups?sv=test&sig=fake'};
+ try{store.create();let uploads=0;const copied=await createBackup(store,env,async(url,request)=>{uploads++;assert.equal(url.hostname,'independent.blob.core.windows.net');assert.ok(url.pathname.endsWith('.pbackup'));assert.equal(request.method,'PUT');assert.equal(JSON.parse(request.body.toString()).encrypted,true);return {status:201};});assert.equal(uploads,1);assert.equal(copied.offHost,true);
+  await assert.rejects(createBackup(store,env,async()=>({status:403})),/Independent encrypted backup copy failed/);
+  assert.equal(store.durable.status('backup').file,copied.file);
+ }finally{store.close();for(const name of readdirSync(dir))unlinkSync(join(dir,name));rmdirSync(dir);}
+});

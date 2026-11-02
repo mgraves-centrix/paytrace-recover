@@ -22,7 +22,7 @@ test('course connection check reads a new entitlement without granting access',a
  const env={COURSE_ACCESS_URL:'https://course.example.test/',COURSE_ACCESS_API_KEY:'private-test-key'};
  assert.equal((await checkConnection('access',{},async()=>{throw Error('must not call')})).state,'not-configured');
  const paths=[];
- const fetcher=async(url,options)=>{paths.push(new URL(url).pathname);assert.equal(options.method,'POST');assert.equal(options.headers.Authorization,'Bearer private-test-key');assert.equal(options.headers['Idempotency-Key'],undefined);const body=JSON.parse(options.body);assert.match(body.caseId,/^paytrace-connection-/);return {ok:true,status:200,json:async()=>({userId:body.userId,courseId:body.courseId,active:false,captureId:null})};};
+ const fetcher=async(url,options)=>{paths.push(new URL(url).pathname);assert.equal(options.method,'POST');assert.equal(options.headers.Authorization,'Bearer private-test-key');assert.equal(options.headers['Idempotency-Key'],undefined);const body=JSON.parse(options.body);assert.match(body.caseId,/^paytrace-connection-/);assert.equal(body.tenantId,'paytrace-connection-check');return {ok:true,status:200,json:async()=>({tenantId:body.tenantId,userId:body.userId,courseId:body.courseId,active:false,captureId:null})};};
  const result=await checkConnection('access',env,fetcher);assert.equal(result.state,'connected');assert.deepEqual(paths,['/v1/access/check']);assert.ok(!JSON.stringify(result).includes('private-test-key'));
  const denied=await checkConnection('access',env,async()=>({ok:false,status:401}));assert.equal(denied.state,'failed');
 });

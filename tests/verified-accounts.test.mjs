@@ -24,7 +24,7 @@ test('verified merchant cases start empty and analyst access remains redacted an
  assert.equal(created.status,200);const state=(await created.json()).state;
  assert.equal(state.capture,null);
  const invitation=db.accounts.invite(owner,{email:'analyst@example.test',role:'analyst'}),analystClaims={...claims('n'),sub:'analyst',email:'analyst@example.test'},analystToken=db.accounts.signIn(analystClaims,{});db.accounts.accept(analystToken,invitation.token);
- const listed=await request('operations',analystToken);assert.equal(listed.status,200);assert.equal((await listed.json()).cases[0].order.userId,'[restricted]');
+ const listed=await request('operations',analystToken);assert.equal(listed.status,200);const restricted=(await listed.json()).cases[0];assert.equal(restricted.restrictedView,true);assert.equal(restricted.order,undefined);assert.equal(restricted.customerName,undefined);
  assert.equal((await request('support?caseId='+state.id,analystToken)).status,403);
  assert.equal((await request('action',analystToken,{action:'approve',caseId:state.id})).status,403);
  assert.equal((await request('action',ownerToken,{action:'create-case',customerName:'Fake',mode:'sample',requestId:'00000000-0000-4000-8000-000000000002'})).status,403);

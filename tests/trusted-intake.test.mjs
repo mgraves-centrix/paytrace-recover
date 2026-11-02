@@ -35,3 +35,17 @@ test('trusted store intake rejects a mismatched PayPal capture without creating 
   assert.equal(db.listCases(owner).some(s=>s.id==='CL-STORE-12345'),false);
  }finally{db.close();}
 });
+
+test('one completed PayPal capture cannot be claimed by two workspaces',async()=>{
+ const db=openStore(':memory:');try{
+  const {createService}=await import('../server/service.mjs');
+  const service=createService(db,{}, {paypal:{refresh:async s=>({id:'CAPTURE-SHARED',orderId:s.order.id,userId:s.order.userId,courseId:s.order.courseId,amount:s.order.amount,currency:s.order.currency,status:'COMPLETED',source:'paypal-sandbox'})}});
+  const a=db.createWorkspace(),b=db.createWorkspace();
+  const purchase={caseId:'CL-STORE-SHARED',purchaseId:'STORE-FIRST',paypalOrderId:'PAYPAL-SHARED',learnerId:'learner-first',customerName:'Fictional Buyer',email:'first@example.test',courseId:'course-light',amount:12800,currency:'USD'};
+  const results=await Promise.allSettled([service.intakePurchase(a,purchase),service.intakePurchase(b,{...purchase,purchaseId:'STORE-SECOND',learnerId:'learner-second',email:'second@example.test'})]);
+  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+  assert.equal(results.filter(r=>r.status==='rejected'&&r.reason.status===409).length,1);
+  assert.equal(db.listCases(a).length+db.listCases(b).length,1);
+  assert.equal(db.findByPaypalOrder('PAYPAL-SHARED').length,1);
+ }finally{db.close();}
+});

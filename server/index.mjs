@@ -117,7 +117,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
     return json(404,{error:'Unknown storefront action.'});}
    if(route==='/api/team'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view team access.'});return json(200,{items:auth.required?store.accounts.members(session.id):store.center.members(session.id)});}
    if(route==='/api/analytics'&&req.method==='GET')return json(200,recoveryAnalytics(store.listCases(session.id),Object.fromEntries(url.searchParams)));
-   if(route==='/api/notifications'&&req.method==='GET'){store.center.tick(session.id);return json(200,{items:store.center.notifications(session.id)});}
+   if(route==='/api/notifications'&&req.method==='GET')return json(200,{items:store.center.notifications(session.id)});
    if(route==='/api/verification'&&req.method==='GET')return json(200,store.center.receipt(session.id,url.searchParams.get('caseId')));
    if(route==='/api/history'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view case history.'});return json(200,{items:store.center.timeline(session.id,url.searchParams.get('caseId'))});}
    if(route==='/api/prioritization'&&req.method==='GET')return json(200,await prioritize(store.listCases(session.id),{env,fetcher:options.fetcher||fetch}));
@@ -140,7 +140,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/support/reminders'&&req.method==='GET')return json(200,{items:store.support.reminders(session.id)});
    if(route==='/api/support/outcomes'&&req.method==='GET')return json(200,{confirmedCaseIds:store.support.confirmedCaseIds(session.id)});
    if(route==='/api/support'&&req.method==='GET')return json(200,store.support.view(session.id,url.searchParams.get('caseId'),true));
-   if(route==='/api/case'&&req.method==='GET')return json(200,await service.caseInfo(session.id,url.searchParams.get('caseId')));
+   if(route==='/api/case'&&req.method==='GET')return json(200,{state:store.caseById(session.id,url.searchParams.get('caseId'))});
    if(route==='/api/operations'&&req.method==='GET')return json(200,{cases:store.listCases(session.id),graceMinutes:store.grace(session.id)});
    if(route==='/api/workspace'&&req.method==='GET')return json(200,workspaceOverview(store.listCases(session.id),{preferences:store.preferences(session.id),reminders:store.support.reminders(session.id),followups:store.support.inbox(session.id),promises:store.support.promises(session.id),graceMinutes:store.grace(session.id)}));
    if(route==='/api/workspace/export'&&req.method==='GET'){
@@ -221,6 +221,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/operator'){if(auth.required)return json(403,{error:'Verified roles replace the demo operator key.'});const entry=attempts.get(session.id)||{count:0,until:Date.now()+600000};if(Date.now()>entry.until){entry.count=0;entry.until=Date.now()+600000}entry.count++;attempts.set(session.id,entry);if(entry.count>5)return json(429,{error:'Too many attempts. Try later.'});if(!equal(body.key,env.DEMO_OPERATOR_KEY))return json(403,{error:'Operator key is not configured or does not match.'});store.authorize(session.id);return json(200,{ok:true})}
    if(route==='/api/agent/question'){if(!session.operator)return json(403,{error:'Unlock the operator session before asking an AI specialist.'});return json(200,await service.agentQuestion(session.id,body));}
    if(route==='/api/action'){if(auth.required&&(['reset','scenario','pay','sample-age','change-evidence','restore-evidence'].includes(body.action)||body.action==='create-case'&&body.mode!=='sandbox'))return json(403,{error:'Sample mutations are disabled in verified merchant mode.'});const result=await service.action(session.id,body);store.center.audit(session.id,{actor:account?.userId||member?.label||'owner',role:teamRole||'admin',action:'case.'+String(body.action).slice(0,80),caseId:body.caseId||session.state.id});return json(200,result);}
+   if(route==='/api/case/refresh')return json(200,await service.caseInfo(session.id,body.caseId));
    if(route==='/api/paypal/create'){const result=await service.paypalCreate(session.id,body.caseId);store.center.audit(session.id,{actor:member?.label||'owner',role:member?.role||'admin',action:'paypal.create',caseId:body.caseId||session.state.id});return json(200,result);}
    if(route==='/api/paypal/capture'){const result=await service.paypalCapture(session.id,body.orderId,body.caseId);store.center.audit(session.id,{actor:member?.label||'owner',role:member?.role||'admin',action:'paypal.capture',caseId:body.caseId||session.state.id});await service.scan(session.id);setImmediate(()=>service.autoTriage(session.id).catch(()=>{}));return json(200,result);}
    return json(404,{error:'Endpoint not found.'});

@@ -26,10 +26,10 @@ export function courseAccessClient(env, fetcher = fetch) {
     if (!response.ok) throw Error(`Course access service returned HTTP ${response.status}.`);
     return response.json();
   };
-  const identity = s => ({ caseId: s.id, userId: s.order.userId, courseId: s.order.courseId, captureId: s.capture?.id || null });
-  const check = async s => {
-    const value = await request('v1/access/check', identity(s));
-    if (value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || typeof value.active !== 'boolean') {
+  const identity = (s,owner) => {if(typeof owner!=='string'||!owner||owner.length>128)throw Error('Course tenant identity is required.');return {tenantId:owner,caseId:s.id,userId:s.order.userId,courseId:s.order.courseId,captureId:s.capture?.id || null};};
+  const check = async (s,owner) => {
+    const value = await request('v1/access/check', identity(s,owner));
+    if (value?.tenantId !== owner || value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || typeof value.active !== 'boolean') {
       throw Error('Course access service returned a mismatched entitlement.');
     }
     if (value.active && value.captureId !== s.capture?.id) throw Error('Course access belongs to a different payment.');
@@ -37,27 +37,27 @@ export function courseAccessClient(env, fetcher = fetch) {
   };
   return {
     check,
-    async grant(s, operationKey = `paytrace:${s.id}:${s.capture?.id}`) {
+    async grant(s, operationKey = `paytrace:${s.id}:${s.capture?.id}`, owner) {
       if (s.capture?.source !== 'paypal-sandbox' || s.capture.status !== 'COMPLETED') throw Error('A completed PayPal sandbox capture is required.');
-      const value = await request('v1/access/grants', identity(s), operationKey);
-      if (value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture.id || value?.active !== true) {
+      const value = await request('v1/access/grants', identity(s,owner), operationKey);
+      if (value?.tenantId !== owner || value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture.id || value?.active !== true) {
         throw Error('Course access service did not confirm the approved grant.');
       }
-      return check(s);
+      return check(s,owner);
     },
-    async suspend(s, operationKey = `suspend:${s.id}:${s.capture?.id}`) {
+    async suspend(s, operationKey = `suspend:${s.id}:${s.capture?.id}`, owner) {
       if (s.capture?.source !== 'paypal-sandbox' || !['REFUNDED','REVERSED','DENIED','DECLINED','FAILED'].includes(s.capture.status)) throw Error('A confirmed adverse PayPal sandbox capture is required.');
-      const value = await request('v1/access/suspensions', identity(s), operationKey);
-      if (value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture.id || value?.active !== false) {
+      const value = await request('v1/access/suspensions', identity(s,owner), operationKey);
+      if (value?.tenantId !== owner || value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture.id || value?.active !== false) {
         throw Error('Course access service did not confirm the exact suspension.');
       }
-      const current = await check(s);
+      const current = await check(s,owner);
       if (current.active) throw Error('Course access remains active after suspension.');
       return current;
     },
-    async probe(s) {
-      const value = await request('v1/access/lesson-probe', identity(s));
-      if (value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture?.id) {
+    async probe(s,owner) {
+      const value = await request('v1/access/lesson-probe', identity(s,owner));
+      if (value?.tenantId !== owner || value?.userId !== s.order.userId || value?.courseId !== s.order.courseId || value?.captureId !== s.capture?.id) {
         throw Error('Protected lesson belongs to another purchase.');
       }
       return value;

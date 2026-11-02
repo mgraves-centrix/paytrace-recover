@@ -20,7 +20,7 @@ Restart the server, unlock the operator session, and choose **Restart story**. I
 
 Run investigate → rehearse → approve → apply & verify. Open the lesson. Confirm in the sandbox dashboard that only the original capture exists. A fresh order GET and capture GET supply verification evidence. The merchant's internal order binds learner and course; the PayPal payer is not used as a learner-identity claim.
 
-There is no webhook receiver yet. This prototype uses the explicit checkout/capture path and injects a failure in its own entitlement update. Do not describe its sample timeout as a PayPal delivery failure. Production event processing would require verified webhooks and replay handling.
+An optional signature-verified receiver exists at `/api/paypal/webhook` when `PAYPAL_WEBHOOK_ID` is configured. It rereads the exact PayPal order and capture and schedules reconciliation; it cannot approve or apply access. Live webhook delivery has not been accepted on the hosted demo. The explicit checkout/capture path remains the primary demo path and deliberately injects a failure in its own entitlement update. Do not describe this as a PayPal delivery failure.
 
 Reference: [Orders walkthrough](https://developer.paypal.com/checkout/put-it-all-together/), [Payments v2](https://developer.paypal.com/api/payments/v2/).
 
@@ -32,7 +32,7 @@ Configure `OPENAI_API_KEY` and `OPENAI_MODEL` with a Responses API model that su
 
 The Focus case's **Agent decision desk** then allows up to eight read-only questions about the current model review. Select a specialist, inspect the answer and cited snapshot, and confirm the answer has not changed eligibility or merchant approval. The form requires the unlocked operator session. A stale or scripted review cannot use model follow-ups.
 
-Only the fictional transaction, course, entitlement, log, and prior findings are sent. Requests use `store:false`; provider retention policies still apply. No API tool enables money movement or access writes. An incomplete/invalid response surfaces an error instead of inventing success. Record latency and inspect factual claims against source records before demonstrating.
+The model receives the current case review snapshot, including payment, course, entitlement, log, and prior specialist findings. On connected sandbox cases that snapshot may contain sandbox order or capture references and learner identifiers; do not submit real buyer data to this prototype. Requests use `store:false`; provider retention policies still apply. No API tool enables money movement or access writes. An incomplete/invalid response surfaces an error instead of inventing success. Record latency and inspect factual claims against source records before demonstrating.
 
 Reference: [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
 
@@ -66,7 +66,7 @@ Reference: [task definitions](https://render.com/docs/workflows-defining), [runn
 
 ## Access Watch and content verification
 
-Each demo session owns a portfolio seeded with seven fictional purchases. The delivery window accepts integer values from 1 to 60 minutes. The backend scans saved purchases every 30 seconds while running; a manual scan is available. Configured sandbox captures are refreshed from PayPal. This is not an external store discovery service or a webhook listener. The static demo uses fictional timestamps and scans only while its page is visible.
+Each demo session owns a portfolio seeded with seven fictional purchases. The delivery window accepts integer values from 1 to 60 minutes. The backend scans saved purchases every 30 seconds while running; a manual scan is available. Configured sandbox captures are refreshed from PayPal. This is not an external store discovery service; the optional webhook receiver is documented above. The static demo uses fictional timestamps and scans only while its page is visible.
 
 Cases with matching merchant, course, enrollment error, and payment timestamps within 15 minutes can be filtered together. They retain separate reviews and approvals. No bulk repair is authorized. Wrong login accounts, expired terms, pending captures, and conflicting records cannot trigger the same grant.
 

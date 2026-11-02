@@ -1,4 +1,3 @@
-import {diagnose} from '../dist/diagnosis.mjs';
 import {verificationStatus,proofFresh} from '../dist/verification-policy.mjs';
 import {createHash,createHmac,randomBytes,randomUUID} from 'node:crypto';
 import {currentOutcome} from '../dist/workspace-model.mjs';
@@ -14,9 +13,23 @@ export function permissionFor(route,method,body={}){
  if(route.startsWith('/api/support')||['/api/draft','/api/lesson','/api/learner/session'].includes(route))return 'private';
  if(route==='/api/prioritization'&&method==='POST')return 'analyze';
  if(route==='/api/action'){if(['approve','repair'].includes(body.action))return 'approve';if(['investigate','rehearse','verify','select-case'].includes(body.action))return 'analyze';return 'manage';}
- return method==='POST'&&route!=='/api/notifications/read'?'manage':'read';
+ if(method==='GET')return ['/api/state','/api/identity','/api/operations','/api/analytics','/api/providers'].includes(route)?'read':'private';
+ return 'manage';
 }
-export function masked(value,role){if(PERMISSIONS[role]?.includes('private'))return value;return JSON.parse(JSON.stringify(value,(k,v)=>{if(/email|preview|messages|creationInput|currentAccountId|userId|fingerprint|^analysis$|^review$/i.test(k))return typeof v==='string'?'[restricted]':null;if(v?.schema===1&&v.order)return {...v,restrictedView:true,verifiedView:currentOutcome(v),redactedDiagnosis:diagnose(v)};return v;}));}
+// Non-private roles receive a deliberately small case projection. A denylist
+// alone cannot protect nested provider records added by future integrations.
+export function masked(value,role){if(PERMISSIONS[role]?.includes('private'))return value;
+ const project=v=>{
+  if(v===null||typeof v!=='object')return v;
+  if(Array.isArray(v))return v.map(item=>project(item));
+  if(v.schema===1&&v.order){return {id:v.id,schema:v.schema,restrictedView:true,phase:v.phase,createdAt:v.createdAt,revision:v.revision,paymentSource:v.capture?.source||null,paymentStatus:v.capture?.status||null,amount:v.order?.amount,currency:v.order?.currency};}
+  const out={};for(const [name,item] of Object.entries(v)){
+   if(/email|customerName|buyerName|payer|recipient|learner|userId|paypalOrderId|captureId|orderId|purchaseId|reference|sourceId|sourceRef|token|secret|mailBody|messages|creationInput|currentAccountId|fingerprint|^analysis$|^review$|^order$|^capture$|^sources$|^evidence$|^paymentSignal$/i.test(name)){out[name]=typeof item==='string'?'[restricted]':null;continue;}
+   out[name]=project(item);
+  }return out;
+ };
+ return project(value);
+}
 export function recoveryAnalytics(cases,{from,to,now=Date.now(),source='all'}={}){
  from=from||new Date(now-29*86400000).toISOString().slice(0,10);to=to||new Date(now).toISOString().slice(0,10);
  if(!/^\d{4}-\d{2}-\d{2}$/.test(from)||!/^\d{4}-\d{2}-\d{2}$/.test(to))throw Error('Choose YYYY-MM-DD dates.');const start=Date.parse(from+'T00:00:00Z'),end=Date.parse(to+'T23:59:59.999Z');
