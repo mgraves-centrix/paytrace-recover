@@ -38,6 +38,8 @@ The case desk now adds an [agent challenge room, recovery flight recorder, and i
 
 The [access assurance layer](docs/ACCESS-ASSURANCE.md) adds a private buyer-browser receipt for the protected lesson, a visible PayPal-payment-to-access delivery target, and an incident detective that refreshes source checks and optionally adds cited AI perspectives. Browser receipt, technical proof, and customer confirmation remain separate facts. Incident checks are read-only and do not approve a batch grant.
 
+The merchant decision card now exposes exact case checks, open objections, and the saved review's source names in one place. Customer communication offers a case-fact progress draft that the merchant must review before sending. The [decision replay](dist/failure-replay.html) compares three fictional outcomes without calling providers or changing access.
+
 The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
 
 The first working example is a paid course with missing access. The app checks the evidence, rehearses the smallest correction on a copy, asks the merchant to approve the exact change, applies it once, and checks the outcome. Memberships and downloads are future directions to validate, not supported connectors.
@@ -48,7 +50,7 @@ The first working example is a paid course with missing access. The app checks t
 - Local Node backend: isolated cookie sessions, durable SQLite records, protected lesson-access endpoint, same-origin mutation checks, operator gate for configured integrations, serial per-session writes.
 - Setup-ready PayPal sandbox order creation/capture/fresh reads and Render investigation and approved-recovery task chains. The Azure app now runs six to eight bounded Azure OpenAI Responses calls with cited objections, specialist responses, and final review. A separate Azure reference course-access service is configured for sandbox cases.
 - Merchant agent desk: a plain-language decision brief, live specialist progress, and read-only follow-up questions tied to the saved review. Model answers keep their cited source records and cannot approve or apply an access change. Follow-ups require an unlocked operator session and configured AI; the public browser demo remains scripted.
-- Automated tests cover business invariants and mocked integration contracts. The Azure model-backed specialists passed a live five-scenario evaluation, and the separate course service passed authenticated and unauthorized read checks. **PayPal sandbox credentials are configured on the Azure app, but an end-to-end connected recovery has not been demonstrated; Render Workflows remain unconfigured.** The published Sites version remains a browser simulation.
+- Automated tests cover business invariants and mocked integration contracts. The Azure model-backed specialists passed a live five-scenario evaluation, and the separate course service passed authenticated and unauthorized read checks. Render Workflows completed investigation and approved recovery for an isolated fictional case. **A buyer-approved PayPal sandbox capture through separate-course grant and protected-lesson verification has not yet been demonstrated.** The published Sites version remains a browser simulation.
 
 ## Run
 
