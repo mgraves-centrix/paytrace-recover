@@ -107,7 +107,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(auth.required&&session.mode!=='verified')return json(403,{error:'Verified merchant workspace required.'});
    if(!auth.required&&session.mode==='verified')return json(403,{error:'Verified merchant sign-in required.'});
    if(member||auth.required){teamRole=auth.required?account.role:member.role;requirePermission(teamRole,permissionFor(route,req.method,body));session={...session,operator:session.operator&&['admin','manager'].includes(teamRole)};}
-   if(route==='/api/state'&&req.method==='GET')return json(200,{state:session.state,operator:session.operator});
+   if(route==='/api/state'&&req.method==='GET')return json(200,{state:session.state,operator:session.operator,...(url.searchParams.get('bootstrap')==='1'?{cases:store.listCases(session.id)}:{})});
    if(route==='/api/identity'&&req.method==='GET')return json(200,{actor:account?.email||member?.label||'Demo workspace owner',role:account?.role||member?.role||'admin',operator:session.operator,productionAuthentication:auth.required});
    if(route==='/api/intake/key'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});return json(200,store.intakeKeyStatus(session.id));}
    if(route==='/api/connector/mapping'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});return json(200,store.connectorMapping(session.id));}
