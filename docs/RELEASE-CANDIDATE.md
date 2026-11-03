@@ -1,6 +1,6 @@
 # PayTrace release candidate
 
-This branch prepares a verified merchant mode and a repeatable connected acceptance check. An earlier version of the branch was deployed to the public Azure **sandbox demo**; the latest draft PR commit is not yet verified there. It has not passed a complete PayPal sandbox and Render Workflow acceptance run. `main` remains unchanged until that evidence exists. A successful deploy or configured credential is not connected acceptance.
+This branch prepares a verified merchant mode and a repeatable connected acceptance check. Commit `8b42d3c` was deployed to the public Azure **sandbox demo** on 2026-11-03 and passed hosted route/provider preflight; the documentation-only update after it is not part of that archive. It has not passed a complete PayPal sandbox and Render Workflow acceptance run. `main` remains unchanged until that evidence exists. A successful deploy or configured credential is not connected acceptance.
 
 ## Identity and workspace boundary
 

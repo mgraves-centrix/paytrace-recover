@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. The live Azure deployment has not yet been verified at this PR's latest commit; `main` has not received it.
+Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. Commit `8b42d3c` from that PR is live on the Azure sandbox demo, with the Prevention Studio tab and condensed case review verified. The complete PayPal-connected recovery has not been recorded, and `main` has not received the PR.
 
 ## Demo Video
 
@@ -71,7 +71,7 @@ TODO: Record a video under three minutes, upload it publicly to YouTube, and put
 
 ## Submission Readiness Notes
 
-The code-level security fixes have a green PR and the paired Azure apps were updated on 2026-11-02. Azure health, unauthenticated course boundary, tenant-scoped authenticated course read, hosted route preflight, PayPal sandbox OAuth, and AI model connection checks passed. None of those checks constitutes a complete connected recovery. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
+The code-level security fixes have a green PR and the paired Azure apps were updated on 2026-11-02. The current PayTrace UI was deployed on 2026-11-03; Azure health, new public assets, hosted route/provider preflight, unauthenticated course boundary, tenant-scoped authenticated course read, PayPal sandbox OAuth, and AI model connection checks passed. None of those checks constitutes a complete connected recovery. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
 
 ## Known Limitations
 
