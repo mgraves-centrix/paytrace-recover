@@ -46,9 +46,11 @@ test('prevention API requires merchant controls and replay makes no case, mappin
  const base='http://127.0.0.1:'+server.address().port,first=await fetch(base+'/api/state'),cookie=first.headers.get('set-cookie').split(';')[0],owner=cookie.slice('cl_session='.length);
  const call=(route,body)=>fetch(base+'/api/'+route,{method:body===undefined?'GET':'POST',headers:{Cookie:cookie,Origin:'http://localhost',...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});
  assert.equal((await call('prevention')).status,403);
+ assert.equal((await call('prevention/fix-watch')).status,403);
  assert.equal((await call('prevention/replay',{events:[sample],mapping})).status,403);
  assert.equal((await call('operator',{key:'test-key'})).status,200);
  assert.equal((await call('prevention')).status,200);
+ const watch=await(await call('prevention/fix-watch')).json();assert.equal(watch.state,'inactive');
  const before=db.listCases(owner).map(s=>({id:s.id,writes:s.writes})),result=await(await call('prevention/replay',{events:[sample],mapping})).json();
  assert.equal(result.proposedValid,1);assert.equal(result.paymentChecked,false);
  assert.deepEqual(db.listCases(owner).map(s=>({id:s.id,writes:s.writes})),before);
