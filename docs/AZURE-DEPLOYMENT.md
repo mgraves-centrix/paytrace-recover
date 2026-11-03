@@ -14,6 +14,8 @@ All provider settings belong in Azure App Service **Environment variables**, nev
 
 The four specialist roles use the existing Azure OpenAI `gpt-4o-mini` deployment on `automation-jl107`. The Azure App Service has `OPENAI_BASE_URL=https://automation-jl107.openai.azure.com/openai/v1/`, `OPENAI_MODEL=gpt-4o-mini`, and a server-side `OPENAI_API_KEY` configured. The four-call-role consultation was confirmed against the live Azure model on 2026-10-24. A local `npm run ai:smoke` check runs all four specialists against fictional evidence and reports the outcome without a repair. Prism can hold a case for more evidence; a model consultation alone does not establish a connected PayPal recovery.
 
+The specialists are also registered as external agents in a dedicated [PayTrace Foundry project](FOUNDRY-AGENTS.md). This is a discoverability and privacy-limited tracing layer; the Azure OpenAI calls and recovery gates remain in the app. Foundry does not host these agents or authorize an access change.
+
 Render Workflows are configured for the Azure demo. The Workflow service comes from `render-workflow.yaml`; the root `render.yaml` would provision an additional web app. `WORKFLOW_SECRET`, `RENDER_API_KEY`, `RENDER_INVESTIGATE_TASK`, and `RENDER_RECOVER_TASK` are configured on the Azure web app, with the matching secret and Azure `APP_URL` on Render. A fictional investigation and a separately approved fictional recovery completed on 2026-11-02; the buyer-approved PayPal-to-separate-course path remains untested. Optional customer email requires `RESEND_API_KEY` and `EMAIL_FROM` from a verified sender.
 
 ## What the automation does
