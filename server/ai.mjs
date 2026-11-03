@@ -58,7 +58,8 @@ export async function analyze(s,env=process.env,fetcher=fetch,onProgress=async()
  const extra=objections.map(o=>{const d=decision.decisions.find(d=>d.id===o.id);return {...o,status:d.status,resolution:d.summary,resolutionSources:d.sources}});
  results.push({agent:3,summary:decision.summary,unknown:decision.unknown,sources:decision.sources});
  review.mode='model';review.objections.push(...extra);
- if(extra.some(o=>o.status==='open')&&!['blocked','needs-evidence'].includes(review.outcome))review.outcome='needs-evidence';
+ // Open objections can block a proposed grant, but an existing entitlement needs no grant.
+ if(review.outcome==='ready'&&extra.some(o=>o.status==='open'))review.outcome='needs-evidence';
  review.exchange=[...results.map(f=>({...f,kind:f.agent===3?'Independent conclusion':f.agent===2?'Proposal':'Finding'})),...objections.map(o=>({agent:3,kind:'Challenge',summary:o.question,sources:o.sources,objectionId:o.id})),...answers.map(a=>({...a,kind:'Evidence response'})),...decision.decisions.map(d=>({agent:3,kind:d.status==='open'?'Still open':'Resolved',...d}))];
  return {mode:'model',model:endpoint.model,provider:endpoint.provider,findings:results,review};
 }

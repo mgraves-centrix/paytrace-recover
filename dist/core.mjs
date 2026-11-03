@@ -36,7 +36,7 @@ export function findings(s){const d=diagnose(s);return [
 
 export function evidenceSnapshot(s){return structuredClone({payment:s.evidenceAvailable===false?null:s.capture,order:s.order,store:{entitlement:s.entitlement,currentAccountId:s.currentAccountId,accessExpiresAt:s.accessExpiresAt,log:s.fulfillment?.code||'No enrollment failure log supplied',cause:'unknown',diagnosis:diagnose(s)},event:{paymentRecorded:!!s.capture,accessUpdateAttempted:!!s.fulfillment?.code,subsequentStoreRetry:s.scenario==='restored',source:s.capture?.source==='sample'?'sample fixture':'PayTrace Recover sandbox adapter'},checks:s.evidenceAvailable===false?[{id:'payment',ok:false,detail:'Payment record unavailable'}]:checks(s)})}
 export function reviewIsCurrent(s){return !!s.review&&s.review.fingerprint===fingerprint(s)}
-export function requireReview(s,outcome){if(!reviewIsCurrent(s)||s.review.outcome!==outcome||s.review.objections.some(o=>o.status==='open'))throw Error('The challenge round is incomplete, on hold, or out of date. Investigate again.');}
+export function requireReview(s,outcome){if(!reviewIsCurrent(s)||s.review.outcome!==outcome||(outcome!=='verify-only'&&s.review.objections.some(o=>o.status==='open')))throw Error('The challenge round is incomplete, on hold, or out of date. Investigate again.');}
 function setReviewPhase(s){s.phase={ready:'investigated',blocked:'blocked','needs-evidence':'needs-evidence','verify-only':'verify-only'}[s.review.outcome]}
 export function scriptedReview(s){
  const failed=checks(s).filter(c=>!c.ok),missing=s.evidenceAvailable===false,restored=canOpenLesson(s);
@@ -60,7 +60,7 @@ export function attachAnalysis(s,analysis){
  const mandatory=scriptedReview(s);s.analysis=analysis;s.review=structuredClone(analysis.review);
  s.review.objections=[...mandatory.objections,...s.review.objections.filter(o=>!['identity','duplicate'].includes(o.id))];
  if(['blocked','needs-evidence'].includes(mandatory.outcome))s.review.outcome=mandatory.outcome;
- else if(s.review.objections.some(o=>o.status==='open'))s.review.outcome='needs-evidence';
+ else if(mandatory.outcome==='ready'&&s.review.objections.some(o=>o.status==='open'))s.review.outcome='needs-evidence';
  else s.review.outcome=mandatory.outcome;
  s.review.proposal=s.review.outcome==='needs-evidence'?'Hold the access grant until the remaining objections are answered.':mandatory.proposal;setReviewPhase(s);return s;
 }
