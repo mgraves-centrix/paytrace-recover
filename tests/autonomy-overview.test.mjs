@@ -13,6 +13,9 @@ test('autonomy preview explains holds and never presents them as repair candidat
  const result=autonomyOverview([hold,written,outside],policy,{ready:true,database:true});
  assert.deepEqual(result.items.map(i=>i.status),['paused','verification','manual']);
  assert.match(result.items[1].next,/never repeat the grant/i);
+ assert.deepEqual(result.items[0].path.find(step=>step.label==='Payment'),{label:'Payment',state:'blocked'});
+ assert.equal(result.items[1].path.find(step=>step.label==='Access').state,'grant');
+ assert.equal(result.items[1].path.find(step=>step.label==='Lesson proof').state,'active');
  assert.deepEqual([hold,written,outside],before);
 });
 
@@ -23,4 +26,13 @@ test('simulated policy changes classification without changing stored case',()=>
  assert.equal(autonomyOverview([s],{...policy,maxAmountCents:10000},{ready:true}).items[0].status,'manual');
  assert.equal(autonomyOverview([s],{...policy,enabled:false},{ready:true}).items[0].status,'review');
  assert.deepEqual(s,before);
+});
+
+test('progress path distinguishes policy authorization from a completed lesson proof',()=>{
+ const s=caseFor('timeline');s.monitor={status:'attention'};s.approval={mode:'policy'};s.writes=1;
+ const path=autonomyOverview([s],policy,{ready:true}).items[0].path;
+ assert.equal(path.find(step=>step.label==='Payment').state,'done');
+ assert.equal(path.find(step=>step.label==='Authorization').state,'policy');
+ assert.equal(path.find(step=>step.label==='Access').state,'grant');
+ assert.equal(path.find(step=>step.label==='Lesson proof').state,'active');
 });
