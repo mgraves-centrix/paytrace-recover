@@ -1,4 +1,4 @@
-# Integration status — 2026-11-02
+# Integration status — 2026-11-03
 
 | Capability | Implemented in source | Configured on Azure demo | Live acceptance recorded |
 | --- | --- | --- | --- |
@@ -10,6 +10,7 @@
 | Customer email via Resend | Yes, optional | Not confirmed | No live delivery acceptance |
 | Verified OIDC/MFA merchant sign-in | Yes, optional | No | No |
 | AG Studio | No | No | No |
+| Prevention Studio and Fix Watch | Yes, on draft PR #3 | Not yet verified on Azure | No mapped-purchase cohort yet |
 | Encrypted daily local backup and restore probe | Yes | Yes | Local restore probe passed; independent copy not configured |
 | Independent encrypted Azure Blob backup copy | Yes, optional | No | No remote restore drill |
 | Tenant-scoped reference course grants | Yes | Both Azure apps deployed together 2026-11-02 | No completed grant and lesson acceptance |

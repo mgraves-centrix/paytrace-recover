@@ -22,3 +22,22 @@ export function arrangeCase(root,s){
  const journey=main.querySelector('.access-journey');if(journey)head.append(journey);
  for(const details of main.querySelectorAll(':scope > details.detail')){const title=details.querySelector('summary')?.textContent||'';if(title.startsWith('Purchase evidence')&&!s.review)details.open=true;}
 }
+
+// Keep the decision, three purchase facts, and customer update in the first
+// reading path. The detailed instruments remain available without dominating it.
+export function finishCaseLayout(root,s){
+ const sheet=root.querySelector('.case-redesign'),main=sheet?.querySelector('.case-evidence-column'),layout=sheet?.querySelector('.case-layout'),communication=sheet?.querySelector('.case-communication-area');
+ if(!main||!layout||!communication||!s)return;
+ const exact=!!s.capture&&s.capture.status==='COMPLETED'&&s.capture.orderId===s.order.id&&s.capture.userId===s.order.userId&&s.capture.courseId===s.order.courseId&&s.capture.amount===s.order.amount&&s.capture.currency===s.order.currency;
+ const access=!!s.entitlement?.active&&s.entitlement.userId===s.order.userId&&s.entitlement.courseId===s.order.courseId&&s.entitlement.captureId===s.capture?.id;
+ const facts=document.createElement('section');facts.className='case-first-look';facts.setAttribute('aria-label','Three purchase facts');
+ const source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':s.capture?'Sample record':'No capture';
+ const items=[['Payment',s.capture?.status==='COMPLETED'?'Completed':'Not confirmed',source],['Purchase match',exact?'Exact fields agree':'Needs review','Order, learner, course, amount, currency'],['Purchased access',access?'Matching entitlement':'Missing or unconfirmed',s.proof?.passed?'Lesson proof recorded':'Protected lesson not yet proven']];
+ for(const [label,value,detail] of items){const card=document.createElement('div');for(const [tag,className,content] of [['span','case-first-look-label',label],['strong','',value],['small','',detail]]){const node=document.createElement(tag);if(className)node.className=className;node.textContent=content;card.append(node);}facts.append(card);}
+ main.querySelector('.case-column-title')?.after(facts);
+ const deep=document.createElement('details');deep.className='case-deep-dive';const title=document.createElement('summary');title.innerHTML='<span><strong>Explore full evidence and reports</strong><small>Source records, agent challenges, diagnosis map, proof, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
+ const selectors=['.ci-flight-mount','.ci-disagreement','.breakpoint-map','.agent-workbench','.source-disclosure','.detail','.case-experience','.story-outcome-panel','.communication-timeline'];
+ for(const child of [...main.children])if(selectors.some(selector=>child.matches(selector)))deep.append(child);
+ main.append(deep);
+ layout.after(communication);
+}

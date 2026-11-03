@@ -37,14 +37,14 @@ Codex helped build the merchant and customer flows, integrate and compare fronte
 
 ## Architecture
 
-The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-instance sandbox demonstration. A separate Azure App Service hosts the reference course service and owns its entitlement database. The server keeps PayPal and Azure OpenAI credentials private. Render Workflow task definitions are in the repository for staged investigation and recovery. A fictional investigation run completed through all three Render stages with a model-backed consultation; a PayPal-connected recovery run remains untested. Optional encrypted Azure Blob backup copying is implemented but not configured. This architecture is a sandbox prototype, not a production multi-merchant deployment.
+The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-instance sandbox demonstration. A separate Azure App Service hosts the reference course service and owns its entitlement database. The server keeps PayPal and Azure OpenAI credentials private. Render Workflow task definitions are in the repository for staged investigation and recovery. Isolated fictional investigation and merchant-approved recovery runs completed with model-backed consultation and a local lesson proof; a PayPal-connected recovery run remains untested. Optional encrypted Azure Blob backup copying is implemented but not configured. This architecture is a sandbox prototype, not a production multi-merchant deployment.
 
 ## Testing Instructions
 
 1. Open the [judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) and follow the labeled fictional sample.
 2. Open the [merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html). The Connections view shows which providers are configured; configuration is not an end-to-end pass.
 3. For a connected test, create a sandbox case, complete a PayPal sandbox buyer checkout, run investigation, inspect the cited findings, rehearse and approve the exact grant, apply it, then verify the protected lesson. Download the run report and open the private customer tracker.
-4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The latest branch passed 290 automated tests; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
+4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The latest reviewed branch passed 301 automated tests; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
 5. Run `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/` to check public routes and provider configuration. It does not prove a checkout or grant.
 
 ## Public Demo Link
@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-Security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3 (the paired Azure deployment currently runs this branch's package; `main` has not yet received it).
+Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. The live Azure deployment has not yet been verified at this PR's latest commit; `main` has not received it.
 
 ## Demo Video
 
@@ -75,7 +75,7 @@ The code-level security fixes have a green PR and the paired Azure apps were upd
 
 ## Known Limitations
 
-- A fictional Render `investigate` run completed through evidence, model consultation, and findings callbacks; no `recover` run or PayPal-connected acceptance has been recorded.
+- Isolated fictional Render `investigate` and merchant-approved `recover` runs completed; no PayPal-connected acceptance has been recorded.
 - A complete PayPal sandbox buyer checkout, recovery, and protected-lesson acceptance run is still pending.
 - The encrypted backup restore probe passed locally on Azure App Service storage; independent off-site copy and remote restore drill are pending.
 - Current all-files coverage is about 87% lines and 82% branches, below the 90% review target.
