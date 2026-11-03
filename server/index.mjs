@@ -13,6 +13,7 @@ import {discoverPurchases} from './paypal-discovery.mjs';
 import {demoStore} from './demo-store.mjs';
 import {autonomyOverview} from './autonomy-overview.mjs';
 import {mapStoreEvent,suggestMapping,validateMapping,checkMappedPayment} from './connector-studio.mjs';
+import {preventionPatterns,replayMapping} from './prevention-studio.mjs';
 import http from 'node:http';import {readFile} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {timingSafeEqual} from 'node:crypto';import {openStore} from './store.mjs';import {createService} from './service.mjs';
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../dist');
 export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./data/courselatch.sqlite'),options={}){
@@ -117,6 +118,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
     return json(404,{error:'Unknown storefront action.'});}
    if(route==='/api/team'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view team access.'});return json(200,{items:auth.required?store.accounts.members(session.id):store.center.members(session.id)});}
    if(route==='/api/analytics'&&req.method==='GET')return json(200,recoveryAnalytics(store.listCases(session.id),Object.fromEntries(url.searchParams)));
+   if(route==='/api/prevention'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock merchant controls to review prevention patterns.'});return json(200,preventionPatterns(store.listCases(session.id)));}
    if(route==='/api/notifications'&&req.method==='GET')return json(200,{items:store.center.notifications(session.id)});
    if(route==='/api/verification'&&req.method==='GET')return json(200,store.center.receipt(session.id,url.searchParams.get('caseId')));
    if(route==='/api/history'&&req.method==='GET'){if(!session.operator)return json(403,{error:'Unlock the operator session to view case history.'});return json(200,{items:store.center.timeline(session.id,url.searchParams.get('caseId'))});}
@@ -185,6 +187,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    if(route==='/api/lesson'&&req.method==='GET'){try{return json(200,await service.lesson(session.id))}catch{return json(403,{error:'Course access is locked.'})}}
    if(req.method!=='POST')return json(405,{error:'POST required.'});
    if(route==='/api/intake/key'){if(!session.operator)return json(403,{error:'Merchant operator access required.'});const key=store.rotateIntakeKey(session.id);store.center.audit(session.id,{action:'store-intake.rotate-key',detail:'Previous store intake key revoked.'});return json(200,{key,notice:'Copy this key to the store server now. It is shown once and replaces the previous key.'});}
+   if(route==='/api/prevention/replay'){if(!session.operator)return json(403,{error:'Unlock merchant controls to rehearse a mapping.'});return json(200,replayMapping(body.events,body.mapping,store.connectorMapping(session.id).mapping));}
    if(route.startsWith('/api/connector/')){
     if(!session.operator)return json(403,{error:'Unlock merchant controls to configure a store connector.'});
     if(route==='/api/connector/suggest'){if(!store.durable.allow('connector-ai:'+session.id,5))return json(429,{error:'Wait before requesting another mapping suggestion.'});return json(200,await suggestMapping(body.sample,env,options.fetcher||fetch));}
