@@ -37,7 +37,7 @@ Codex helped build the merchant and customer flows, integrate and compare fronte
 
 ## Architecture
 
-The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-instance sandbox demonstration. A separate Azure App Service hosts the reference course service and owns its entitlement database. The server keeps PayPal and Azure OpenAI credentials private. Render Workflow task definitions are in the repository for staged investigation and recovery; the hosted API connection is configured and authenticated, but no task run or callback has been live-accepted yet. Optional encrypted Azure Blob backup copying is implemented but not configured. This architecture is a sandbox prototype, not a production multi-merchant deployment.
+The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-instance sandbox demonstration. A separate Azure App Service hosts the reference course service and owns its entitlement database. The server keeps PayPal and Azure OpenAI credentials private. Render Workflow task definitions are in the repository for staged investigation and recovery. A fictional investigation run completed through all three Render stages with a model-backed consultation; a PayPal-connected recovery run remains untested. Optional encrypted Azure Blob backup copying is implemented but not configured. This architecture is a sandbox prototype, not a production multi-merchant deployment.
 
 ## Testing Instructions
 
@@ -75,7 +75,7 @@ The code-level security fixes have a green PR and the paired Azure apps were upd
 
 ## Known Limitations
 
-- Render Workflows are configured and the authenticated task lookup passed; there is still no live task-run or callback evidence.
+- A fictional Render `investigate` run completed through evidence, model consultation, and findings callbacks; no `recover` run or PayPal-connected acceptance has been recorded.
 - A complete PayPal sandbox buyer checkout, recovery, and protected-lesson acceptance run is still pending.
 - The encrypted backup restore probe passed locally on Azure App Service storage; independent off-site copy and remote restore drill are pending.
 - Current all-files coverage is about 87% lines and 82% branches, below the 90% review target.
