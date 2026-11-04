@@ -1,5 +1,6 @@
 // Present the existing controls in a focused layout; authorization stays on the server.
 export function arrangeCase(root,s){
+ document.body.classList.toggle('focus-case-open',!!s);
  const sheet=root.querySelector('.sheet'),body=sheet?.querySelector('.sheet-body');if(!body||!s)return;
  sheet.classList.add('case-redesign');
  const head=sheet.querySelector('.sheet-head'),identity=document.createElement('div');identity.className='case-customer';
@@ -41,10 +42,25 @@ export function finishCaseLayout(root,s){
  const handoff=sheet.querySelector('.clarity-handoff');if(handoff)deep.append(handoff);
  const chapter=sheet.querySelector('.sheet-body > .case-chapter');if(chapter)deep.append(chapter);
  const freshness=sheet.querySelector('.freshness-band');if(freshness)deep.append(freshness);
+ const automation=sheet.querySelector('.sheet-body > .automation-card');if(automation)deep.append(automation);
  for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-change-preview'))deep.append(child);
  const rail=layout.querySelector('.case-decision-column');
  for(const child of [...rail.children])if(child.matches('.story-brief-panel,.customer-preview-disclosure,.case-priority-panel,.exact-approval'))deep.append(child);
  for(const selector of ['.summary','.merchant-decision','.case-change-preview','.consent','.actionbar']){const child=rail.querySelector(':scope > '+selector);if(child)rail.append(child);}
+ const decision=rail.querySelector(':scope > .merchant-decision');
+ if(decision&&rail.querySelector(':scope > .summary')){
+  // The summary already names the next step; keep this card about supporting facts.
+  const eyebrow=decision.querySelector(':scope > .eyebrow'),heading=decision.querySelector(':scope > h2');
+  if(eyebrow)eyebrow.textContent='SUPPORTING EVIDENCE';
+  if(heading)heading.textContent='Why this step';
+  decision.querySelector(':scope > p')?.remove();
+ }
+ if(preview)decision?.querySelector('.decision-change')?.remove();
+ // Before a correction exists, the read-only next step can lead; once a
+ // preview exists, supporting evidence remains ahead of consent and approval.
+ if(!preview&&decision)rail.append(decision);
+ const stepper=root.querySelector('.review-shell > .stepper');
+ if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}
  main.append(communication,deep);
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
 }
