@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. Commit `8b42d3c` from that PR is live on the Azure sandbox demo, with the Prevention Studio tab and condensed case review verified. The complete PayPal-connected recovery has not been recorded, and `main` has not received the PR.
+Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. Commit `58c471a` from that PR is live on the Azure sandbox demo; hosted preflight and the condensed case review passed. The complete PayPal-connected recovery has not been recorded, and `main` has not received the PR.
 
 ## Demo Video
 
