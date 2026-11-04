@@ -108,10 +108,11 @@ export function caseChapterMarkup(s, support, options = {}) {
 export function mountCaseChapter(root, s, support = null, options = {}) {
   const body = root.querySelector('.sheet-body');
   if (!body) return;
-  const prior = body.querySelector(':scope > .case-chapter');
+  const target = root.querySelector('.case-deep-dive') || body;
+  const prior = body.querySelector('.case-chapter');
   if (prior) prior.remove();
-  body.insertAdjacentHTML('afterbegin', caseChapterMarkup(s, support, options));
-  const card = body.querySelector(':scope > .case-chapter');
+  target.insertAdjacentHTML('beforeend', caseChapterMarkup(s, support, options));
+  const card = target.querySelector(':scope > .case-chapter');
   card.querySelector('[data-chapter-target]')?.addEventListener('click', event => {
     const kind = event.currentTarget.dataset.chapterTarget;
     if (kind === 'refresh') { root.querySelector('[data-action="refresh"]')?.click(); return; }

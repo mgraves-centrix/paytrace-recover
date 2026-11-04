@@ -1,0 +1,27 @@
+.case-redesign .case-layout{gap:22px}
+.case-redesign .case-decision-column{top:12px}
+.case-redesign .case-decision-column .summary{padding-bottom:15px;border-bottom:1px solid #cbdff3}
+.case-redesign .case-decision-column .summary h2{font-size:22px}
+.case-redesign .merchant-decision{margin:16px 0 0;padding:15px;border-color:#d7e6f6;background:#fff}
+.case-redesign .merchant-decision h2{font-size:17px}
+.case-redesign .merchant-decision>small{margin-top:8px}
+.case-redesign .decision-evidence{margin:12px 0}
+.case-redesign .exact-approval{margin-top:16px}
+.case-change-preview{margin:0 0 18px;padding:17px;border:1px solid #c9dff4;border-radius:15px;background:#f7fbff}
+.case-change-preview>h3{margin:0 0 13px;color:#123b70;font-size:17px}
+.case-change-preview .diff{margin:0}
+.case-decision-column .case-change-preview .diff{grid-template-columns:1fr}
+.case-decision-column .case-change-preview .diff>div{min-width:0}
+.case-change-preview .footnote{margin:12px 0 0}
+.case-redesign .case-communication-area{margin:6px 0 0!important;padding:19px}
+.case-redesign .case-communication-heading h2{font-size:20px}
+.case-redesign .case-communication-heading p{line-height:1.5}
+.case-redesign .case-sample-update{margin:0 0 14px;padding:12px 14px;border:1px solid #d8e6f5;border-radius:10px;background:#fff;color:#3c5876;font-size:13px;line-height:1.5}
+.case-redesign .case-sample-update a{font-weight:700;color:#075bab}
+.case-redesign .case-deep-dive{margin:16px 0 0}
+.case-redesign .case-deep-dive .clarity-specialists,.case-redesign .case-deep-dive .case-experience,.case-redesign .case-deep-dive .agent-workbench{margin-top:18px}
+.case-redesign .case-deep-dive .case-priority-panel{margin:16px 0}
+.case-redesign .case-deep-dive .story-brief-panel{margin:16px 0}
+.case-redesign .case-deep-dive .freshness-band{margin-top:18px}
+.case-redesign .case-deep-dive .access-journey{padding:15px 0}
+@media(max-width:850px){.case-redesign .case-layout{gap:16px}.case-redesign .case-decision-column{top:auto}.case-redesign .case-communication-area{padding:16px}.case-change-preview{padding:14px}}
