@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createCase,simulatePayment,investigate,rehearse,approve,applyRepair,verify} from '../dist/core.mjs';
 import {openStore} from '../server/store.mjs';
 import {createService} from '../server/service.mjs';
-import {traceCaseKey,withRecoverySpan} from '../server/recovery-trace.mjs';
+import {foundryAgentIds,traceCaseKey,withRecoverySpan,withSpecialistSpan} from '../server/recovery-trace.mjs';
 
 function paid(){return simulatePayment(createCase('match','CL-regression'))}
 const unsafe=[
@@ -67,4 +67,15 @@ test('recovery tracing uses a pseudonymous case key and never exports raw errors
  await assert.rejects(withRecoverySpan('repair',reference,async()=>{throw Error('private email and payment token')},{tracer}),/private email/);
  const {name,span}=spans[0];assert.equal(name,'recovery.repair');assert.equal(span.attributes['paytrace.case_key'],traceCaseKey(reference));assert.equal(span.attributes['paytrace.failed'],true);assert.equal(span.ended,true);
  assert.doesNotMatch(JSON.stringify({name,span}),/customer@|PAYPAL-SECRET|private email|payment token/);
+});
+
+test('Foundry specialist spans identify the registered agent without exporting case evidence',async()=>{
+ const spans=[],tracer={startActiveSpan(name,options,run){const span={attributes:{...options.attributes},status:null,ended:false,setStatus(v){this.status=v},end(){this.ended=true}};spans.push({name,span});return run(span)}};
+ assert.deepEqual(foundryAgentIds,['paytrace-ledger','paytrace-relay','paytrace-patch','paytrace-prism']);
+ await assert.rejects(withSpecialistSpan(3,'decision',async()=>{throw Error('customer@example.test PAYPAL-SECRET')},{tracer}),/PAYPAL-SECRET/);
+ const {name,span}=spans[0];
+ assert.equal(span.attributes['gen_ai.agent.id'],'paytrace-prism');
+ assert.equal(span.attributes['gen_ai.operation.name'],'invoke_agent');
+ assert.equal(span.ended,true);
+ assert.doesNotMatch(JSON.stringify({name,span}),/customer@|PAYPAL-SECRET/);
 });

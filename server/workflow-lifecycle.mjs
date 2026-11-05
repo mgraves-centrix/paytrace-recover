@@ -8,7 +8,9 @@ export function workflowTimeout(env={}){
 
 // Expiration never reverses a grant or lets a late callback resume one.
 export function expireWorkflow(s,{now=Date.now(),timeoutMs=900000}={}){
- if(!s.job?.pending)return false;
+ if(!s.job||s.job.expiredAt)return false;
+ const steps=s.job.kind==='recover'?['repair','verify']:['gather','analyze','record'];
+ if(!s.job.pending&&steps.every(step=>Object.hasOwn(s.job.completed||{},step)))return false;
  const started=Date.parse(s.job.startedAt||s.createdAt);
  const deadline=Date.parse(s.job.deadlineAt||'');
  const cutoff=Number.isFinite(deadline)?deadline:Number.isFinite(started)?started+timeoutMs:now;

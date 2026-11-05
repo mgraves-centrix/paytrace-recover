@@ -15,7 +15,7 @@ export async function checkConnection(kind,env=process.env,fetcher=fetch){
    if(!env.COURSE_ACCESS_URL||!env.COURSE_ACCESS_API_KEY)return result('not-configured','Add the course service URL and API key to the server. This check does not grant access.');
    let client;try{client=courseAccessClient(env,fetcher)}catch{return result('failed','The course service URL or key configuration is invalid. No access was changed.');}
    const id='paytrace-connection-'+randomUUID();
-   let value;try{value=await client.check({id,order:{userId:id,courseId:'course-light'},capture:null});}catch(error){if(/returned HTTP \d+|mismatched entitlement|different payment/.test(error.message))return result('failed','The course service rejected the authenticated entitlement read or returned a mismatched record. No change was made.');throw error;}
+   let value;try{value=await client.check({id,order:{userId:id,courseId:'course-light'},capture:null},'paytrace-connection-check');}catch(error){if(/returned HTTP \d+|mismatched entitlement|different payment/.test(error.message))return result('failed','The course service rejected the authenticated entitlement read or returned a mismatched record. No change was made.');throw error;}
    return value.active===false?result('connected','The separate course service accepted an authenticated entitlement read. No grant or lesson check was made.'):result('failed','The course service returned unexpected access for a new check identity. No change was made.');
   }
   if(kind==='ai'){

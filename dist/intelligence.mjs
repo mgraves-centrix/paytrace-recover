@@ -1,7 +1,9 @@
 import {mountIncidentDetective} from './incident-detective-ui.mjs';
+import {packetMatchesSelection} from './intelligence-packet.mjs';
 const root=document.querySelector('#intelligence-app');
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let overview=null,discovery=null,packet=null,activeCase=null,notice='',scanning=false;
+let overview=null,discovery=null,packet=null,activeCase=null,notice='',scanning=false,packetRequest=0,viewActive=true;
+window.addEventListener('pagehide',()=>{viewActive=false;packetRequest++;packet=null;});
 
 async function api(path,body,timeoutMs=30000){
  const response=await fetch('/api/'+path,{method:body?'POST':'GET',credentials:'same-origin',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(timeoutMs)});
@@ -18,9 +20,9 @@ function render(){
  mountIncidentDetective(root,incident,api);
  root.querySelector('#scan').onclick=async()=>{if(scanning)return;scanning=true;notice='Scanning PayPal reporting without changing a case…';render();try{discovery=await api('intelligence/discover',undefined,45000);notice=discovery.state==='connected'?'Scan complete. Unlinked rows still need a merchant match.':discovery.detail;}catch(error){notice=error.message;}finally{scanning=false;render();}};
  root.querySelector('#policy-form').onsubmit=async event=>{event.preventDefault();const form=event.currentTarget,max=Math.round(Number(form.elements.namedItem('amount').value)*100),limit=Number(form.elements.namedItem('limit').value);try{overview=await api(`intelligence?maxAmountCents=${max}&dailyLimit=${limit}`);notice='Policy rehearsed. No access changed.';}catch(error){notice=error.message;}render();};
- root.querySelector('#packet-case').onchange=event=>{activeCase=event.target.value;packet=null;render();};
- root.querySelector('#prepare-packet').onclick=async()=>{if(!activeCase)return;try{packet=await api('intelligence/packet?caseId='+encodeURIComponent(activeCase));notice='Case packet prepared for merchant review.';}catch(error){notice=error.message;}render();};
- root.querySelector('#download-packet')?.addEventListener('click',()=>{const file=new Blob([JSON.stringify(packet,null,2)],{type:'application/json'}),url=URL.createObjectURL(file),link=document.createElement('a');link.href=url;link.download=packet.caseId+'-merchant-packet.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+ root.querySelector('#packet-case').onchange=event=>{activeCase=event.target.value;packet=null;packetRequest++;render();};
+ root.querySelector('#prepare-packet').onclick=async()=>{if(!activeCase)return;const caseId=activeCase,request=++packetRequest;packet=null;notice='Preparing the selected case packet…';render();try{const result=await api('intelligence/packet?caseId='+encodeURIComponent(caseId));if(!viewActive||request!==packetRequest||activeCase!==caseId)return;if(!packetMatchesSelection({viewActive,activeCase,request,latestRequest:packetRequest,packet:result}))throw Error('The packet did not match the selected case. Refresh and try again.');packet=result;notice='Case packet prepared for merchant review.';}catch(error){if(!viewActive||request!==packetRequest||activeCase!==caseId)return;notice=error.message;}render();};
+ root.querySelector('#download-packet')?.addEventListener('click',()=>{if(!packetMatchesSelection({viewActive,activeCase,request:packetRequest,latestRequest:packetRequest,packet}))return;const file=new Blob([JSON.stringify(packet,null,2)],{type:'application/json'}),url=URL.createObjectURL(file),link=document.createElement('a');link.href=url;link.download=packet.caseId+'-merchant-packet.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 }
 
 async function load(){

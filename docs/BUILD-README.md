@@ -105,10 +105,16 @@ PAYPAL_CLIENT_SECRET=YOUR_SANDBOX_CLIENT_SECRET
 DEMO_OPERATOR_KEY=YOUR_PRIVATE_RANDOM_OPERATOR_KEY
 ```
 
-Generate the operator key locally and store the output privately:
+Generate the operator key directly into the git-ignored local `.env` file. The command prints only a status message; keep that file private:
 
 ```powershell
-node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+$operatorKey = [Convert]::ToHexString([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32)).ToLowerInvariant()
+$privateEnv = Get-Content -Raw -LiteralPath .env
+if ($privateEnv -notmatch '(?m)^DEMO_OPERATOR_KEY=') { throw 'Copy .env.example to .env first.' }
+$privateEnv = [regex]::Replace($privateEnv, '(?m)^DEMO_OPERATOR_KEY=.*$', "DEMO_OPERATOR_KEY=$operatorKey")
+[System.IO.File]::WriteAllText((Resolve-Path .env).Path, $privateEnv)
+Remove-Variable operatorKey
+Write-Output 'DEMO_OPERATOR_KEY updated in private .env'
 ```
 
 The operator key unlocks configured integrations for one demo session. It is not production merchant authentication. `server/paypal.mjs` hardcodes the sandbox API host; do not supply live credentials.
@@ -221,7 +227,7 @@ APP_URL=https://YOUR-SERVICE.onrender.com
 WORKFLOW_SECRET=YOUR_PRIVATE_SHARED_WORKFLOW_SECRET
 ```
 
-Generate a new random secret using the local command above. Do not reuse the operator key. `APP_URL` points to the web service, not the static Sites demo. The current tasks call the web service, so PayPal and AI keys stay on the web service rather than being duplicated into the workflow service.
+Generate a separate random value in your secret manager or Render's protected environment editor; do not print it to terminal output or reuse the operator key. Set the same `WORKFLOW_SECRET` on both services. `APP_URL` points to the web service, not the static Sites demo. The current tasks call the web service, so PayPal and AI keys stay on the web service rather than being duplicated into the workflow service.
 
 Confirm all seven tasks appear after deployment:
 

@@ -1,17 +1,14 @@
-# Three-minute demonstration
+# PayTrace demo video: 2 minutes 40 seconds
 
-For a screen-to-screen presentation, start at `/judge.html`. Its sample story and connected sandbox path are separate. The browser story opens Maya's seeded case; it is not a live PayPal checkout. For a connected PayPal run, create a sandbox case in Focus and complete checkout there before reviewing evidence. Only show connected provider claims after the six-check run report passes.
+Record the browser at desktop size with a readable zoom level. Use one newly completed PayPal **sandbox** buyer checkout and the same case throughout. Record the merchant and learner views only after the connected acceptance report passes all six checks. Keep the operator key, buyer login, customer email, API keys, and private case links out of the capture. Export a redacted report for any public stills. A fictional sample can illustrate the interface, but label it as a sample and do not edit its footage to imply a connected payment or model call.
 
-**0:00–0:20 — The consequence.** “Maya paid $128 for a workshop. The payment succeeded; access did not. PayTrace Recover connects payment to the digital access the customer purchased.” Show the locked learner storefront. Explicitly identify browser simulation or configured sandbox mode.
+| Time | Screen and action | Narration |
+| --- | --- | --- |
+| 0:00–0:20 | Start at the learner's locked lesson and show the completed sandbox payment status. | “The buyer paid for digital access, but the lesson stayed locked. PayTrace gives the merchant a way to prove what failed.” |
+| 0:20–0:50 | Open the same case in Focus. Show the exact PayPal capture beside the separate course entitlement and their timestamps. | “It matches the purchase to a completed PayPal sandbox capture, then checks access in a different system. The mismatch is evidence, not a guess.” |
+| 0:50–1:20 | Start or open the completed model-backed investigation. Show Ledger, Relay, Patch, and Prism with a cited fact and an objection. | “Four AI specialists analyze the same evidence from different angles. Their recommendation is explained, and a safety objection can stop the repair.” |
+| 1:20–1:45 | Show the exact before/after preview and merchant approval. | “The merchant sees precisely which learner and course would change. Approval applies only to this preview.” |
+| 1:45–2:15 | Show the Render recovery run, one idempotent grant, the fresh PayPal and entitlement rereads, and the protected lesson opening. | “Render separates investigation from correction. PayTrace applies one bounded grant, then checks the protected lesson itself.” |
+| 2:15–2:40 | Show the customer progress tracker, confirmation control, and six-check run report. End with the product name and public repo URL. | “The buyer sees progress and can confirm the outcome. The merchant has a report showing what was checked, what changed, and what was verified.” |
 
-**0:20–0:55 — Evidence before action.** Switch to merchant desk; investigate. Show the four specialist cards and open one saved payment citation. “Ledger matches the purchase. Relay traces the handoff. Patch proposes one entitlement. Prism challenges the evidence.” Show one safety question and its answer.
-
-**0:55–1:25 — Show control.** Rehearse. Show before/after and zero writes. Switch to learner: still locked. Return and approve the specific access grant. “Changed evidence invalidates this approval.”
-
-**1:25–1:55 — Outcome, not just an API response.** Apply & verify. Show three passed checks, one access write, and the visual recovery receipt. Open the learner's first lesson. Expand the six source checks; each is labeled connected, demo, or incomplete. Download the run report.
-
-**1:55–2:20 — Knowing when to stop.** Select case B, investigate, and show the incorrect order. No approve control is available. “A matching amount is not enough.”
-
-**2:20–2:45 — Honest uncertainty.** Select case C; investigate, rehearse, approve, apply. The verification is incomplete. Retry reads only. Show that access writes stays at one while verification attempts increases.
-
-**2:45–3:00 — Architecture and status.** “PayPal supplies the capture evidence; the optional model team interprets it; the merchant approves; Render separates investigation from recovery.” Only show actual sandbox/model/workflow runs if configured and proven. Otherwise say “setup-ready adapters” and show the guide. Do not submit the browser simulation as proof of live API execution.
+Capture a single uninterrupted path where possible. A short edit may remove waiting time, but preserve the order and display the actual case and provider states. Keep the final upload **under three minutes** and make it publicly visible on YouTube. The [hackathon requirements](https://paypalaihackathon.devpost.com/rules) require footage of the functioning project, not a static mockup. If the six-check connected run is still pending, record an honestly labeled partial demo and state the missing checks in the submission; do not call it an end-to-end recovery.

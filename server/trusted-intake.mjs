@@ -11,9 +11,10 @@ export function validateTrustedPurchase(input){
  if(typeof paypalOrderId!=='string'||!/^[A-Za-z0-9-]{5,128}$/.test(paypalOrderId))throw Error('A PayPal sandbox order ID is required.');
  if(typeof learnerId!=='string'||!/^[A-Za-z0-9_-]{3,128}$/.test(learnerId))throw Error('A stable learner ID is required.');
  if(typeof customerName!=='string'||!customerName.trim()||customerName.length>80||/[\x00-\x1f<>]/.test(customerName))throw Error('A customer display name is required.');
- if(typeof email!=='string'||email.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(email))throw Error('A verified purchase email is required.');
+ const normalizedEmail=typeof email==='string'?email.trim():'';
+ if(normalizedEmail.length>254||!/^\S+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail))throw Error('A verified purchase email is required.');
  if(courseId!==COURSE.id||amount!==COURSE.price||currency!==COURSE.currency)throw Error('This connector accepts only the configured reference course and exact amount.');
- return {caseId,purchaseId,paypalOrderId,learnerId,customerName:customerName.trim(),email:email.trim().toLowerCase(),courseId,amount,currency};
+ return {caseId,purchaseId,paypalOrderId,learnerId,customerName:customerName.trim(),email:normalizedEmail.toLowerCase(),courseId,amount,currency};
 }
 
 export function trustedPurchaseDigest(purchase){return createHash('sha256').update(JSON.stringify(purchase)).digest('hex');}

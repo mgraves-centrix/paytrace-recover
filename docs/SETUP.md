@@ -20,7 +20,7 @@ Restart the server, unlock the operator session, and choose **Restart story**. I
 
 Run investigate → rehearse → approve → apply & verify. Open the lesson. Confirm in the sandbox dashboard that only the original capture exists. A fresh order GET and capture GET supply verification evidence. The merchant's internal order binds learner and course; the PayPal payer is not used as a learner-identity claim.
 
-There is no webhook receiver yet. This prototype uses the explicit checkout/capture path and injects a failure in its own entitlement update. Do not describe its sample timeout as a PayPal delivery failure. Production event processing would require verified webhooks and replay handling.
+An optional signature-verified receiver exists at `/api/paypal/webhook` when `PAYPAL_WEBHOOK_ID` is configured. It rereads the exact PayPal order and capture and schedules reconciliation; it cannot approve or apply access. Live webhook delivery has not been accepted on the hosted demo. The explicit checkout/capture path remains the primary demo path and deliberately injects a failure in its own entitlement update. Do not describe this as a PayPal delivery failure.
 
 Reference: [Orders walkthrough](https://developer.paypal.com/checkout/put-it-all-together/), [Payments v2](https://developer.paypal.com/api/payments/v2/).
 
@@ -32,15 +32,17 @@ Configure `OPENAI_API_KEY` and `OPENAI_MODEL` with a Responses API model that su
 
 The Focus case's **Agent decision desk** then allows up to eight read-only questions about the current model review. Select a specialist, inspect the answer and cited snapshot, and confirm the answer has not changed eligibility or merchant approval. The form requires the unlocked operator session. A stale or scripted review cannot use model follow-ups.
 
-Only the fictional transaction, course, entitlement, log, and prior findings are sent. Requests use `store:false`; provider retention policies still apply. No API tool enables money movement or access writes. An incomplete/invalid response surfaces an error instead of inventing success. Record latency and inspect factual claims against source records before demonstrating.
+The model receives the current case review snapshot, including payment, course, entitlement, log, and prior specialist findings. On connected sandbox cases that snapshot may contain sandbox order or capture references and learner identifiers; do not submit real buyer data to this prototype. Requests use `store:false`; provider retention policies still apply. No API tool enables money movement or access writes. An incomplete/invalid response surfaces an error instead of inventing success. Record latency and inspect factual claims against source records before demonstrating.
 
 Reference: [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
 
 ## 4. Render web service
 
-Connect Render to the public [PayTrace Recover repository](https://github.com/sagitta414/paytrace-recover). The supplied `render.yaml` describes one Node web service and persistent disk. Review Render's current costs before creating resources; no Render service was created by this build.
+Connect Render to the public [PayTrace Recover repository](https://github.com/sagitta414/paytrace-recover). The supplied `render.yaml` describes an optional second Node web service and persistent disk. Review Render's current costs before creating resources. The Azure-hosted demo does not require this web service.
 
 Use build command `npm ci`, start command `npm start`, Node 24+, and `DATABASE_PATH=/var/data/courselatch.sqlite`. Set `PUBLIC_URL` to the web service's exact HTTPS URL. Configure secrets through Render's environment settings. Keep one web instance because the SQLite database and session lock are local to it.
+
+**Startup error: `Verified sign-in is required. Configure OIDC_ISSUER and OIDC_CLIENT_ID.`** Render sets `NODE_ENV=production` for Node services at runtime. PayTrace intentionally fails closed in that mode until a verified OIDC provider with MFA is configured. The preceding `.env not found` message is informational: Render environment variables do not require a checked-in `.env` file. If you are keeping the Azure web app, use the Workflow-only Blueprint in section 5 instead of deploying this extra web service. If you intentionally want a separate production Render web app, configure `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `AUTH_REQUIRED=true`, `OIDC_REQUIRE_MFA=true`, an exact HTTPS `PUBLIC_URL`, and the provider's `/auth/callback` redirect before redeploying. Do not turn off production authentication merely to clear the startup error.
 
 ## 5. Render Workflows
 
@@ -66,7 +68,7 @@ Reference: [task definitions](https://render.com/docs/workflows-defining), [runn
 
 ## Access Watch and content verification
 
-Each demo session owns a portfolio seeded with seven fictional purchases. The delivery window accepts integer values from 1 to 60 minutes. The backend scans saved purchases every 30 seconds while running; a manual scan is available. Configured sandbox captures are refreshed from PayPal. This is not an external store discovery service or a webhook listener. The static demo uses fictional timestamps and scans only while its page is visible.
+Each demo session owns a portfolio seeded with seven fictional purchases. The delivery window accepts integer values from 1 to 60 minutes. The backend scans saved purchases every 30 seconds while running; a manual scan is available. Configured sandbox captures are refreshed from PayPal. This is not an external store discovery service; the optional webhook receiver is documented above. The static demo uses fictional timestamps and scans only while its page is visible.
 
 Cases with matching merchant, course, enrollment error, and payment timestamps within 15 minutes can be filtered together. They retain separate reviews and approvals. No bulk repair is authorized. Wrong login accounts, expired terms, pending captures, and conflicting records cannot trigger the same grant.
 

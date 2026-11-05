@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {openStore} from '../server/store.mjs';
 import {createService} from '../server/service.mjs';
+import {createApp} from '../server/index.mjs';
 import {safetyQuestions} from '../server/ai.mjs';
 
 const env={PAYPAL_CLIENT_ID:'sandbox-id',PAYPAL_CLIENT_SECRET:'sandbox-secret',COURSE_ACCESS_URL:'https://course.example',COURSE_ACCESS_API_KEY:'course-key',OPENAI_API_KEY:'test',OPENAI_MODEL:'test-model'};
@@ -35,3 +36,20 @@ test('ambiguous external write is held for review and never automatically replay
 test('course-side retry is verified automatically with no grant, operator, or model',async()=>{const f=fixture({alreadyActive:true,authorize:false,envOverride:{OPENAI_API_KEY:undefined,OPENAI_MODEL:undefined}});try{await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id),s=f.db.get(f.id).state;assert.equal(result.status,'verified-existing');assert.equal(s.phase,'verified');assert.equal(s.writes,0);assert.equal(f.grants(),0);const customer=f.db.support.view(f.id,s.id);assert.equal(customer.verified,true);assert.match(customer.messages.at(-1).text,/No new payment or access change/);}finally{f.db.close();}});
 test('unavailable protected lesson keeps course-side retry open without a grant',async()=>{const f=fixture({alreadyActive:true,probeFails:true});try{await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id),s=f.db.get(f.id).state;assert.equal(result.status,'verification-pending');assert.equal(s.phase,'unverified');assert.equal(s.writes,0);assert.equal(f.grants(),0);assert.equal(f.db.support.view(f.id,s.id).verified,false);}finally{f.db.close();}});
 test('existing entitlement cannot mask a mismatched payment',async()=>{const f=fixture({alreadyActive:true,mismatch:true});try{await f.svc.scan(f.id);const result=await f.svc.autoTriage(f.id),s=f.db.get(f.id).state;assert.notEqual(result.status,'verified-existing');assert.notEqual(s.phase,'verified');assert.equal(f.grants(),0);assert.equal(f.db.support.view(f.id,s.id).verified,false);}finally{f.db.close();}});
+
+test('background worker completes an eligible recovery without a merchant action on the case',async t=>{
+ const db=openStore(':memory:'),{id}=db.create();db.authorize(id);
+ const s=db.get(id).state;s.intakeMode='sandbox';s.paypalOrderId='PP-worker';s.capture.source='paypal-sandbox';s.paidAt=new Date(Date.now()-10*60000).toISOString();db.save(id,s);
+ let grants=0,active=false;
+ const paypal={refresh:async state=>({...state.capture,source:'paypal-sandbox',status:'COMPLETED'})};
+ const course={check:async state=>({userId:state.order.userId,courseId:state.order.courseId,active,captureId:active?state.capture.id:null}),grant:async state=>{grants++;active=true;return {userId:state.order.userId,courseId:state.order.courseId,active:true,captureId:state.capture.id};},probe:async state=>({accessible:active,userId:state.order.userId,courseId:state.order.courseId,captureId:state.capture.id,contentId:'light-lesson-01',body:'A protected lesson with more than twenty characters.'})};
+ const {server,service}=createApp({...env,PUBLIC_URL:'http://localhost'},db,{paypal,course,fetcher:model()});
+ t.after(()=>new Promise(resolve=>server.close(()=>{db.close();resolve();})));
+ await service.setAutopilot(id,{enabled:true,maxAmountCents:15000,dailyLimit:2});
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ const deadline=Date.now()+7000;
+ while(db.get(id).state.phase!=='verified'&&Date.now()<deadline)await new Promise(resolve=>setTimeout(resolve,50));
+ const result=db.get(id).state;
+ assert.equal(result.phase,'verified');assert.equal(result.automation.status,'verified');assert.equal(result.approval.mode,'policy');
+ assert.equal(result.writes,1);assert.equal(grants,1);assert.equal(db.support.view(id,result.id).verified,true);
+});

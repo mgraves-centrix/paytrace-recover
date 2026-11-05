@@ -7,6 +7,16 @@ import {reviewIsCurrent} from '../dist/core.mjs';
 export function autonomyOverview(cases, policy, {ready=false, workflows=false, backup=null, database=true, worker=false}={}) {
  const incident=detectIncident(cases);
  const items=cases.map(s=>{
+  const paymentConfirmed=s.capture?.source==='paypal-sandbox'&&s.capture?.status==='COMPLETED'&&!s.paymentHold;
+  const currentReview=s.review?.mode==='model'&&reviewIsCurrent(s);
+  const path=[
+   {label:'Payment',state:s.paymentHold?'blocked':paymentConfirmed?'done':'waiting'},
+   {label:'Delivery watch',state:['attention','access_present'].includes(s.monitor?.status)?'done':'waiting'},
+   {label:'AI review',state:currentReview?'done':s.agentRun?.status==='running'?'active':'waiting'},
+   {label:'Authorization',state:s.approval?.mode==='policy'?'policy':s.approval?'merchant':'waiting'},
+   {label:'Access',state:s.writes>0?'grant':s.entitlement?.active?'present':'waiting'},
+   {label:'Lesson proof',state:proofIsCurrent(s)?'done':s.writes>0||s.entitlement?.active?'active':'waiting'}
+  ];
   let status,reason,next;
   if(s.paymentHold){status='paused';reason='Payment changed or is disputed.';next='Merchant reviews the payment hold.';}
   else if(proofIsCurrent(s)){status='verified';reason='Current payment, access, and lesson proof passed.';next='Customer confirms the purchase opens.';}
@@ -22,7 +32,7 @@ export function autonomyOverview(cases, policy, {ready=false, workflows=false, b
   else if(s.review?.mode==='model'&&s.review?.outcome==='ready'&&reviewIsCurrent(s)&&s.phase==='investigated'){status='candidate';reason='Current model review appears ready within the selected policy.';next='Service must refresh payment and access, check all gates, preview, reserve the daily limit, and verify.';}
   else if(s.monitor?.status==='attention'){status='investigate';reason='Delivery window passed and access appears missing.';next='Fetch fresh evidence and run specialist analysis.';}
   else {status='watching';reason='No overdue missing-access signal yet.';next='Watch for payment, course, or delivery-window changes.';}
-  return {caseId:s.id,status,reason,next,automationStatus:s.automation?.status||null};
+  return {caseId:s.id,status,reason,next,path,automationStatus:s.automation?.status||null};
  });
  const counts=Object.fromEntries(['candidate','investigate','verify','verification','manual','paused','running','verified','review','setup','watching'].map(k=>[k,items.filter(x=>x.status===k).length]));
  return {advisory:true,policy:{enabled:!!policy.enabled,maxAmountCents:policy.maxAmountCents,dailyLimit:policy.dailyLimit,courseId:policy.courseId},readiness:{connections:ready,workflows,worker,database,backupConfigured:!!backup,restoreVerified:!!backup?.restoreVerified,incident:incident.active},counts,items};

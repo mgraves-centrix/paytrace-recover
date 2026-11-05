@@ -28,13 +28,20 @@ export function openStore(file){
  CREATE TABLE IF NOT EXISTS trusted_intake_keys (owner TEXT PRIMARY KEY, digest TEXT NOT NULL, created_at TEXT NOT NULL);
  CREATE TABLE IF NOT EXISTS connector_mappings (owner TEXT PRIMARY KEY, value TEXT NOT NULL, revision INTEGER NOT NULL, active INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL, activated_at TEXT);
  CREATE TABLE IF NOT EXISTS demo_store_checkouts (owner TEXT NOT NULL, request_id TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,request_id));`);
+ db.exec('CREATE TABLE IF NOT EXISTS paypal_purchase_claims (paypal_order_id TEXT PRIMARY KEY, capture_id TEXT UNIQUE, owner TEXT NOT NULL, case_id TEXT NOT NULL, purchase_id TEXT NOT NULL);');
  db.exec('CREATE TABLE IF NOT EXISTS case_preferences (owner TEXT NOT NULL,case_id TEXT NOT NULL,priority TEXT NOT NULL,revision INTEGER NOT NULL,updated TEXT NOT NULL,PRIMARY KEY(owner,case_id));');
  try{db.exec("ALTER TABLE sessions ADD COLUMN mode TEXT NOT NULL DEFAULT 'demo'")}catch(e){if(!/duplicate column name/.test(e.message))throw e;}
  db.exec('PRAGMA busy_timeout=5000');
  const put=s=>JSON.stringify(s),hash=token=>createHash('sha256').update(token).digest('hex');
- function saveCase(owner,state){durable.guard(owner);db.prepare('INSERT INTO cases VALUES (?,?,?) ON CONFLICT(owner,id) DO UPDATE SET value=excluded.value').run(owner,state.id,put(state));support.sync(owner,state);}
+ function claimPayment(owner,state){if(state.intakeMode!=='sandbox'||!state.paypalOrderId)return;const orderId=state.paypalOrderId,captureId=state.capture?.source==='paypal-sandbox'?state.capture.id:null,purchaseId=state.externalIntake?.purchaseId||state.id;
+  const prior=db.prepare('SELECT * FROM paypal_purchase_claims WHERE paypal_order_id=? OR (capture_id IS NOT NULL AND capture_id=?)').all(orderId,captureId);
+  if(prior.some(row=>row.paypal_order_id!==orderId||row.owner!==owner||row.case_id!==state.id||row.purchase_id!==purchaseId||row.capture_id&&captureId&&row.capture_id!==captureId)){const error=Error('PayPal sandbox purchase is already bound to another case or workspace.');error.status=409;throw error;}
+  if(prior.length)db.prepare('UPDATE paypal_purchase_claims SET capture_id=COALESCE(capture_id,?) WHERE paypal_order_id=?').run(captureId,orderId);
+  else db.prepare('INSERT INTO paypal_purchase_claims VALUES (?,?,?,?,?)').run(orderId,captureId,owner,state.id,purchaseId);
+ }
+ function saveCase(owner,state){durable.guard(owner);db.exec('SAVEPOINT paytrace_case');try{claimPayment(owner,state);db.prepare('INSERT INTO cases VALUES (?,?,?) ON CONFLICT(owner,id) DO UPDATE SET value=excluded.value').run(owner,state.id,put(state));support.sync(owner,state);db.exec('RELEASE paytrace_case');}catch(e){db.exec('ROLLBACK TO paytrace_case');db.exec('RELEASE paytrace_case');throw e;}}
  function get(id){const row=db.prepare('SELECT * FROM sessions WHERE id=?').get(id);return row?{id,state:JSON.parse(row.value),operator:!!row.operator,mode:row.mode}:null;}
- function save(owner,state){durable.guard(owner);db.prepare('UPDATE sessions SET value=?,updated=? WHERE id=?').run(put(state),Date.now(),owner);saveCase(owner,state);}
+ function save(owner,state){durable.guard(owner);db.exec('SAVEPOINT paytrace_session');try{db.prepare('UPDATE sessions SET value=?,updated=? WHERE id=?').run(put(state),Date.now(),owner);saveCase(owner,state);db.exec('RELEASE paytrace_session');}catch(e){db.exec('ROLLBACK TO paytrace_session');db.exec('RELEASE paytrace_session');throw e;}}
  function grantRecord(owner,s){db.prepare('INSERT INTO course_access VALUES (?,?,?,?,?) ON CONFLICT(owner,case_id) DO NOTHING').run(owner,s.id,s.order.userId,s.order.courseId,s.capture.id);}
  function init(owner){const row=get(owner);if(!row)throw Error('Unknown workspace.');if(row.mode==='verified'||db.prepare('SELECT count(*) AS n FROM cases WHERE owner=?').get(owner).n)return;for(const s of seedPortfolio(row.state)){saveCase(owner,s);if(canOpenLesson(s))grantRecord(owner,s);}}
  function listCases(owner){init(owner);return db.prepare('SELECT value FROM cases WHERE owner=? ORDER BY id').all(owner).map(r=>JSON.parse(r.value));}
@@ -47,14 +54,19 @@ export function openStore(file){
  const support=customerSupport(db,{caseById,content,grace:owner=>db.prepare('SELECT grace FROM monitor_settings WHERE owner=?').get(owner)?.grace||5});
  const durable=durability(db);
  const center=recoveryCenter(db,{getCase:caseById,listCases,support,grace:owner=>db.prepare('SELECT grace FROM monitor_settings WHERE owner=?').get(owner)?.grace||5});
+ for(const row of db.prepare('SELECT owner,value FROM cases').all())claimPayment(row.owner,JSON.parse(row.value));
  function create(){const id=randomUUID(),state=simulatePayment(createCase('match','CL-'+randomUUID().slice(0,12)));db.prepare("INSERT INTO sessions(id,value,operator,updated,mode) VALUES (?,?,0,?,'demo')").run(id,put(state),Date.now());init(id);return {id,state,operator:false};}
  function createWorkspace(){const id=randomUUID(),state=createCase('match','CL-'+randomUUID().slice(0,12));db.prepare("INSERT INTO sessions(id,value,operator,updated,mode) VALUES (?,?,1,?,'verified')").run(id,put(state),Date.now());return id;}
- function createPublicDemo(address){const bucket=Math.floor(Date.now()/3600000),key=hash(String(address||'unknown'));db.exec('BEGIN IMMEDIATE');try{
+ function createPublicDemo(address,capacity=500){const now=Date.now(),bucket=Math.floor(now/3600000),key=hash(String(address||'unknown'));db.exec('BEGIN IMMEDIATE');try{
   db.prepare('DELETE FROM demo_creation_limits WHERE bucket<?').run(bucket-24);
+  // Reclaim only inactive anonymous demos; verified merchant workspaces are never pruned.
+  const expired=db.prepare("SELECT d.owner FROM demo_workspaces d JOIN sessions s ON s.id=d.owner WHERE s.mode='demo' AND max(d.created,s.updated)<?").all(now-48*3600000);
+  const ownedTables=['cases','monitor_settings','autopilot_policies','autopilot_reservations','course_access','learner_tokens','paypal_webhook_events','access_intents','trusted_intake_keys','connector_mappings','demo_store_checkouts','case_preferences','support_threads','support_tokens','support_mail','support_reminders','support_update_promises','durable_jobs','audit_entries','audit_heads','team_members','center_settings','automation_runs','center_notifications','paypal_purchase_claims'];
+  for(const {owner} of expired){for(const table of ownedTables)db.prepare(`DELETE FROM ${table} WHERE owner=?`).run(owner);db.prepare('DELETE FROM demo_workspaces WHERE owner=?').run(owner);db.prepare("DELETE FROM sessions WHERE id=? AND mode='demo'").run(owner);}
   const total=db.prepare('SELECT count(*) AS n FROM demo_workspaces').get().n;
   const hourly=db.prepare('SELECT count FROM demo_creation_limits WHERE key=? AND bucket=?').get(key,bucket)?.count||0;
-  if(total>=500||hourly>=20){const e=Error('Public demo capacity reached. Try again later or use an existing session.');e.status=429;throw e;}
-  const session=create();db.prepare('INSERT INTO demo_workspaces VALUES (?,?)').run(session.id,Date.now());
+  if(total>=capacity||hourly>=20){const e=Error('Public demo capacity reached. Try again later or use an existing session.');e.status=429;throw e;}
+  const session=create();db.prepare('INSERT INTO demo_workspaces VALUES (?,?)').run(session.id,now);
   db.prepare('INSERT INTO demo_creation_limits VALUES (?,?,1) ON CONFLICT(key,bucket) DO UPDATE SET count=count+1').run(key,bucket);
   db.exec('COMMIT');return session;
  }catch(e){db.exec('ROLLBACK');throw e;}}

@@ -1,0 +1,87 @@
+# Title
+
+PayTrace Recover — From paid purchase to proven digital access
+
+## One-line Summary
+
+PayTrace Recover helps a merchant investigate a PayPal sandbox purchase whose digital lesson stayed locked, explain the evidence with four AI specialists, approve a narrow access correction, and verify that the protected lesson opens.
+
+## Problem
+
+A buyer can complete a payment yet never receive the course, download, or membership access they bought. The buyer sees silence; the merchant has to reconcile payment, order, entitlement, and support records across systems. A payment receipt alone does not prove delivery, and a blind retry can grant the wrong account or duplicate a change.
+
+## Solution
+
+PayTrace keeps one case timeline from reported missing access to a checked outcome. It reads the exact PayPal sandbox order/capture and a separate course-service entitlement, flags contradictions, asks four AI specialists to explain the evidence and objections, previews one purchase-bound grant, and records merchant approval or a narrowly configured sandbox policy. After any grant it rereads payment, entitlement, and protected lesson. The customer can follow a private progress timeline, reply, and confirm whether the lesson works on their device.
+
+## Why This Matters
+
+Digital delivery failures are easy to miss and hard for buyers to track. PayTrace turns a vague support ticket into a case with visible evidence, an accountable decision, and a verifiable access outcome. Its key distinction is the post-correction proof, including a fresh protected-content check and a separate buyer confirmation.
+
+## How We Used AI
+
+Four Azure OpenAI-backed specialists — Ledger, Relay, Patch, and Prism — review the current case snapshot from different perspectives. They cite saved evidence, surface unresolved objections, and recommend the next safe step. Their output does not authorize payment capture or access writes. Deterministic checks still require an exact completed sandbox payment, matching learner/course/amount/currency, current entitlement state, and an approved preview or bounded merchant policy. The UI labels scripted sample consultations separately from model-backed reviews.
+
+## How We Used Codex
+
+Codex helped build the merchant and customer flows, integrate and compare frontend/backend work, write safety tests, diagnose Azure startup and deployment failures, and implement fixes from a whole-repository security/functionality review. The fixes cover purchase ownership, revoked-link mail races, read-only data exposure, demo-capacity expiry, explicit provider refresh, and backup handling. The team verified the result with automated tests and an Azure paired deployment.
+
+## Key Features
+
+- PayPal sandbox order/capture integration with fresh payment checks and webhook handling.
+- Separate tenant-scoped reference course service for entitlement reads, idempotent grants, suspensions, and protected-lesson probes.
+- Guided merchant desk with case queue, evidence, AI consultations, exact correction preview, approval, activity, and run report.
+- Private customer case tracker with progress updates, messages, information requests, lesson access, and separate buyer confirmation.
+- Durable worker, retry and payment-hold behavior, optional bounded sandbox autopilot, and audit trail.
+- Connection studio, Recovery Passport, judge walkthrough, and clear labels for demo versus connected evidence.
+
+## Architecture
+
+The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-instance sandbox demonstration. A separate Azure App Service hosts the reference course service and owns its entitlement database. The server keeps PayPal and Azure OpenAI credentials private. Render Workflow task definitions are in the repository for staged investigation and recovery. Isolated fictional investigation and merchant-approved recovery runs completed with model-backed consultation and a local lesson proof; a PayPal-connected recovery run remains untested. Optional encrypted Azure Blob backup copying is implemented but not configured. This architecture is a sandbox prototype, not a production multi-merchant deployment.
+
+## Testing Instructions
+
+1. Open the [judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) and follow the labeled fictional sample.
+2. Open the [merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html). The Connections view shows which providers are configured; configuration is not an end-to-end pass.
+3. For a connected test, create a sandbox case, complete a PayPal sandbox buyer checkout, run investigation, inspect the cited findings, rehearse and approve the exact grant, apply it, then verify the protected lesson. Download the run report and open the private customer tracker.
+4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The current review-fix branch passed 313 automated tests on November 4; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
+5. Run `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/` to check public routes and provider configuration. It does not prove a checkout or grant.
+
+## Public Demo Link
+
+https://paytrace-recover-sagitta.azurewebsites.net/judge.html
+
+## Public Repository Link
+
+https://github.com/sagitta414/paytrace-recover
+
+Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. The review fixes are on the PR branch; they are not yet on `main` or deployed to Azure. The Azure sandbox demo is serving an earlier build. Its SQLite database was rebuilt into a separate integrity-clean copy after `/health` returned 503; `/health` and hosted route/configuration preflight returned 200 on November 4. The complete PayPal-connected recovery has not been recorded.
+
+## Demo Video
+
+TODO: Record a video under three minutes, upload it publicly to YouTube, and put its URL in the submission form. Show the product functioning in a browser. Suggested sequence: buyer sees a locked lesson after payment; merchant opens the case and checks PayPal/course evidence; four specialists explain their recommendation; merchant approves one narrow grant; protected lesson opens; customer sees the update and confirms. Show the run report's connected/demo labels and avoid implying Render ran until a real Workflow run is captured. Use only media and marks you have permission to include.
+
+## Screenshot Shot List
+
+1. Judge page showing the problem and honest readiness labels.
+2. Merchant case evidence with payment and access mismatch.
+3. Four specialist findings and objections tied to sources.
+4. Exact before/after grant preview and approval control.
+5. Protected-lesson proof, Recovery Passport, and customer progress view.
+
+## Submission Readiness Notes
+
+The code-level security fixes have a green draft PR. The paired Azure apps were updated on 2026-11-02, and an earlier PayTrace UI build was deployed on 2026-11-03. On November 4, the Azure database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy, and `/health` plus the hosted route/provider preflight passed. This does not prove that the latest PR code is deployed or that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
+
+## Known Limitations
+
+- Isolated fictional Render `investigate` and merchant-approved `recover` runs completed; no PayPal-connected acceptance has been recorded.
+- A complete PayPal sandbox buyer checkout, recovery, and protected-lesson acceptance run is still pending.
+- The encrypted backup restore probe passed locally on Azure App Service storage; independent off-site copy and remote restore drill are pending.
+- Current all-files coverage is about 87% lines and 82% branches, below the 90% review target.
+- The public merchant workspace is a sandbox demo; verified merchant OIDC and a commercial LMS integration are not configured.
+- The Azure demo database uses SQLite on App Service shared storage. It recovered from a November 4 integrity failure, but a managed transactional database is needed before a merchant pilot.
+
+## Official Submission Check
+
+The [event overview](https://paypalaihackathon.devpost.com/) and [official rules](https://paypalaihackathon.devpost.com/rules) list a deadline of **November 12, 2026 at 12:00 p.m. Pacific**. The entry needs a functional demo or complete local run instructions, a public open-source repository with source and license, a text description explaining features and tools, and a public YouTube demo video under three minutes. This repository has an MIT `LICENSE`, source, and local run instructions; the hosted demo is live. The video and complete connected recovery recording are still outstanding. Confirm the form's exact fields, team information, and any sponsor-specific requirements in Devpost before submitting. This is a draft, not a submitted entry.

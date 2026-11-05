@@ -10,6 +10,7 @@
   "start": "node --env-file-if-exists=.env --import ./server/telemetry-bootstrap.mjs server/index.mjs",
   "dev": "node --env-file-if-exists=.env --import ./server/telemetry-bootstrap.mjs server/index.mjs",
   "test": "node --test --test-concurrency=1 tests/*.test.mjs",
+  "test:coverage": "node --test --test-concurrency=1 --experimental-test-coverage --test-coverage-lines=87 --test-coverage-branches=81 tests/*.test.mjs",
   "workflows": "node workflows/index.mjs",
   "ai:smoke": "node scripts/ai-smoke.mjs",
   "ai:eval": "node scripts/ai-eval.mjs",

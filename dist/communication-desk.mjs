@@ -12,7 +12,7 @@ export function timelineMarkup(entries,filter='all'){
 }
 
 export function mountTimeline(root,state,support){
- const target=root.querySelector('.case-evidence-column');if(!target)return;
+ const target=root.querySelector('.case-deep-dive')||root.querySelector('.case-evidence-column');if(!target)return;
  let panel=target.querySelector('.communication-timeline');
  const previous=panel?.querySelector('[aria-pressed="true"]')?.dataset.timelineFilter||'all';
  if(!panel){panel=document.createElement('section');panel.className='communication-timeline';target.append(panel);}

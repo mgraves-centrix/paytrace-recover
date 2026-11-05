@@ -65,6 +65,30 @@ test('expired workflow rejects late callbacks without applying a grant',async()=
  }finally{db.close();}
 });
 
+test('read-only refresh recovers a completed sandbox capture after its response is lost',async()=>{
+ const db=openStore(':memory:');try{const {id}=db.create();db.authorize(id);let captures=0,inspections=0,remoteComplete=false;
+ const payment={id:'CAP-recovered',source:'paypal-sandbox',orderId:'',userId:'',courseId:'',status:'COMPLETED',amount:12800,currency:'USD'};
+ const paypal={create:async()=> 'PP-recovered',capture:async()=>{captures++;remoteComplete=true;throw Error('Capture response lost');},inspect:async s=>{inspections++;return remoteComplete?{...payment,orderId:s.id,userId:s.order.userId,courseId:s.order.courseId}:null;},refresh:async s=>({...s.capture})};
+ const svc=createService(db,{}, {paypal});await svc.action(id,{action:'create-case',requestId:randomUUID(),customerName:'Test Buyer',mode:'sandbox'});const order=await svc.paypalCreate(id);await assert.rejects(svc.paypalCapture(id,order.id),/response lost/);
+ assert.equal(db.get(id).state.capture,null);const refreshed=await svc.caseInfo(id,db.get(id).state.id);assert.equal(refreshed.state.capture.id,'CAP-recovered');assert.equal(refreshed.state.phase,'paid');assert.equal(captures,1);assert.equal(inspections,1);
+ }finally{db.close();}
+});
+
+test('failed unfinished workflow cannot resume after deadline but completed stages remain replayable',async()=>{
+ const db=openStore(':memory:');try{const {id}=db.create();db.authorize(id);let unavailable=true;const svc=createService(db,{...workflowEnv,WORKFLOW_TIMEOUT_SECONDS:'60'},{fetcher:async()=>Response.json({id:'run'}),access:(owner,s)=>{if(unavailable)throw Error('outage');return db.readAccess(owner,s);}});
+ const queued=await svc.action(id,{action:'investigate'}),job=queued.state.job.id;
+ await assert.rejects(svc.stage(id,'gather',job),/unavailable/);
+ const expired=db.get(id).state;expired.job.deadlineAt=new Date(0).toISOString();db.save(id,expired);unavailable=false;
+ await assert.rejects(svc.stage(id,'gather',job),/expired/);
+ assert.equal(db.get(id).state.job.expiredAt!==undefined,true);
+ const next=await svc.action(id,{action:'investigate'}),nextJob=next.state.job.id;
+ const cached=await svc.stage(id,'gather',nextJob);const stale=db.get(id).state;stale.job.deadlineAt=new Date(0).toISOString();db.save(id,stale);
+ assert.deepEqual(await svc.stage(id,'gather',nextJob),cached);
+ await assert.rejects(svc.stage(id,'analyze',nextJob),/expired/);
+ assert.equal(db.get(id).state.writes,0);
+ }finally{db.close();}
+});
+
 test('anonymous demo creation has a persistent per-address cap',async()=>{
  const db=openStore(':memory:');try{
   for(let i=0;i<20;i++)db.createPublicDemo('203.0.113.10');

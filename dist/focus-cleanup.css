@@ -1,0 +1,57 @@
+.case-redesign .case-layout{gap:22px}
+.case-redesign .case-decision-column{top:12px}
+.case-redesign .case-decision-column .summary{padding-bottom:15px;border-bottom:1px solid #cbdff3}
+.case-redesign .case-decision-column .summary h2{font-size:22px}
+.case-redesign .merchant-decision{margin:16px 0 0;padding:15px;border-color:#d7e6f6;background:#fff}
+.case-redesign .merchant-decision h2{font-size:17px}
+.case-redesign .merchant-decision>small{margin-top:8px}
+.case-redesign .decision-evidence{margin:12px 0}
+.case-redesign .exact-approval{margin-top:16px}
+.case-change-preview{margin:0 0 18px;padding:17px;border:1px solid #c9dff4;border-radius:15px;background:#f7fbff}
+.case-change-preview>h3{margin:0 0 13px;color:#123b70;font-size:17px}
+.case-change-preview .diff{margin:0}
+.case-decision-column .case-change-preview .diff{grid-template-columns:1fr}
+.case-decision-column .case-change-preview .diff>div{min-width:0}
+.case-change-preview .footnote{margin:12px 0 0}
+.case-redesign .case-communication-area{margin:6px 0 0!important;padding:19px}
+.case-redesign .case-communication-heading h2{font-size:20px}
+.case-redesign .case-communication-heading p{line-height:1.5}
+.case-redesign .case-sample-update{margin:0 0 14px;padding:12px 14px;border:1px solid #d8e6f5;border-radius:10px;background:#fff;color:#3c5876;font-size:13px;line-height:1.5}
+.case-redesign .case-sample-update a{font-weight:700;color:#075bab}
+.case-redesign .case-deep-dive{margin:16px 0 0}
+.case-redesign .case-deep-dive .clarity-specialists,.case-redesign .case-deep-dive .case-experience,.case-redesign .case-deep-dive .agent-workbench{margin-top:18px}
+.case-redesign .case-deep-dive .case-priority-panel{margin:16px 0}
+.case-redesign .case-deep-dive .story-brief-panel{margin:16px 0}
+.case-redesign .case-deep-dive .freshness-band{margin-top:18px}
+.case-redesign .case-deep-dive .access-journey{padding:15px 0}
+@media(max-width:850px){.case-redesign .case-layout{gap:16px}.case-redesign .case-decision-column{top:auto}.case-redesign .case-communication-area{padding:16px}.case-change-preview{padding:14px}}
+@media(max-width:650px){
+ .focus-case-open .workspace-subbar>.merchant-account-link{display:none}
+ .focus-case-open .case-create-toolbar{display:none}
+ .review-shell>.stepper{display:flex;align-items:center;justify-content:flex-start;gap:8px;margin:3px 0 9px;padding:0}
+ .review-shell>.stepper::before{content:"STEP " attr(data-current-step);color:#426487;font-size:10px;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+ .review-shell>.stepper>span{display:none}
+ .review-shell>.stepper>span.active{display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;font-size:11px}
+ .review-shell>.stepper>span.active i{width:19px;height:19px}
+ .case-redesign .sheet-head{padding:14px 15px 12px!important}
+ .case-redesign .case-customer{display:none}
+ .case-redesign .case-meta{margin-bottom:5px;gap:6px}
+ .case-redesign .case-meta .eyebrow{font-size:9px;line-height:1.35}
+ .case-redesign .sheet-head h1{font-size:21px;line-height:1.2;letter-spacing:-.6px;margin:9px 0 0}
+ .case-redesign .sheet-head>p{display:none}
+ .case-redesign .purchase{grid-template-columns:1fr 1fr;gap:8px;margin-top:10px!important;padding:9px 10px!important}
+ .case-redesign .purchase strong{font-size:12px}
+ .case-redesign .purchase small{font-size:10px;line-height:1.3}
+ .case-redesign .sheet-body{padding:12px!important}
+ .case-redesign .case-wayfinding{display:none}
+ .case-redesign .case-decision-column{padding:14px}
+ .case-redesign .case-decision-column .summary{padding-bottom:10px}
+ .case-redesign .case-decision-column .summary h2{font-size:20px;margin:5px 0 7px}
+ .case-redesign .case-decision-column .summary p{font-size:12px;line-height:1.45}
+ .case-redesign .merchant-decision{margin-top:10px;padding:12px}
+ .case-redesign .decision-evidence{margin:9px 0}
+ .case-redesign .decision-evidence span{padding:7px}
+ .case-redesign .case-change-preview{padding:12px;margin-bottom:10px}
+ .case-redesign .case-decision-column .consent{margin-top:10px}
+ .case-redesign .case-decision-column .actionbar{padding-top:10px}
+}

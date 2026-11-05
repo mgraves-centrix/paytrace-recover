@@ -42,6 +42,6 @@ test('connector activation requires a matching fresh capture, then raw events us
  const draft=await(await merchant('connector/mapping',{sample,mapping,expectedRevision:0})).json();assert.equal(draft.active,false);assert.equal(draft.revision,1);
  mismatch=true;assert.equal((await merchant('connector/activate',{sample,expectedRevision:1})).status,409);assert.equal(db.connectorMapping(owner).active,false);assert.equal(db.listCases(owner).some(s=>s.id==='CL-STORE-10001'),false);
  mismatch=false;const active=await(await merchant('connector/activate',{sample,expectedRevision:1})).json();assert.equal(active.active,true);assert.equal(active.payment.matched,true);
- assert.equal((await intake(sample)).status,201);assert.equal((await intake(sample)).status,200);const s=db.caseById(owner,'CL-STORE-10001');assert.equal(s.writes,0);assert.equal(s.capture.source,'paypal-sandbox');assert.equal(reads,3);
+ assert.equal((await intake(sample)).status,201);assert.equal((await intake(sample)).status,200);const s=db.caseById(owner,'CL-STORE-10001');assert.equal(s.writes,0);assert.equal(s.capture.source,'paypal-sandbox');assert.equal(s.externalIntake.channel,'mapped-event');assert.equal(s.externalIntake.connectorRevision,1);assert.equal(reads,3);
  const changed=await(await merchant('connector/mapping',{sample,mapping,expectedRevision:1})).json();assert.equal(changed.active,false);assert.equal((await intake({...sample,purchase:{...sample.purchase,case_id:'CL-STORE-10002'}})).status,400);
 });
