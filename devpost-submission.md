@@ -44,7 +44,7 @@ The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-in
 1. Open the [judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) and follow the labeled fictional sample.
 2. Open the [merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html). The Connections view shows which providers are configured; configuration is not an end-to-end pass.
 3. For a connected test, create a sandbox case, complete a PayPal sandbox buyer checkout, run investigation, inspect the cited findings, rehearse and approve the exact grant, apply it, then verify the protected lesson. Download the run report and open the private customer tracker.
-4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The latest reviewed branch passed 301 automated tests; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
+4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The current review-fix branch passed 313 automated tests on November 4; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
 5. Run `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/` to check public routes and provider configuration. It does not prove a checkout or grant.
 
 ## Public Demo Link
@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. Commit `58c471a` from that PR is live on the Azure sandbox demo; hosted preflight and the condensed case review passed. The complete PayPal-connected recovery has not been recorded, and `main` has not received the PR.
+Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. The review fixes are on the PR branch; they are not yet on `main` or deployed to Azure. The Azure sandbox demo is serving an earlier build. Its SQLite database was rebuilt into a separate integrity-clean copy after `/health` returned 503; `/health` and hosted route/configuration preflight returned 200 on November 4. The complete PayPal-connected recovery has not been recorded.
 
 ## Demo Video
 
@@ -71,7 +71,7 @@ TODO: Record a video under three minutes, upload it publicly to YouTube, and put
 
 ## Submission Readiness Notes
 
-The code-level security fixes have a green PR and the paired Azure apps were updated on 2026-11-02. The current PayTrace UI was deployed on 2026-11-03; Azure health, new public assets, hosted route/provider preflight, unauthenticated course boundary, tenant-scoped authenticated course read, PayPal sandbox OAuth, and AI model connection checks passed. None of those checks constitutes a complete connected recovery. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
+The code-level security fixes have a green draft PR. The paired Azure apps were updated on 2026-11-02, and an earlier PayTrace UI build was deployed on 2026-11-03. On November 4, the Azure database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy, and `/health` plus the hosted route/provider preflight passed. This does not prove that the latest PR code is deployed or that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
 
 ## Known Limitations
 
@@ -80,6 +80,7 @@ The code-level security fixes have a green PR and the paired Azure apps were upd
 - The encrypted backup restore probe passed locally on Azure App Service storage; independent off-site copy and remote restore drill are pending.
 - Current all-files coverage is about 87% lines and 82% branches, below the 90% review target.
 - The public merchant workspace is a sandbox demo; verified merchant OIDC and a commercial LMS integration are not configured.
+- The Azure demo database uses SQLite on App Service shared storage. It recovered from a November 4 integrity failure, but a managed transactional database is needed before a merchant pilot.
 
 ## Official Submission Check
 
