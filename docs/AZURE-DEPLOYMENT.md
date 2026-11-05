@@ -1,5 +1,7 @@
 # Azure demo deployment
 
+> Review on November 4, 2026: public routes responded, runtime reported all five integrations configured, but `/health` returned HTTP 503 with `{"ok":false}`. Hosted preflight failed. Configuration notes below are historical; do not present this host as a healthy connected recovery until the database check and case-level acceptance pass. See [current validation](VALIDATION-2026-11-04.md).
+
 The Node demo is hosted at `https://paytrace-recover-sagitta.azurewebsites.net/` on the existing Linux Free F1 App Service plan `shared-free-plan` in resource group `provenance-pilot-rg`. The separate reference course service shares this plan. This plan can sleep and has limited shared capacity; expect cold starts during a judge walkthrough. Confirm the current plan in Azure before relying on this document for deployment or cost decisions.
 
 The app uses Node 24 LTS, `npm start`, and the `DATABASE_PATH` App Setting for its single-instance demo database (currently `/home/data/courselatch-20261102-recovered.sqlite`). Always On is not available on the current Free plan. Keep the app at one instance: SQLite and the in-process lock are not suitable for scale-out. The public Sites URL remains a browser simulation; the Azure URL serves the Node backend. Start a review at `/judge.html` to distinguish those paths.

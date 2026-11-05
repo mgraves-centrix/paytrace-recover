@@ -1,5 +1,7 @@
 # Connected demo checklist
 
+> Review on November 4, 2026: public routes responded, runtime reported all five integrations configured, but `/health` returned HTTP 503 with `{"ok":false}`. Hosted preflight failed. Configuration notes below are historical; do not present this host as a healthy connected recovery until the database check and case-level acceptance pass. See [current validation](VALIDATION-2026-11-04.md).
+
 Start at `https://paytrace-recover-sagitta.azurewebsites.net/judge.html`. The sample tour is clearly labeled fictional. The Azure merchant workspace is server-backed, with **AI, a separate course service, and PayPal sandbox credentials configured; Render Workflow remains unconfigured**. A recovery run is connected only when the run report records all six checks as passed. Credential configuration alone does not establish that a completed PayPal checkout or recovery succeeded.
 
 The judge page now gives one short route through the sample story and a separate server-backed case, then points to the connection checklist for a sandbox run. The Focus dashboard's outcomes panel counts current verified access, evidence holds, and writes awaiting verification. On the server it also counts technically verified cases without a recorded customer confirmation. These are this workspace's cases, split by sandbox versus sample; they are not a claim about merchant-wide impact.

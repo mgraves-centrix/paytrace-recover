@@ -1,127 +1,278 @@
-# PayTrace Recover — Payment made. Access restored.
+# PayTrace Recover
 
-PayTrace Recover helps merchants resolve cases where a customer paid but didn’t receive the digital access they purchased.
+**Trace a completed payment to missing digital access. Review a precise correction. Verify the outcome.**
 
-[Judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) · [Azure merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html) · [Public browser simulation](https://courselatch.sagitta107.chatgpt.site/focus.html) · [Setup instructions](docs/SETUP.md)
+PayTrace Recover is a sandbox prototype for merchants handling “I paid, but I can’t get in.” Its first supported use case is a purchased course. It compares payment and access evidence, runs a four-specialist investigation, rehearses a narrow entitlement change, records merchant approval, applies an idempotent correction, and checks protected lesson access.
 
-The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
+A write is not proof of recovery. Current technical verification, a buyer-browser receipt, and customer confirmation are separate facts.
 
-The [Recovery Passport](docs/RECOVERY-PASSPORT.md) gives merchants a source-linked case receipt and customers a private, simpler timeline. It separates payment, investigation, a recorded correction, current protected-lesson proof, buyer-browser receipt, and customer confirmation. A Render run appears with its saved stage states only when one actually exists.
+[Project overview](dist/project.html) · [Interactive sample](dist/demo.html) · [Judge walkthrough](dist/judge.html) · [Feature acceptance matrix](docs/FEATURE-ACCEPTANCE.md) · [Review results](docs/VALIDATION-2026-11-04.md)
 
-The [Merchant Connection Studio](docs/TRUSTED-STORE-INTAKE.md) lets an operator map a store's purchase JSON to PayTrace's trusted intake contract, preview the result, and activate the mapping only after a fresh matching PayPal sandbox capture. AI can suggest field names without seeing buyer or payment values. The store must still send events from its server; this is not a claim that an independent store is already connected.
+## Status and evidence
 
-The server-backed [Recovery intelligence lab](docs/INTELLIGENCE-LAB.md) adds a read-only PayPal reporting scan, possible-incident pause for automatic grants, policy what-if rehearsal, a private customer access check, and a merchant evidence packet. These are prototype features; reporting candidates cannot authorize a course grant.
+This review starts from GitHub `main` commit `eff16c73a128db0ff23a9277d431e9ae35c8e815`, fetched November 4, 2026. The unchanged baseline passed **276 automated tests** with no failures or skips. See the validation report for checks after the documentation/page changes.
 
-The local presentation route is `/` → `/story.html` → `/focus.html?from=story` → a private customer case link. The guided story and merchant workspace are separate examples, so their case state does not transfer. In the browser demo, the handoff opens Maya's seeded Focus case; on the server, it opens the merchant's own case queue. See the [screen-by-screen story](docs/DEMO-STORY.md).
+| Mode | What it does | What it does not establish |
+| --- | --- | --- |
+| Static browser demonstration | Fictional records and scripted specialist interactions | Real provider reads, persistent server work, or connected recovery |
+| Local server demo | SQLite-backed cases, support links, recovery rules and local protected lesson | External course delivery or a real PayPal capture |
+| Configured sandbox | Optional PayPal, AI, separate course service, email and Render calls | Configuration alone is not successful acceptance |
+| Verified merchant mode | Implemented OIDC/MFA membership and role boundaries | Live identity-provider acceptance still needs private setup |
 
-**Building the connected version? Start with the [current connected-demo checklist](docs/CONNECTED-DEMO.md) and [detailed PayPal Sandbox and Render Build README](docs/BUILD-README.md).** They cover account setup, environment variables, checkout, AI review, persistent hosting, Render Workflows, acceptance tests, and release readiness.
+Earlier deployment notes record Azure AI evaluation and authenticated course-service reads. This review does not independently repeat those private tests. A complete connected PayPal-to-lesson recovery, Render execution, real identity/MFA and email delivery still require recorded acceptance evidence. PayPal is **sandbox only**. A commercial LMS adapter and multi-host production deployment are outside the demonstrated scope.
 
-An optional [separate course-access service](docs/COURSE-ACCESS.md) now lets sandbox cases read, grant, and verify access outside PayTrace's SQLite store. The repository includes a small local reference service for a two-process demo; it is not a commercial LMS connector.
+## Quick start
 
-Optional [PayPal sandbox webhook intake](docs/PAYPAL-WEBHOOKS.md) verifies capture events, rereads the exact payment from PayPal, and checks access for an existing case. Webhooks never approve or apply a repair.
+Requirements: **Node.js 24 or newer**, npm, Git, and an available local port. There is no compilation step; current browser assets are authored in `dist/`.
 
-The Focus workspace now shows a downloadable [recovery run report](docs/RUN-REPORT.md) that labels each saved payment, access, AI, approval, Render, and lesson check as connected, demo, or incomplete.
+In PowerShell:
 
-The merchant case view also includes an interactive Break Point Map from PayPal capture to protected lesson. Each step exposes its saved source record, evidence status, check time when available, and responsible specialist. The highlighted step identifies the first actionable break without claiming its underlying cause. An expandable purchase comparison shows the expected and observed status, order, learner, course, amount, currency, and account or term checks. Browser samples, server demo records, and connected sandbox reads are labeled separately; unavailable sources and stale proof remain unknown.
-
-The Connections screen can perform a read-only authenticated check against the separate course service before a recovery run. It checks a new test entitlement and never grants access; a successful connection check does not claim that lesson verification or an end-to-end recovery passed.
-
-The judge walkthrough now offers a single short route through the sample story and merchant workspace, with a separate sandbox readiness callout. The Focus desk reports verified access, cases held for evidence, writes awaiting verification, and technically verified cases awaiting customer confirmation. The merchant can set a customer-visible next progress-update time independently of private reminders; it makes no promise that access will be restored by that time.
-
-The guided story now hands viewers into the merchant workspace. The judge page shows current configuration separately from completed case evidence; the Connections page tracks four pre-Render checkpoints. Sandbox intake requires valid PayPal credentials and a completed connected test. Activity can be searched and filtered with full dates, while the customer view distinguishes the latest case message from the last merchant reply. The case view presents one specialist evidence section instead of repeating the same four findings.
-
-The [focused recovery experience](docs/TODAY-EXPERIENCE.md) brings decisions, waiting customers, and unfinished verification into a simple Today view; adds a merchant decision brief and customer-visible update time; flags possible shared incidents; and includes an [interactive fictional walkthrough](dist/demo.html) from purchase to customer confirmation. The walkthrough is a sample, while connected outcomes still require the run report.
-
-The case desk now adds an [agent challenge room, recovery flight recorder, and incident scope](docs/CASE-INTELLIGENCE.md). They expose saved objections and source records, separate payment, approval, access write, lesson proof, and customer confirmation, and show which sandbox cases form a possible shared incident. These views explain existing evidence; they do not authorize a grant or prove a shared root cause.
-
-The [access assurance layer](docs/ACCESS-ASSURANCE.md) adds a private buyer-browser receipt for the protected lesson, a visible PayPal-payment-to-access delivery target, and an incident detective that refreshes source checks and optionally adds cited AI perspectives. Browser receipt, technical proof, and customer confirmation remain separate facts. Incident checks are read-only and do not approve a batch grant.
-
-The public link runs a browser simulation using fictional records. Run the Node backend below to explore server-backed recovery; external integrations require your own sandbox credentials.
-
-The first working example is a paid course with missing access. The app checks the evidence, rehearses the smallest correction on a copy, asks the merchant to approve the exact change, applies it once, and checks the outcome. Memberships and downloads are future directions to validate, not supported connectors.
-
-## What works today
-
-- Public static demonstration: nine scenarios, a seven-purchase sample portfolio, delivery-window monitoring, distinct diagnoses, related-case filtering, editable customer drafts, and the existing reviewed recovery flow. Records and agent consultations are fictional.
-- Local Node backend: isolated cookie sessions, durable SQLite records, protected lesson-access endpoint, same-origin mutation checks, operator gate for configured integrations, serial per-session writes.
-- Setup-ready PayPal sandbox order creation/capture/fresh reads and Render investigation and approved-recovery task chains. The Azure app now runs six to eight bounded Azure OpenAI Responses calls with cited objections, specialist responses, and final review. A separate Azure reference course-access service is configured for sandbox cases.
-- Merchant agent desk: a plain-language decision brief, live specialist progress, and read-only follow-up questions tied to the saved review. Model answers keep their cited source records and cannot approve or apply an access change. Follow-ups require an unlocked operator session and configured AI; the public browser demo remains scripted.
-- Automated tests cover business invariants and mocked integration contracts. The Azure model-backed specialists passed a live five-scenario evaluation, and the separate course service passed authenticated and unauthorized read checks. **PayPal sandbox credentials are configured on the Azure app, but an end-to-end connected recovery has not been demonstrated; Render Workflows remain unconfigured.** The published Sites version remains a browser simulation.
-
-## Run
-
-Use Node 24 or newer. From this directory:
-
-```sh
+```powershell
+cd "C:\path\to\paytrace-recover"
 npm ci
 npm test
 npm start
 ```
 
-Open http://127.0.0.1:4358. It works without credentials in server-demo mode. To run the exact static publication instead, use `node serve.cjs` and http://127.0.0.1:4357.
+Use your actual checkout path. PowerShell uses `cd "path"`; the `/d` switch belongs to Command Prompt.
 
-See [integration setup](docs/SETUP.md), [product scope](docs/PRODUCT.md), [demo script](docs/DEMO_SCRIPT.md), and [seller research kit](docs/SELLER_RESEARCH.md).
+Open [the local project page](http://127.0.0.1:4358/project.html), [judge walkthrough](http://127.0.0.1:4358/judge.html), or [merchant workspace](http://127.0.0.1:4358/focus.html). No provider credentials are needed for server-demo mode. Stop with **Ctrl+C**.
 
-The [development plan](docs/DEVELOPMENT_PLAN.md) sequences the Render and AG Studio build, live integration checks, and the later merchant pilot.
+For an optional private configuration file:
 
-The Recovery Center now includes **Autonomy control**. It explains each case's next step and the current database, worker, connection, restore-probe, and Render signals. Its policy simulator is read-only: changing the amount, daily limit, or enabled toggle in that screen does not save a policy, call PayPal, or grant access. The merchant sets a real policy in Focus → Connections. A completed sandbox capture from the demo store or trusted store intake queues a scan; the durable worker watches the delivery window, refreshes provider evidence, and runs AI analysis. A policy-eligible case can receive one bounded repair after fresh checks and a saved preview. A payment hold, incident, uncertain write, or failed verification cannot trigger a repeat grant. Customer progress messages are emitted when the case reaches review, completed evidence review, access-write verification, or verified access; email delivery remains a separate observable attempt.
+```powershell
+Copy-Item .env.example .env
+```
 
-This is an operating view, not a claim that all connected services passed acceptance. The existing six-signal run report remains the source of truth for a connected demonstration. Render Workflows and encrypted backup/restore must show as configured and tested before describing them as live. See [Connected demo checklist](docs/CONNECTED-DEMO.md) for setup and proof steps.
-The Azure backup helper at `scripts/configure-azure-backups.ps1` creates a private encryption key only when none exists and places encrypted backups under `/home/data/backups`. The worker runs a restore probe with each backup. That path is on the same App Service storage as the demo database, so an independent off-site copy is still needed for disaster recovery.
+Edit `.env` locally; never commit it. To use another port, update both values together:
 
-The [integration decisions](docs/INTEGRATION-DECISIONS.md) describe the Darius work brought into this branch and the chosen merchant-identity and course-connector boundaries. The [Recovery Center](docs/RECOVERY-CENTER.md) adds analytics, verification receipts, alerts, follow-up automation, audit records, and scoped team access. The [release-candidate runbook](docs/RELEASE-CANDIDATE.md) covers verified sign-in and connected acceptance.
+```powershell
+$env:PORT = "4362"
+$env:PUBLIC_URL = "http://127.0.0.1:4362"
+npm start
+```
 
-## Structure
+The normal server binds all interfaces; use local firewall/network controls when running demo mode. Private customer and team links are bearer access links: do not publish them or include them in screenshots.
 
-`dist/` is the published static site. `dist/core.mjs` contains shared recovery rules. `server/` owns durable state, provider calls, and authorization. `workflows/` defines Render tasks. `tests/` verifies the rules and HTTP/provider boundaries. `render.yaml` configures an optional web service; Workflows are configured separately. `.openai/hosting.json` retains the existing Sites project identity.
+### Ports and pages
 
-The original PayTrace design remains in `source/` as historical design material. Do not run the legacy `export-demos.cjs` generator: it would restore the old visual pages. Current pages are authored directly in `dist/`. Existing portrait illustrations are fictional characters.
+| Port | Purpose | How selected |
+| --- | --- | --- |
+| 4358 | Default Node backend and browser assets | `npm start`; override `PORT` and `PUBLIC_URL` together |
+| 4357 | Static browser simulation | `node serve.cjs`; no Node API or durable workspace |
+| 4362 | Isolated local review preview | Review-only override, not a second required service |
+| Configured separately | Reference course-access service | See its example and course-service guide |
 
-## Prototype boundaries
+There is no separate frontend dev-server port for normal operation.
 
-The public demonstration uses isolated fictional merchant workspaces with one reference course. This branch also includes optional verified merchant sign-in and membership using OIDC + MFA; it is not configured or live-accepted on the public deployment. No production payments or commercial LMS connector are included. Sandbox webhook intake is implemented but has not been validated with a live PayPal delivery. The storefront deliberately injects an access-update failure after capture; it does not diagnose an actual third-party store outage. AI interprets supplied records but cannot authorize or execute writes. Citations are checked for valid source IDs, not automatically proven factually correct. Deterministic checks and either exact case approval or a merchant-enabled narrow sandbox policy remain necessary.
+| Page | Purpose |
+| --- | --- |
+| `/project.html` | Project overview, architecture story and evidence boundaries |
+| `/judge.html` | Short evaluation route and readiness explanation |
+| `/demo.html`, `/story.html` | Fictional interactive recovery stories |
+| `/focus.html` | Merchant Today view, queue, case review and connections |
+| `/recovery.html` | Analytics, notifications, audit, priorities, automation, team and operations |
+| `/store-demo.html` | PayTrace-hosted sandbox storefront |
+| `/connection-studio.html` | Trusted store-event field mapping and activation |
+| `/passport.html` | Merchant evidence trail for the selected authorized case |
+| `/customer.html` | Customer entry; case details require a private case link |
+| `/account.html` | Verified merchant sign-in and membership setup |
+| `/health` | Database-aware health response; not connected acceptance |
 
-SQLite persistence, durable scheduled and webhook reconciliation jobs, and workspace leases support one durable host with processes sharing the same database. Verified OIDC membership is implemented but needs provider setup and connected acceptance. A production service still needs shared authorization and idempotency across multiple hosts, retention controls, verified refund suspension at the chosen course platform, and a real course-platform adapter. Approval is specific to the previewed evidence or a narrow merchant-enabled sandbox policy. Verification checks current state, not a permanent guarantee.
+## Feature inventory
 
-PayTrace Recover is a working name, not a trademark-clearance claim. This is an independent project, not an official PayPal product.
+### Merchant workspace
 
-## Agent challenge round
+- Today dashboard for decisions, waiting customers and outcomes needing verification.
+- Case search, filters, persistent priorities, related-case views, new sample/sandbox cases and activity history.
+- Decision brief, guided mode, tour and connection status.
+- Timeline joining recovery events, customer messages and separate private notes.
+- Customer-visible next-update promises, private reminders, workspace CSV and case outcome facts.
 
-The merchant sees a compact decision card before rehearsal. Expand it for categorized objections, one response round, and source records frozen at review time. The agent desk adds a short decision brief and optional cited follow-up questions. Outcomes are ready for rehearsal, needs evidence, blocked, or verify only. Existing access is checked with zero repair writes; changed evidence invalidates review and approval. Unknown timeout cause stays visible.
+### Payment and access investigation
 
-Cases D–F demonstrate missing payment evidence, an earlier store retry restoring access, and a payment reference changing after review. Read [challenge validation](docs/CHALLENGE_ROUND.md) for invariants and the demo sequence.
+- PayPal sandbox order creation, checkout capture and fresh authoritative payment reads.
+- Exact order, learner, course, amount, currency and account checks; separate course-entitlement comparison.
+- Delivery targets, overdue monitoring, source timestamps and purchase-evidence comparison.
+- Break Point Map, related-case detection and possible shared-incident alerts.
+- Cause-specific holds for pending, mismatched, expired, wrong-account, stale or uncertain evidence.
 
-## Five connected improvements
+### AI specialists
 
-1. **Access Watch:** configurable 1–60 minute delivery window, manual checks, and reconciliation every 30 seconds. The backend checks saved purchases while running; the static demo checks sample records while the page is visible. Complaint timing stays unknown unless recorded.
-2. **Cause-specific routing:** missing enrollment can proceed to review; wrong login, expired access, pending payment, and conflicting records require different next steps and cannot trigger the same grant.
-3. **Related cases:** correlate the same merchant, course, enrollment error, and 15-minute payment window. Similarity is not proof of shared cause. Each purchase requires a separate review; a correction requires either exact case approval or the merchant's narrow sandbox automation policy.
+| Specialist | Responsibility |
+| --- | --- |
+| Ledger | Payment evidence |
+| Relay | Events and handoffs |
+| Patch | Smallest safe correction proposal |
+| Prism | Independent objections and challenge |
 
-### Opt-in automatic recovery
+The case view includes cited findings, challenge discussion, recommendations and read-only specialist follow-ups. Optional AI can rank cases, add incident perspectives or suggest store mappings. Mapping suggestions use field names/types rather than buyer values. Model-backed review needs configured AI; public guided stories use scripts. AI never supplies merchant approval or directly authorizes a grant.
 
-The Connections screen includes a merchant-controlled policy, **off by default**. The operator can set a maximum purchase amount and a daily case limit. It can be enabled only when PayPal sandbox, the external course-access service, and AI are configured. For the single demo course, PayTrace can then investigate an overdue case, require a current model-backed review with every objection resolved, rehearse the exact grant, match it against the merchant's policy, reread PayPal and access, apply one grant, and verify the protected lesson. The case records the policy ID and exact preview used. Mismatches, unsupported cases, exhausted limits, unavailable sources, and uncertain writes go to merchant review. A failed lesson check is retried with reads only. The policy can be disabled at any time; changes are serialized with in-flight recovery operations.
+### Correction and verification
 
-This path currently runs inside the PayTrace server monitor, not Render Workflows. It is tested with mocked sandbox and course-service adapters. The published Azure app has PayPal sandbox credentials, but automatic grants cannot be claimed as a live connected demonstration until a completed sandbox recovery is observed. Production use needs real merchant authentication and a full operational review.
+- Exact-change rehearsal and evidence-bound merchant approval.
+- Fresh payment and entitlement checks before correction; idempotent grant protection and durable recovery jobs.
+- Protected-lesson check after correction; read-only verification retries without repeating grants.
+- Recognition of course-system self-restoration without a PayTrace grant.
+- Holds for unresolved objections, stale evidence, ambiguous writes and possible shared incidents.
+- Opt-in sandbox autopilot with amount/daily limits, **off by default**. Its bounded authorization is separate from the normal per-case approval path.
 
-If the course system restores a known sandbox purchase on its own, the monitor now verifies the current PayPal capture, matching entitlement, and protected lesson automatically **without an access write or merchant approval**. A failed lesson check remains open and schedules read-only rechecks. A successful proof updates the private customer tracker and records that no PayTrace grant was needed. This read-only path works independently of the AI configuration and the grant policy.
-4. **Protected-content proof:** the Node verifier makes an authenticated HTTP request using a short-lived, case/learner/course-scoped capability, checks returned lesson content, then revokes the token. The separate course-access record must agree with the purchase. This verifies our demo content service, not an external LMS or a real customer's device. The public static version explicitly simulates verification.
-5. **Customer response:** an editable evidence-based template that claims restoration only after current verification passes. Copying never sends a message. Templates are deterministic; the optional AI integration still handles specialist review.
+### Customer experience
 
-The custom investigation console is working; **AG Studio remains planned**. The [judge walkthrough](dist/judge.html) separates the sample tour from the connected sandbox path. See [setup and prototype limits](docs/SETUP.md) before attempting a live deployment.
+- Purchase-support entry, private progress tracker and simpler Recovery Passport.
+- Two-way messages, information requests and visible update promises with overdue status.
+- Read-only access self-check and currently verified demo lesson access.
+- One-use buyer-browser receipt, separate “It works” confirmation and “I still need help” response.
+- Optional email links/notifications. Provider acceptance and attempted delivery are not inbox confirmation.
 
-## License
+### Evidence, reporting and integration
 
-Project source is available under the [MIT License](LICENSE). Third-party dependencies retain their own licenses. PayPal names and marks belong to their respective owners; this license grants no trademark rights or endorsement.
-# Customer progress and messaging
+- Seven Passport stages: payment, investigation, approval, correction, lesson proof, buyer-browser receipt and customer confirmation.
+- Flight recorder, case history, expiring verification receipt, evidence packet, audit search, currency-separated analytics and run reports.
+- Reports label checks **connected**, **demo** or **incomplete**.
+- Authenticated/idempotent server-to-server purchase intake, fresh PayPal matching, store JSON mapping preview and checked activation; edits deactivate mappings.
+- Store-key creation/rotation, verified sandbox webhooks and read-only PayPal reporting discovery. Events/reporting candidates cannot authorize a repair.
 
-Customers can follow a private case, message the merchant, answer information requests, open verified demo course content, and confirm success or ask for more help. Admin notes stay private. Start in the Focus case’s **Customer communication** panel; see [customer support setup and testing](docs/CUSTOMER-SUPPORT.md). Email alerts require optional Resend configuration and report provider acceptance separately from delivery.
+### Team and operations
 
-## Follow the recovery story
+- Demo operator controls; Admin, Manager, Analyst and Read-Only role boundaries and redaction.
+- Implemented OIDC/MFA memberships, awaiting configured identity acceptance.
+- SQLite durability, scoped writes, leases/jobs, retry tracking and operational diagnostics.
+- Encrypted backup and restore-check tooling; configurable audit integrity key.
+- Optional Azure tracing/alerts, GitHub Actions, model evaluations, hosted preflight and connected acceptance checks.
 
-Open `/story.html` for a seven-chapter Merchant/Customer story: a paid purchase with missing access, an evidence-linked four-specialist challenge, merchant approval of one correction, fresh verification, and customer confirmation. Alternate paths show a mismatched payment held safely, a verification failure that needs another check, and a customer who still needs help after technical verification. The merchant can acknowledge that report, recheck without a second grant, and explicitly send a state-aware customer update drafted by the scripted Relay specialist. This story uses labeled local sample data and scripted analysis. The connected Focus workspace also includes a concise decision brief and measured outcome facts. See the [demo walkthrough and measurement boundaries](docs/DEMO-STORY.md).
+See [the acceptance matrix](docs/FEATURE-ACCEPTANCE.md) for implementation locations, test families and remaining external proof.
 
-## Local backend update
+## Architecture and safety boundaries
 
-This source package incorporates upstream revision `ae216c815358b925a1a4475e99f07e1b55ab5946` and the earlier local UI fixes. Additional backend checks enforce workflow stage order, persist completed stage results for safe callback retries, reject stale case identifiers from browser tabs, validate JSON request objects and byte limits, and refresh existing sandbox captures without capturing again. Browser actions pass the selected case ID to the backend.
+```mermaid
+flowchart LR
+    Store[Merchant store server] -->|Authenticated purchase event| API[PayTrace Node API]
+    Merchant[Merchant workspace] --> API
+    Buyer[Private customer link] --> API
+    API --> DB[(SQLite: cases, support, jobs, audit)]
+    API -->|Fresh sandbox reads| PayPal[PayPal sandbox]
+    API -->|Read and exact scoped write| Course[Separate course service]
+    API -->|Bounded cited review| AI[AI Responses endpoint]
+    Render[Optional Render tasks] -->|Authenticated stages| API
+    API -->|Optional notification| Email[Email provider]
+```
 
-Run `npm ci`, `npm test`, and `npm start` with Node 24 or newer. The default URL is http://127.0.0.1:4358; configure both `PORT` and `PUBLIC_URL` when choosing another port. Use `.env.example` for optional integration configuration. The automated suite covers HTTP, persistence, private customer support, a separate course service, mocked webhook verification, run-report truth checks, and recovery safety regressions. GitHub Actions now runs the suite on pull requests and pushes to `main`. Live PayPal, Render workflow, and email acceptance still require service configuration. Use `npm run ai:eval` with a server-side model key to check five fictional review outcomes without applying a repair. Optional Azure Application Insights recovery tracing and Codex review rules are described in [Observability and release checks](docs/OBSERVABILITY.md).
+The deterministic recovery rules remain authoritative. Evidence changes invalidate review/approval; a webhook triggers fresh reads rather than trusting the payload as proof. Identity mismatches and incomplete reads hold the case. Protected-content failure leaves recovery unverified. Rechecking access does not grant again. Refund/reversal handling targets the exact purchase and blocks further recovery while held.
+
+Customer projections omit merchant-private notes and source details. Role checks run on the server. Session isolation and same-origin mutation checks protect the merchant boundary. Demo operator keys and bearer team links are demonstration controls, separate from verified OIDC/MFA membership. The reference course service is a demo contract, not a verified integration with a commercial LMS.
+
+SQLite and local job coordination are intended for one durable host. Do not enable multi-host scaling against independent local databases. Protect stable identity, audit, course and backup keys outside Git. Proof freshness is bounded; a past passing check is not a permanent access guarantee.
+
+## Configuration
+
+`.env.example` is the authoritative example. Provide secrets through local `.env` or private hosting settings. Never send them in a URL, browser field intended for public content, commit, issue or screenshot.
+
+| Area | Variables | Setup guide |
+| --- | --- | --- |
+| Local server | `PORT`, `PUBLIC_URL`, `DATABASE_PATH`, optional `VERIFICATION_MAX_AGE_SECONDS` | [Setup](docs/SETUP.md) |
+| Sandbox PayPal | `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, optional `PAYPAL_WEBHOOK_ID` | [Connected demo](docs/CONNECTED-DEMO.md), [webhooks](docs/PAYPAL-WEBHOOKS.md) |
+| Separate course service | `COURSE_ACCESS_URL`, `COURSE_ACCESS_API_KEY` | [Course contract](docs/COURSE-ACCESS.md), `examples/course-service.mjs` |
+| AI | `OPENAI_API_KEY`, `OPENAI_MODEL`, optional `OPENAI_BASE_URL` for Azure v1 endpoint | [Build guide](docs/BUILD-README.md) |
+| Render | `WORKFLOW_SECRET`, `APP_URL`, `RENDER_API_KEY`, exact investigation/recovery task slugs | [Connected demo](docs/CONNECTED-DEMO.md) |
+| Demo operator | `DEMO_OPERATOR_KEY` | [Setup](docs/SETUP.md) |
+| Verified merchants | `AUTH_REQUIRED`, OIDC issuer/client settings, MFA settings, bootstrap admin emails | [Verified release setup](docs/RELEASE-CANDIDATE.md) |
+| Email | `RESEND_API_KEY`, `EMAIL_FROM` | [Customer support](docs/CUSTOMER-SUPPORT.md) |
+| Audit/backup | `AUDIT_HMAC_KEY`, `BACKUP_ENCRYPTION_KEY`, `BACKUP_DIR`, `BACKUP_KEEP` | [Backups](docs/BACKUPS.md), [Recovery Center](docs/RECOVERY-CENTER.md) |
+| Telemetry | `APPLICATIONINSIGHTS_CONNECTION_STRING` | [Observability](docs/OBSERVABILITY.md) |
+
+Configure verified mode only after the identity provider and course connector are ready. Production/verified startup deliberately fails closed when required configuration is missing. Keep demo and real merchant environments separate. PayPal live credentials are unsupported.
+
+## Testing and acceptance
+
+```powershell
+npm test
+npm run hosted:preflight -- http://127.0.0.1:4358
+```
+
+The default suite uses Node's test runner with sequential test-file execution. It includes business rules, HTTP behavior, provider mocks, authorization, privacy, retry/idempotency, mapping/intake, customer progress, proof freshness, backups and acceptance assessment. Tests do not charge buyers or demonstrate live external delivery.
+
+Optional configured checks:
+
+```powershell
+npm run ai:smoke
+npm run ai:eval
+npm run course:smoke
+npm run hosted:preflight -- https://YOUR-HOST/ --require-connected
+npm run acceptance:check
+```
+
+AI checks call the configured model and can incur provider usage. `acceptance:check` requires a private selected-case session and the environment variables documented in [RELEASE-CANDIDATE.md](docs/RELEASE-CANDIDATE.md). It is read-only and validates saved six-signal evidence; it does not perform checkout, approval or grant. Never paste a session cookie into an issue or commit.
+
+### Manual evaluation route
+
+1. Open `/project.html`, then `/demo.html`; confirm the sample label remains visible.
+2. Open the merchant workspace. Review a matching paid sample, examine the specialist evidence, rehearse and approve the exact correction.
+3. Apply once and inspect lesson proof. Retry verification and confirm the write count remains one.
+4. Try wrong-order, wrong-account, missing-payment and already-restored scenarios. Unsafe evidence must not grant access; self-restoration needs verification without a grant.
+5. Open the private customer link. Check messages, update promise, access self-check, lesson/browser receipt and separate confirmation/help responses. Merchant notes must stay private.
+6. Inspect analytics, audit, receipt expiry, roles, store mappings and connection checks. Disabled/unconfigured actions must explain their prerequisites.
+7. For external acceptance, follow one sandbox case from genuine sandbox checkout through all six connected checks and retain its run report. Verify refunds, duplicate delivery and interrupted retries using the release guide.
+
+## Deployment, data and backups
+
+Use [Azure deployment](docs/AZURE-DEPLOYMENT.md) for the existing hosting approach. `render.yaml` describes an optional web service; `render-workflow.yaml` describes the separate Workflow service. Inspect configuration and cost before provisioning. A static Sites deployment cannot run this Node/SQLite backend.
+
+Persist `DATABASE_PATH` on durable private storage. Restarting or redeploying an ephemeral filesystem can lose cases. Encrypt backups with a stable private base64-encoded 32-byte key, retain the key separately, and test restoration:
+
+```powershell
+npm run backup
+npm run restore -- "C:\private\snapshot.pbackup" "C:\private\restored.sqlite"
+```
+
+Restore into a new destination; never overwrite a live database. The backup command performs integrity and row-count restore checks. A successful local backup is not proof that an off-host disaster-recovery copy exists. Preserve external audit checkpoints and test the complete operational procedure before relying on it.
+
+## Repository map
+
+| Path | Contents |
+| --- | --- |
+| `dist/` | Current browser pages/assets and shared deterministic recovery models |
+| `server/` | HTTP API, persistence, authorization, provider adapters and durable operations |
+| `tests/` | Automated rules, HTTP and mocked contract tests |
+| `scripts/` | AI checks, course smoke, hosted preflight and connected acceptance |
+| `examples/` | Reference course-access service |
+| `workflows/` | Render investigation/recovery task definitions |
+| `docs/` | Product, integration, operations and acceptance guides |
+| `source/`, `design/` | Historical design material and drafts |
+| `.github/` | CI automation |
+| `.openai/hosting.json` | Existing static Sites project identity |
+
+Do not run the legacy `export-demos.cjs` generator over current pages; it restores older design output.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| PowerShell rejects `cd /d` | Use `cd "full path"` without `/d` |
+| Port already in use | Stop the old process or change both `PORT` and `PUBLIC_URL` |
+| SQLite import fails | Check `node --version`; Node 24+ is required |
+| Buttons show locked/not configured | Inspect Connections; configured integrations require the operator or verified membership gate |
+| Same-origin request rejected | Ensure browser origin and `PUBLIC_URL` agree, including scheme and port |
+| Lesson proof expired | Refresh evidence with read-only verification; do not repeat a grant |
+| PayPal payment mismatch | Check sandbox app, exact capture/order, buyer/course, amount and currency; do not bypass the hold |
+| Verification fails after a write | Keep the case open, inspect provider evidence and retry reads |
+| Email accepted but not received | Check delivery attempts/provider status; acceptance is not inbox delivery |
+| Verified mode will not start | Complete OIDC/MFA and course connector settings before enabling it |
+| Backup fails | Check private directory permissions and the base64 32-byte encryption key |
+| Hosted preflight passes | Continue case-level acceptance; reachability/configuration is not recovery proof |
+
+## Known limits and next acceptance gates
+
+- Sandbox-only payments; no live payment processing or raw card storage.
+- No independently demonstrated complete connected recovery in this review.
+- Configured OIDC/MFA, email, Render, provider refunds and receiving course-platform behavior need external acceptance.
+- The example course service is a prototype, not a commercial LMS connector.
+- AI can be mistaken; citations identify records rather than proving reasoning. Human review and deterministic checks remain necessary.
+- Multi-host scaling, merchant pilot outcomes, accessibility certification and production readiness are not established by unit tests.
+- Technical verification does not imply customer satisfaction; retain both outcomes.
+
+## Contributing and license
+
+Read [AGENTS.md](AGENTS.md), keep credentials/runtime databases out of commits, run `npm test`, and describe connected versus mocked evidence in pull requests. Preserve exact-purchase safeguards and read-only verification retries. Leave proposed changes open for review before merging.
+
+Source is [MIT licensed](LICENSE). Third-party dependencies retain their licenses. PayTrace Recover is a working name, not a trademark-clearance claim; this independent project is not endorsed by PayPal.
