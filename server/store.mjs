@@ -60,7 +60,7 @@ export function openStore(file){
  function createPublicDemo(address,capacity=500){const now=Date.now(),bucket=Math.floor(now/3600000),key=hash(String(address||'unknown'));db.exec('BEGIN IMMEDIATE');try{
   db.prepare('DELETE FROM demo_creation_limits WHERE bucket<?').run(bucket-24);
   // Reclaim only inactive anonymous demos; verified merchant workspaces are never pruned.
-  const expired=db.prepare("SELECT d.owner FROM demo_workspaces d JOIN sessions s ON s.id=d.owner WHERE s.mode='demo' AND max(d.created,s.updated)<?").all(now-30*86400000);
+  const expired=db.prepare("SELECT d.owner FROM demo_workspaces d JOIN sessions s ON s.id=d.owner WHERE s.mode='demo' AND max(d.created,s.updated)<?").all(now-48*3600000);
   const ownedTables=['cases','monitor_settings','autopilot_policies','autopilot_reservations','course_access','learner_tokens','paypal_webhook_events','access_intents','trusted_intake_keys','connector_mappings','demo_store_checkouts','case_preferences','support_threads','support_tokens','support_mail','support_reminders','support_update_promises','durable_jobs','audit_entries','audit_heads','team_members','center_settings','automation_runs','center_notifications','paypal_purchase_claims'];
   for(const {owner} of expired){for(const table of ownedTables)db.prepare(`DELETE FROM ${table} WHERE owner=?`).run(owner);db.prepare('DELETE FROM demo_workspaces WHERE owner=?').run(owner);db.prepare("DELETE FROM sessions WHERE id=? AND mode='demo'").run(owner);}
   const total=db.prepare('SELECT count(*) AS n FROM demo_workspaces').get().n;

@@ -170,12 +170,13 @@ export function createService(store,env=process.env,{fetcher=fetch,paypal=paypal
   });
  }
  async function stage(id,step,jobId){return store.lock(id,async()=>{
-  const row=store.get(id);if(!row)throw Error('Session not found.');let s=reconcileWorkflow(row.state,id);
-  if(s.job?.expiredAt)throw Error('Workflow has expired. Start a fresh review or retry verification; this callback cannot resume it.');
+  const row=store.get(id);if(!row)throw Error('Session not found.');let s=row.state;
   if(!jobId||s.job?.id!==jobId||s.job.caseId!==s.id)throw Error('Workflow is obsolete.');
   const steps={investigate:['gather','analyze','record'],recover:['repair','verify']}[s.job.kind]||[];
   if(!steps.includes(step))throw Error('Stage does not belong to this workflow.');
   if(Object.hasOwn(s.job.completed||{},step))return s.job.completed[step];
+  s=reconcileWorkflow(s,id);
+  if(s.job?.expiredAt)throw Error('Workflow has expired. Start a fresh review or retry verification; this callback cannot resume it.');
   const next=steps.find(name=>!Object.hasOwn(s.job.completed||{},name));
   if(step!==next)throw Error('Workflow stages must run in order.');
   if(!row.operator)throw Error('Workflow requires an authorized operator session.');

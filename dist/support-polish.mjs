@@ -13,6 +13,12 @@ export function emailStatus(state){return ({
  cancelled:['Notification cancelled','This pending automatic follow-up will not be sent.']
  })[state]||['Status unavailable','Refresh email activity to check this attempt.'];}
 
+export function emailActivityGuidance(notifications=[]){
+ const state=notifications.at(-1)?.state;
+ if(!state)return 'No email attempt recorded. Save a verified purchase email before sending an invitation.';
+ return emailStatus(state)[1];
+}
+
 export function resolutionSteps(state,support){return [
  {label:'Access record active',done:!!state.entitlement?.active,detail:'The stored entitlement is active; this alone does not prove the purchase opens.'},
  {label:'Technical verification',done:!!support.verified,detail:'Current payment, entitlement, and protected content checks must agree.'},

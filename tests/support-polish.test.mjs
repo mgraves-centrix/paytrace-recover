@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {emailStatus,resolutionSteps,replyTemplates} from '../dist/support-polish.mjs';
+import {emailStatus,emailActivityGuidance,resolutionSteps,replyTemplates} from '../dist/support-polish.mjs';
 import {updatePromiseState} from '../dist/focus-support.mjs';
 
 test('resolution distinguishes active access from verification and reopened customer help',()=>{
@@ -19,6 +19,13 @@ test('email labels and suggested replies do not overstate delivery or access',()
  assert.match(replyTemplates({verified:false})[0][1],/still open/);
  assert.doesNotMatch(replyTemplates({verified:false})[0][1],/check has passed/);
  assert.match(replyTemplates({verified:true})[0][1],/let us know whether it works/);
+});
+test('email activity guidance distinguishes automatic retries from terminal states',()=>{
+ assert.match(emailActivityGuidance([{state:'not-configured'}]),/retried/);
+ assert.match(emailActivityGuidance([{state:'retry-pending'}]),/same request ID/);
+ assert.match(emailActivityGuidance([{state:'delivery-unknown'}]),/check provider activity/);
+ assert.match(emailActivityGuidance([{state:'failed'}]),/fresh invitation/);
+ assert.match(emailActivityGuidance([{state:'needs-manual-review'}]),/Automatic retries stopped/);
 });
 test('customer update timing and email attempt remain separate facts',()=>{
  const now=Date.parse('2026-11-01T15:00:00Z');

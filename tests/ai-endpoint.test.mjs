@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {aiEndpoint} from '../server/ai-endpoint.mjs';
 import {checkConnection} from '../server/connection-check.mjs';
-import {answerQuestion} from '../server/ai.mjs';
+import {analyze,answerQuestion} from '../server/ai.mjs';
 import {createCase,simulatePayment,investigate} from '../dist/core.mjs';
 
 const azure={OPENAI_API_KEY:'private-test-key',OPENAI_MODEL:'gpt-4o-mini',OPENAI_BASE_URL:'https://automation-jl107.openai.azure.com/openai/v1/'};
@@ -16,4 +16,10 @@ test('Azure OpenAI uses the v1 Responses route and server-only key',async()=>{
 test('AI endpoint refuses arbitrary destinations for case evidence',()=>{
  for(const bad of ['http://automation-jl107.openai.azure.com/openai/v1/','https://evil.example/openai/v1/','https://automation-jl107.openai.azure.com.evil.example/openai/v1/','https://automation-jl107.openai.azure.com/openai/v1/?token=secret'])assert.throws(()=>aiEndpoint({...azure,OPENAI_BASE_URL:bad}),/official OpenAI or Azure OpenAI/);
  assert.equal(aiEndpoint({OPENAI_API_KEY:'key',OPENAI_MODEL:'model'}).responsesUrl,'https://api.openai.com/v1/responses');
+});
+test('AI consultation stops within the Workflow callback budget',async()=>{
+ const s=investigate(simulatePayment(createCase()));let aborted=false;
+ const fetcher=(_url,{signal})=>new Promise((_resolve,reject)=>signal.addEventListener('abort',()=>{aborted=true;reject(signal.reason);},{once:true}));
+ await assert.rejects(analyze(s,azure,fetcher,async()=>{},20),/timeout|aborted/i);
+ assert.equal(aborted,true);
 });

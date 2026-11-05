@@ -34,6 +34,13 @@ test('PayPal fresh read refuses a capture ID that changes between order and capt
  await assert.rejects(client.refresh(s),/Capture reference changed/);
 });
 
+test('uncertain checkout inspection uses only provider reads and requires a completed capture',async()=>{
+ const s=state(),calls=[];let captured=false;
+ const client=paypalClient(env,async(url,options)=>{calls.push([url,options.method]);if(url.endsWith('/token'))return Response.json({access_token:'test',expires_in:3600});if(url.includes('/payments/captures/'))return Response.json({id:'CAPTURE-123',status:'COMPLETED',amount:{value:'128.00',currency_code:'USD'}});const value=order(s);if(!captured)value.purchase_units[0].payments.captures=[];return Response.json(value);});
+ assert.equal(await client.inspect(s),null);captured=true;assert.equal((await client.inspect(s)).id,'CAPTURE-123');
+ assert.equal(calls.filter(([url,method])=>url.includes('/checkout/orders/')&&method==='POST').length,0);
+});
+
 test('PayPal webhook verification requires complete signature metadata and an explicit success result',async()=>{
  const s=state(),calls=[],client=paypalClient(env,async(url,options)=>{calls.push(url);return url.endsWith('/token')?Response.json({access_token:'test',expires_in:3600}):Response.json({verification_status:'FAILURE'});});
  await assert.rejects(client.verifyWebhook('{}',{}),/signature headers/);
