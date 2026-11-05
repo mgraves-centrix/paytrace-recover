@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-Current feature and security-fix draft PR: https://github.com/sagitta414/paytrace-recover/pull/3. The review fixes are on the PR branch; they are not yet on `main` or deployed to Azure. The Azure sandbox demo is serving an earlier build. Its SQLite database was rebuilt into a separate integrity-clean copy after `/health` returned 503; `/health` and hosted route/configuration preflight returned 200 on November 4. The complete PayPal-connected recovery has not been recorded.
+The feature and security-fix [PR #3](https://github.com/sagitta414/paytrace-recover/pull/3) was merged into public `main` as commit `6850345` and deployed to the Azure sandbox demo on November 4. Its SQLite database was rebuilt into a separate integrity-clean copy after `/health` returned 503. After deployment, `/health` and hosted route/configuration preflight passed, and an unauthenticated cases request returned 401. The complete PayPal-connected recovery has not been recorded.
 
 ## Demo Video
 
@@ -71,7 +71,7 @@ TODO: Record a video under three minutes, upload it publicly to YouTube, and put
 
 ## Submission Readiness Notes
 
-The code-level security fixes have a green draft PR. The paired Azure apps were updated on 2026-11-02, and an earlier PayTrace UI build was deployed on 2026-11-03. On November 4, the Azure database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy, and `/health` plus the hosted route/provider preflight passed. This does not prove that the latest PR code is deployed or that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
+The code-level security fixes passed CI and are merged into public `main`. The paired Azure apps were updated on 2026-11-02. On November 4, the PayTrace database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy. The merged commit `6850345` was deployed to PayTrace Azure App Service. The post-deploy `/health`, hosted routes, five provider configuration flags, and unauthenticated case boundary passed. These checks do not prove that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
 
 ## Known Limitations
 
