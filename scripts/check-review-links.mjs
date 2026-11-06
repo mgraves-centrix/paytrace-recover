@@ -8,7 +8,8 @@ const files=['README.md','docs/JUDGE-TESTING.md','docs/DEVPOST-SUBMISSION.md','d
 let checked=0;
 for(const relative of files){
  const file=path.join(root,relative),content=await readFile(file,'utf8');
- const links=relative.endsWith('.html')?[...content.matchAll(/(?:href|src)="([^"]+)"/g)].map(match=>match[1]):[...content.matchAll(/\]\(([^)]+)\)/g)].map(match=>match[1]);
+ const links=[...content.matchAll(/\]\(([^)]+)\)/g)].map(match=>match[1]);
+ if(relative.endsWith('.html')||relative==='README.md')links.push(...[...content.matchAll(/(?:href|src)="([^"]+)"/g)].map(match=>match[1]));
  for(const link of links){
   if(/^(?:[a-z][a-z\d+.-]*:|\/\/)/i.test(link))continue;
   const [raw,fragment]=link.split('#');
