@@ -70,7 +70,8 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const items=[['Payment',s.capture?.status==='COMPLETED'?'Completed':'Not confirmed',source],['Purchase match',exact?'Exact fields agree':'Needs review','Order, learner, course, amount, currency'],['Purchased access',access?'Matching entitlement':'Missing or unconfirmed',s.proof?.passed?'Lesson proof recorded':'Protected lesson not yet proven']];
  for(const [label,value,detail] of items){const card=document.createElement('div');for(const [tag,className,content] of [['span','case-first-look-label',label],['strong','',value],['small','',detail]]){const node=document.createElement(tag);if(className)node.className=className;node.textContent=content;card.append(node);}facts.append(card);}
  const heading=main.querySelector('.case-column-title');
- if(heading){layout.before(heading,facts);}else layout.before(facts);
+ if(heading)main.prepend(heading);
+ main.prepend(facts);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
  const deep=document.createElement('details');deep.className='case-deep-dive';deep.id='case-deep-evidence';const title=document.createElement('summary');title.innerHTML='<span><strong>Inspect full evidence and audit</strong><small>Agent findings, source records, workflow, verification, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
@@ -88,7 +89,9 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  // The primary column only needs the readiness result and next action.
  if(decision)deep.append(decision);
  const outcome=outcomeSummaryMarkup(s,{uncertain});
+ const summary=rail.querySelector(':scope > .summary');
  if(outcome)rail.insertAdjacentHTML('afterbegin',outcome);
+ else if(summary)summary.insertAdjacentHTML('afterend',readinessMarkup(s,{uncertain,backend}));
  else rail.insertAdjacentHTML('afterbegin',readinessMarkup(s,{uncertain,backend}));
  const stepper=root.querySelector('.review-shell > .stepper');
  if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}

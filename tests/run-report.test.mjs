@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createCase,simulatePayment,investigate,rehearse,approve,applyRepair,verify} from '../dist/core.mjs';
 import {buildRunReport} from '../dist/run-report.mjs';
+import {workspaceOverview} from '../dist/workspace-model.mjs';
+import {todayMarkup} from '../dist/today-view.mjs';
 import {caseExperience} from '../dist/focus-experience.mjs';
 import {openStore} from '../server/store.mjs';
 import {createApp} from '../server/index.mjs';
@@ -22,6 +24,10 @@ test('connected report requires all six independently recorded criteria',()=>{
  assert.equal(report.passed,6);assert.equal(report.checks.every(c=>c.status==='passed'),true);
  assert.match(caseExperience(s,{backend:true}),/Connected sandbox proof/);
  assert.match(caseExperience(s,{backend:true}),/Download run report/);
+ const overview=workspaceOverview([s],{backend:true});
+ assert.equal(overview.connectedResult.caseId,s.id);
+ assert.match(todayMarkup(overview),/CONNECTED SANDBOX RESULT/);
+ assert.match(todayMarkup(overview),/Inspect the verified case/);
 });
 
 test('scripted and local evidence cannot be presented as a connected sandbox run',()=>{
@@ -32,6 +38,8 @@ test('scripted and local evidence cannot be presented as a connected sandbox run
  assert.equal(report.checks.find(c=>c.id==='agents').status,'demo');
  assert.equal(report.checks.find(c=>c.id==='verification').status,'demo');
  assert.doesNotMatch(caseExperience(s,{backend:true}),/Connected sandbox proof/);
+ assert.equal(workspaceOverview([s],{backend:true}).connectedResult,null);
+ assert.match(todayMarkup(workspaceOverview([s],{backend:true})),/NOT YET RECORDED/);
 });
 
 test('failed Render verification or stale proof removes the connected claim',()=>{
@@ -41,6 +49,7 @@ test('failed Render verification or stale proof removes the connected claim',()=
  const report=buildRunReport(s,{backend:true});
  assert.equal(report.connectedSandboxProof,false);
  assert.equal(report.checks.find(c=>c.id==='verification').status,'pending');
+ assert.equal(workspaceOverview([s],{backend:true}).connectedResult,null);
 });
 
 test('run report HTTP endpoint belongs to the selected session case',async()=>{

@@ -24,3 +24,19 @@
 .case-outcome-summary{border-color:#9dd9bf;background:linear-gradient(150deg,#f1fff8,#fff 70%)}.case-outcome-summary h3{font-size:19px;line-height:1.2;margin:7px 0}.case-outcome-summary p{font-size:12px;line-height:1.5;margin:5px 0 12px}.case-outcome-summary dl{margin:0;display:grid;gap:0}.case-outcome-summary dl>div{padding:8px 0;border-top:1px solid #dcefe4}.case-outcome-summary dt{font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:#56746c;font-weight:750}.case-outcome-summary dd{font-size:12px;line-height:1.45;margin:3px 0 0}
 .case-redesign .merchant-decision .decision-basis{margin-top:10px}
 @media(max-width:850px){.case-readiness,.case-outcome-summary{margin-bottom:14px}.case-readiness li{padding:7px 0}}
+.recovery-pulse .today-result{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:21px;padding:20px 23px;border-radius:17px;border:1px solid #b8d6f3;background:linear-gradient(115deg,#e9f4ff,#fff 72%);color:#123b68}
+.recovery-pulse .today-result.connected{border-color:#92d7bc;background:linear-gradient(115deg,#e9fbf2,#fff 72%)}
+.today-result h3{margin:6px 0;font-size:clamp(19px,2.2vw,25px);line-height:1.2;letter-spacing:-.45px;color:#082b66}
+.today-result p{max-width:670px;margin:0 0 6px;font-size:13px;line-height:1.5;color:#315a7d}
+.today-result small{font-size:11px;color:#4e6d80}
+.today-result .button{flex:none;white-space:nowrap}
+.case-redesign .case-layout{margin-top:0}
+.case-redesign .case-first-look{margin:0 0 11px}
+.case-redesign .case-column-title{margin:10px 0}
+.case-redesign .case-column-title h2{font-size:18px;margin:5px 0}
+.case-redesign .case-column-title p{font-size:12px;margin:0}
+.case-redesign .case-decision-column .summary{border-bottom:0;padding-bottom:3px}
+.case-redesign .case-decision-column .summary .eyebrow{color:#075bb8}
+.case-redesign .case-decision-column .summary h2{font-size:22px}
+.case-redesign .case-readiness{margin-top:12px}
+@media(max-width:850px){.recovery-pulse .today-result{align-items:flex-start;flex-direction:column;padding:17px}.today-result .button{white-space:normal}.case-redesign .case-first-look{order:0}}
