@@ -1,0 +1,13 @@
+/* Match the submission artwork while keeping the story and sample evidence legible. */
+.hero-shell{
+  background:radial-gradient(ellipse at 83% 27%,#15539d80,transparent 48%),linear-gradient(112deg,#061629 0%,#09264f 55%,#0a3f82 100%);
+}
+.hero-shell:before{border-color:#8ac8ff20;box-shadow:0 0 0 70px #8ac8ff05,0 0 0 140px #8ac8ff04}
+.hero h1 em{color:#d0ef42}
+.hero .green{background:#d0ef42;color:#243e00;box-shadow:0 8px 24px #0004}
+.hero .green:hover{background:#e0fb66}
+.hero .green:focus-visible{outline:3px solid #d0ef42;outline-offset:4px}
+.hero-story{background:linear-gradient(145deg,#ffffff16,#ffffff06);border-color:#9ecbff46}
+.hero .text-link{color:#e0eeff}
+.hero-team{border-top-color:#c8e1ff30}
+.story-bottom{color:#c9dcf3}
