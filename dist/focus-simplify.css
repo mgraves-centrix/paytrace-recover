@@ -31,6 +31,17 @@
 .today-result small{font-size:11px;color:#4e6d80}
 .today-result .button{flex:none;white-space:nowrap}
 .case-redesign .case-layout{margin-top:0}
+.review-shell>.stepper{margin:4px 0 10px;padding:5px 0}
+.case-redesign .sheet-head{padding:15px 20px 14px!important}
+.case-redesign .case-customer{display:none}
+.case-redesign .case-meta{margin-bottom:6px}
+.case-redesign .sheet-head h1{font-size:clamp(23px,2.4vw,29px);line-height:1.18;margin:8px 0 0}
+.case-redesign .sheet-head>p{display:none}
+.case-redesign .purchase{margin-top:10px!important;padding:10px 12px!important;gap:10px}
+.case-redesign .purchase strong{font-size:13px}
+.case-redesign .purchase small{font-size:11px;line-height:1.3}
+.case-redesign .sheet-body{padding:14px!important}
+.case-redesign .case-wayfinding{display:none}
 .case-redesign .case-first-look{margin:0 0 11px}
 .case-redesign .case-column-title{margin:10px 0}
 .case-redesign .case-column-title h2{font-size:18px;margin:5px 0}
