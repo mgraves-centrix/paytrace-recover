@@ -1,7 +1,8 @@
 import {journeyAt,journeyChapters} from './demo-journey-model.mjs';
 import {crew,findings,COURSE} from './core.mjs';
 const app=document.querySelector('#demo-app');
-let step=0;
+const requestedStep=Number(new URLSearchParams(location.search).get('step'));
+let step=Number.isInteger(requestedStep)&&requestedStep>=0&&requestedStep<8?requestedStep:0;
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const stages=['Purchase','Missing access','Investigation','Preview','Approval','Grant','Verification','Confirmation'];
 function render(){

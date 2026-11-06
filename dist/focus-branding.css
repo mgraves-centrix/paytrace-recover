@@ -25,6 +25,14 @@
 .today-result.connected .button.primary:hover{background:#e0fb66;border-color:#e0fb66}
 .today-result.connected .button.primary:focus-visible{outline-color:var(--pt-lime)}
 
+.sample-success{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:14px 0 28px;padding:22px 26px;border:1px solid #b8d9f4;border-radius:18px;background:linear-gradient(115deg,#edf7ff,#fff);box-shadow:0 8px 24px #0a32700d}
+.sample-success .eyebrow{color:#075aa9;font-size:11px;letter-spacing:.11em;font-weight:800}
+.sample-success h3{margin:7px 0;color:#0c2e58;font-size:20px}
+.sample-success p{margin:0;max-width:700px;color:#4b6580;font-size:13px;line-height:1.5}
+.sample-success .button{flex-shrink:0;background:#0965bc;border-color:#0965bc;color:#fff;text-align:center}
+.sample-success .button:hover{background:#074c91;border-color:#074c91}
+@media(max-width:700px){.sample-success{flex-direction:column;align-items:stretch}.sample-success .button{width:100%}}
+
 .start-card{background:linear-gradient(115deg,var(--pt-deep) 0%,#0a3370 70%,#1254a1 100%)}
 .case-redesign .merchant-decision{border-left:4px solid #1766ca;background:linear-gradient(145deg,#f0f7ff,#fff 72%)}
 .case-outcome-summary{
