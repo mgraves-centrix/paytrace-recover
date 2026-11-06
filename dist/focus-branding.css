@@ -1,0 +1,41 @@
+/* Carry the submission artwork into the merchant desk without tinting evidence. */
+:root{--pt-deep:#071a33;--pt-deep-blue:#0a3270;--pt-lime:#d0ef42;--pt-lime-ink:#284700}
+
+.recovery-pulse .today-result{
+  border:1px solid #174577;
+  background:radial-gradient(circle at 90% 10%,#15549b 0,transparent 35%),linear-gradient(115deg,var(--pt-deep),var(--pt-deep-blue));
+  box-shadow:0 12px 30px #071a331b;
+  color:#fff;
+}
+.today-result .eyebrow{color:#a9cbf2}
+.today-result h3{color:#fff}
+.today-result p{color:#d3e3f7}
+.today-result small{color:#b5cae2}
+.recovery-pulse .today-result.connected{
+  border-color:#72972a;
+  background:radial-gradient(circle at 90% 10%,#24587a 0,transparent 38%),linear-gradient(115deg,var(--pt-deep),#103f49);
+}
+.today-result.connected .eyebrow{color:var(--pt-lime)}
+.today-result.connected .button.primary{
+  background:var(--pt-lime);
+  border-color:var(--pt-lime);
+  color:var(--pt-lime-ink);
+  box-shadow:0 5px 16px #0003;
+}
+.today-result.connected .button.primary:hover{background:#e0fb66;border-color:#e0fb66}
+.today-result.connected .button.primary:focus-visible{outline-color:var(--pt-lime)}
+
+.start-card{background:linear-gradient(115deg,var(--pt-deep) 0%,#0a3370 70%,#1254a1 100%)}
+.case-redesign .merchant-decision{border-left:4px solid #1766ca;background:linear-gradient(145deg,#f0f7ff,#fff 72%)}
+.case-outcome-summary{
+  border-color:#245f62;
+  background:linear-gradient(145deg,var(--pt-deep),#13484c);
+  color:#fff;
+}
+.case-outcome-summary .eyebrow{color:var(--pt-lime)}
+.case-outcome-summary h3,.case-outcome-summary dd{color:#fff}
+.case-outcome-summary p,.case-outcome-summary dt{color:#cfe2e3}
+.case-outcome-summary dl>div{border-color:#ffffff30}
+.case-outcome-summary a{color:var(--pt-lime)}
+
+@media(forced-colors:active){.today-result.connected .button.primary{border:2px solid ButtonText}}
