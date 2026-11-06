@@ -4,6 +4,8 @@ PayTrace Recover helps merchants resolve cases where a customer paid but didn’
 
 [Judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) · [Azure merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html) · [Public browser simulation](https://courselatch.sagitta107.chatgpt.site/focus.html) · [Setup instructions](docs/SETUP.md)
 
+[Judge testing guide](docs/JUDGE-TESTING.md) · [Devpost draft](docs/DEVPOST-SUBMISSION.md) · [Three-minute video plan](docs/VIDEO-RECORDING.md). These are preparation materials; no completed connected acceptance or submitted video is claimed.
+
 The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
 
 The dated [integration status matrix](docs/INTEGRATION-STATUS.md) separates implemented code, configured services, and completed live acceptance.

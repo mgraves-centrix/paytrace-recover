@@ -21,3 +21,25 @@ test('refund and failed verification have separate fail-closed criteria',()=>{
  assert.equal(assessAcceptance(s,report,receipt,{mode:'refund'}).passed,true);
  report.paymentSignal=null;assert.equal(assessAcceptance(s,report,receipt,{mode:'refund'}).passed,false);
 });
+
+// Sponsor workflow tools are optional; core evidence must still be genuinely connected.
+test('hackathon evidence can pass without Render while strict connected acceptance still fails',()=>{
+ const s=fixture();s.capture.source='paypal-sandbox';s.proof.transport='external-course-service';
+ const report={caseId:s.id,checks:['payment','access','agents','approval','verification'].map(id=>({id,status:'passed'})),connectedSandboxProof:false},receipt={caseId:s.id,status:'Verified'};
+ assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).passed,true);
+ assert.equal(assessAcceptance(s,report,receipt).passed,false);
+ assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).checks.sixConnectedSources,undefined);
+});
+test('hackathon evidence rejects scripted AI, missing approval and sample payment',()=>{
+ const s=fixture();s.capture.source='paypal-sandbox';s.proof.transport='external-course-service';
+ const report={caseId:s.id,checks:['payment','access','agents','approval','verification'].map(id=>({id,status:'passed'}))},receipt={caseId:s.id,status:'Verified'};
+ for(const id of ['agents','approval','payment','access','verification']){const check=report.checks.find(c=>c.id===id);check.status='demo';assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).passed,false,id);check.status='passed';}
+ s.capture.source='sample';assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).passed,false);
+});
+test('hackathon evidence rejects stale proof, duplicate grants and a payment hold',()=>{
+ const s=fixture();s.capture.source='paypal-sandbox';s.proof.transport='external-course-service';
+ const report={caseId:s.id,checks:['payment','access','agents','approval','verification'].map(id=>({id,status:'passed'}))},receipt={caseId:s.id,status:'Verified'};
+ assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon',now:Date.parse(s.proof.at)+3600000}).passed,false);
+ s.writes=2;assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).passed,false);s.writes=1;
+ s.paymentHold={reason:'review'};assert.equal(assessAcceptance(s,report,receipt,{mode:'hackathon'}).passed,false);
+});

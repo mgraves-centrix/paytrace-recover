@@ -1,6 +1,9 @@
 import {assessAcceptance} from '../server/acceptance-check.mjs';
 
-const {PAYTRACE_ACCEPTANCE_URL:site,PAYTRACE_ACCEPTANCE_CASE_ID:caseId,PAYTRACE_ACCEPTANCE_COOKIE:cookie,PAYTRACE_ACCEPTANCE_MODE:mode='connected'}=process.env;
+const {PAYTRACE_ACCEPTANCE_URL:site,PAYTRACE_ACCEPTANCE_CASE_ID:caseId,PAYTRACE_ACCEPTANCE_COOKIE:cookie,PAYTRACE_ACCEPTANCE_MODE:configuredMode='connected'}=process.env;
+const modeArgument=process.argv.slice(2);
+if(modeArgument.length>1||modeArgument.some(value=>!/^--mode=(connected|hackathon|refund|failed-verification)$/.test(value)))throw Error('Use --mode=connected, --mode=hackathon, --mode=refund or --mode=failed-verification.');
+const mode=modeArgument.length?modeArgument[0].slice('--mode='.length):configuredMode;
 if(!site||!caseId||!cookie)throw Error('Set PAYTRACE_ACCEPTANCE_URL, PAYTRACE_ACCEPTANCE_CASE_ID, and PAYTRACE_ACCEPTANCE_COOKIE in your private shell.');
 const base=new URL(site);
 if(base.username||base.password||base.search||base.hash||!['https:','http:'].includes(base.protocol)||base.protocol==='http:'&&!['localhost','127.0.0.1'].includes(base.hostname))throw Error('Use HTTPS or local HTTP for the acceptance URL.');
@@ -8,8 +11,6 @@ if(!/^CL-[A-Za-z0-9-]{6,80}$/.test(caseId))throw Error('A valid PayTrace case ID
 if(!/^(pt_account|cl_session)=[A-Za-z0-9_-]{16,256}$/.test(cookie))throw Error('Use one private account or demo session cookie.');
 async function get(path){const url=new URL(path,base);const response=await fetch(url,{headers:{Cookie:cookie,Accept:'application/json'},redirect:'error',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error(`${path.split('?')[0]} returned HTTP ${response.status}. Select this case in the merchant desk and check your session.`);return response.json();}
 const query=encodeURIComponent(caseId);
-const refresh=await fetch(new URL('/api/case/refresh',base),{method:'POST',headers:{Cookie:cookie,Origin:base.origin,Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({caseId}),redirect:'error',signal:AbortSignal.timeout(30000)});
-if(!refresh.ok)throw Error(`Case refresh returned HTTP ${refresh.status}. Select this case in the merchant desk and check the provider connections.`);
 const first=await get(`/api/case?caseId=${query}`);
 const [report,receipt,latest]=await Promise.all([get(`/api/run-report?caseId=${query}`),get(`/api/verification?caseId=${query}`),get('/api/state')]);
 if(first.state?.revision!==latest.state?.revision||first.state?.id!==latest.state?.id||first.state?.proof?.at!==latest.state?.proof?.at)throw Error('The case changed during acceptance. Refresh and run the check again.');
