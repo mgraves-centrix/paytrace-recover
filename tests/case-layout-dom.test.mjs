@@ -51,6 +51,7 @@ test('case layout keeps the decision action first and moves full records into in
   assert.match(f.summary.inserted[0].html,/Illustrative case · not connected/);
   assert.equal(main.children[0].className,'case-first-look');
   assert.equal(f.summary.parent,rail);
+  assert.equal(rail.children.indexOf(f.actionbar),rail.children.indexOf(f.summary)+1);
   assert.equal(f.stepper.attributes['aria-label'].includes('step 1 of 2'),true);
  }finally{globalThis.document=oldDocument;}
 });

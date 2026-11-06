@@ -93,6 +93,9 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  if(outcome)rail.insertAdjacentHTML('afterbegin',outcome);
  else if(summary)summary.insertAdjacentHTML('afterend',readinessMarkup(s,{uncertain,backend}));
  else rail.insertAdjacentHTML('afterbegin',readinessMarkup(s,{uncertain,backend}));
+ // Before any correction is previewed, the safe next action belongs directly
+ // below the decision so it remains visible without scrolling.
+ if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
  const stepper=root.querySelector('.review-shell > .stepper');
  if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}
  main.append(communication);
