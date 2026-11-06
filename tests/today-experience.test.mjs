@@ -5,16 +5,17 @@ import {journeyAt,journeyChapters} from '../dist/demo-journey-model.mjs';
 import {decisionCardMarkup} from '../dist/decision-card.mjs';
 import {createCase,simulatePayment,investigate,rehearse} from '../dist/core.mjs';
 
-test('Today separates decisions, customer follow-up, and verification without changing cases',()=>{
- const data={checkedAt:new Date().toISOString(),counts:{total:3,verified:0,followupsDue:1,customerWaiting:1,verificationNeeded:1,overdueAccess:0,sourceIssues:0,workflowIssues:0},rows:[
+test('Today gives each case one clear group without changing case data',()=>{
+ const data={checkedAt:new Date().toISOString(),counts:{total:4,verified:1,followupsDue:1,customerWaiting:1,verificationNeeded:1,overdueAccess:0,sourceIssues:0,workflowIssues:0},rows:[
   {caseId:'A',customerName:'Alex',actionable:true,reasons:['Preview awaits your approval'],nextStep:'Approve'},
-  {caseId:'B',customerName:'Bri',actionable:true,reasons:['Customer replied'],nextStep:'Reply'},
-  {caseId:'C',customerName:'Cai',actionable:true,reasons:['Verify access without another grant'],nextStep:'Verify'}
+  {caseId:'B',customerName:'Bri',actionable:false,workflowPending:true,reasons:[],nextStep:'Wait'},
+  {caseId:'C',customerName:'Cai',actionable:false,verified:true,reasons:[],nextStep:'Done'},
+  {caseId:'D',customerName:'Dee',actionable:true,verified:true,reasons:['Customer replied'],nextStep:'Reply'}
  ]};
  const before=structuredClone(data),groups=todayGroups(data);
- assert.deepEqual(groups.map(g=>g.rows.map(r=>r.caseId)),[['A'],['B'],['C']]);
+ assert.deepEqual(groups.map(g=>g.rows.map(r=>r.caseId)),[['A','D'],['B'],['C']]);
  assert.deepEqual(data,before);
- const html=todayMarkup(data,{operator:true});assert.match(html,/Three things to keep moving/);assert.match(html,/Export queue CSV/);
+ const html=todayMarkup(data,{operator:true});assert.match(html,/Know what needs you next/);assert.match(html,/Export queue CSV/);
 });
 
 test('Today escapes customer names and keeps detailed metrics behind a disclosure',()=>{

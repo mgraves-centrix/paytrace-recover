@@ -1,0 +1,21 @@
+.workspace-more{position:relative;margin-left:auto;z-index:20}
+.workspace-more>summary{cursor:pointer;list-style:none;border:1px solid #d8e6f4;border-radius:10px;background:#f4f9ff;color:#164c86;padding:9px 13px;font-size:12px;font-weight:800;white-space:nowrap}
+.workspace-more>summary::-webkit-details-marker{display:none}
+.workspace-more>summary:after{content:"⌄";margin-left:9px}
+.workspace-more[open]>summary:after{display:inline-block;transform:rotate(180deg)}
+.workspace-more>div{position:absolute;right:0;top:calc(100% + 8px);min-width:205px;display:grid;gap:3px;padding:8px;border:1px solid #d8e6f4;border-radius:13px;background:#fff;box-shadow:0 16px 36px #073b7026}
+.workspace-more a{display:block;padding:11px 12px;border-radius:8px;color:#174876;text-decoration:none;font-size:12px;font-weight:700}
+.workspace-more a:hover,.workspace-more a:focus-visible{background:#eaf4ff}
+.case-redesign .sheet-head{padding-top:19px!important;padding-bottom:17px!important}
+.case-redesign .purchase{margin-top:15px!important}
+.case-redesign .sheet-body{padding-top:18px!important}
+.case-redesign .case-column-title{margin:0 0 13px}
+.case-redesign .case-column-title p{margin-bottom:10px}
+.case-redesign .case-first-look{margin-bottom:16px}
+.case-redesign .case-layout{align-items:start}
+.case-redesign .case-decision-column{grid-column:2;grid-row:1}
+.case-redesign .case-evidence-column{grid-column:1;grid-row:1}
+.case-redesign .case-communication-area{margin:0!important}
+.case-redesign .case-deep-dive{margin-top:18px}
+@media(max-width:850px){.case-redesign .case-layout{grid-template-columns:1fr}.case-redesign .case-decision-column{grid-column:1;grid-row:1}.case-redesign .case-evidence-column{grid-column:1;grid-row:2}.case-redesign .case-communication-area{margin-top:14px!important}}
+@media(max-width:650px){.workspace-more>summary{padding:8px 10px;font-size:11px}.workspace-more>div{right:-8px}.workspace-subbar{gap:8px}.case-redesign .case-first-look{grid-template-columns:1fr}.case-redesign .case-first-look>div{display:grid;grid-template-columns:92px minmax(0,1fr);gap:2px 8px;align-items:center;padding:9px 11px}.case-redesign .case-first-look-label{grid-column:1;grid-row:1/3}.case-redesign .case-first-look strong{grid-column:2;margin:0}.case-redesign .case-first-look small{grid-column:2}}

@@ -16,7 +16,7 @@ export function arrangeCase(root,s){
  const sources=body.querySelector('.source-status')||body.querySelector('[aria-label="Case information sources"]');
  if(sources){const wrapper=document.createElement('details');wrapper.className='source-disclosure';const title=document.createElement('summary');title.textContent='Connection checks & freshness';wrapper.append(title,sources);main.append(wrapper);}
  while(body.firstChild)main.append(body.firstChild);
- layout.append(main,rail);
+ layout.append(rail,main);
  const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Decision</a><a href="#case-customer-updates"><b>02</b> Customer update</a><a href="#case-deep-evidence"><b>03</b> Full evidence</a>';
  const communication=document.createElement('section');communication.id='case-customer-updates';communication.className='case-communication-area';communication.innerHTML='<div class="case-communication-heading"><span class="eyebrow">02 / CUSTOMER UPDATE</span><h2>Keep the buyer in the loop.</h2><p>Set the next update and open the conversation when a reply is needed.</p></div>';
  body.append(wayfinding,layout,communication);
@@ -35,7 +35,8 @@ export function finishCaseLayout(root,s){
  const source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':s.capture?'Sample record':'No capture';
  const items=[['Payment',s.capture?.status==='COMPLETED'?'Completed':'Not confirmed',source],['Purchase match',exact?'Exact fields agree':'Needs review','Order, learner, course, amount, currency'],['Purchased access',access?'Matching entitlement':'Missing or unconfirmed',s.proof?.passed?'Lesson proof recorded':'Protected lesson not yet proven']];
  for(const [label,value,detail] of items){const card=document.createElement('div');for(const [tag,className,content] of [['span','case-first-look-label',label],['strong','',value],['small','',detail]]){const node=document.createElement(tag);if(className)node.className=className;node.textContent=content;card.append(node);}facts.append(card);}
- main.querySelector('.case-column-title')?.after(facts);
+ const heading=main.querySelector('.case-column-title');
+ if(heading){layout.before(heading,facts);}else layout.before(facts);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
  const deep=document.createElement('details');deep.className='case-deep-dive';deep.id='case-deep-evidence';const title=document.createElement('summary');title.innerHTML='<span><strong>Inspect full evidence and audit</strong><small>Agent findings, source records, workflow, verification, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
@@ -61,6 +62,7 @@ export function finishCaseLayout(root,s){
  if(!preview&&decision)rail.append(decision);
  const stepper=root.querySelector('.review-shell > .stepper');
  if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}
- main.append(communication,deep);
+ main.append(communication);
+ layout.after(deep);
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
 }
