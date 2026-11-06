@@ -66,4 +66,4 @@ Do not list sponsor tools that are not integrated. Never include production cred
 
 ## Testing disclosure
 
-The walkthrough uses fictional records and scripted specialists. The working Node backend and provider adapters exist. Local/mocked tests do not establish external acceptance. Update [submission status](SUBMISSION-STATUS.md) after actual connected tests; do not replace missing results with claims.
+The walkthrough uses fictional records and scripted specialists. The working Node backend and provider adapters exist. Local/mocked tests do not establish external acceptance. Update the [integration status](INTEGRATION-STATUS.md) after actual connected tests; do not replace missing results with claims.

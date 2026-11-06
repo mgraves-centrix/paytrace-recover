@@ -1,6 +1,6 @@
 # PayTrace release candidate
 
-This branch prepares a verified merchant mode and a repeatable connected acceptance check. Commit `58c471a` was deployed to the public Azure **sandbox demo** on 2026-11-03 and passed hosted route/provider preflight. The automated suite passed 305 tests, and two five-scenario fictional model evaluations passed with zero access writes. It has not passed a complete PayPal sandbox and Render Workflow acceptance run. `main` remains unchanged until that evidence exists. A successful deploy or configured credential is not connected acceptance.
+Main includes verified merchant mode and repeatable evidence checks. The public Azure **sandbox demo** deployed commit `608b8de` on 2026-11-05; deployment reported `RuntimeSuccessful`, and `/health`, `/judge.html`, and `/focus.html` returned HTTP 200. The automated suite passed 321 tests and the coverage gate. A complete PayPal sandbox buyer-to-lesson recovery has not been recorded. A successful deploy or configured credential is not connected acceptance.
 
 ## Identity and workspace boundary
 
@@ -15,6 +15,8 @@ Keep the current `COURSE_ACCESS_URL` and `COURSE_ACCESS_API_KEY` adapter and the
 ## Connected acceptance sequence
 
 Before a connected run, use `npm run hosted:preflight -- https://YOUR-HOST/ --require-connected`. This read-only check verifies the public routes and that PayPal, AI, course access, and Workflows are configured. It does not prove a checkout, task execution, access grant, or lesson delivery. Run it again after deployment; a missing route is a release failure.
+
+For the core PayPal-and-AI hackathon evidence check, `npm run acceptance:check -- --mode=hackathon` assesses the exact sandbox payment, current model review, approval, one grant and fresh external lesson proof without requiring optional Render evidence. The default `connected` mode below additionally requires the Render recovery check. Neither mode performs the recovery or certifies submission requirements.
 
 1. Configure the PayPal **sandbox** client ID and secret, the matching webhook ID, the course service, the AI model, and Render Workflow secrets on the server. Use private hosting settings; never put secrets in the browser or repository. Run connection checks, which prove reachability only.
 2. Sign in as a verified Admin or Manager. Create one **sandbox** case, complete a PayPal sandbox checkout with a sandbox buyer, and inspect the fresh captured order, learner, course, amount, and currency. Do not use a sample case.

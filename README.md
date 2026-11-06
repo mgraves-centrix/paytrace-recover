@@ -6,6 +6,8 @@ PayTrace Recover helps merchants resolve cases where a customer paid but didn’
 
 [Judge testing guide](docs/JUDGE-TESTING.md) · [Devpost draft](docs/DEVPOST-SUBMISSION.md) · [Three-minute video plan](docs/VIDEO-RECORDING.md). These are preparation materials; no completed connected acceptance or submitted video is claimed.
 
+The [feature acceptance matrix](docs/FEATURE-ACCEPTANCE.md) maps the main product areas to local tests and the connected proof still needed. Run `npm run check:review-links` to check local links in the judge and submission materials.
+
 The [Azure Node demo and integration checklist](docs/AZURE-DEPLOYMENT.md) documents the server-backed deployment separately from the public browser simulation.
 
 The dated [integration status matrix](docs/INTEGRATION-STATUS.md) separates implemented code, configured services, and completed live acceptance.
