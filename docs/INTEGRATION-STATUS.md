@@ -1,4 +1,4 @@
-# Integration status — 2026-11-03
+# Integration status — 2026-11-05
 
 | Capability | Implemented in source | Configured on Azure demo | Live acceptance recorded |
 | --- | --- | --- | --- |
@@ -11,14 +11,14 @@
 | Customer email via Resend | Yes, optional | Not confirmed | No live delivery acceptance |
 | Verified OIDC/MFA merchant sign-in | Yes, optional | No | No |
 | AG Studio | No | No | No |
-| Prevention Studio and Fix Watch | Yes, on draft PR #3 | Yes, deployed on Azure sandbox demo 2026-11-03 | No mapped-purchase cohort yet |
+| Prevention Studio and Fix Watch | Yes, merged in PR #3 | Yes, deployed on Azure sandbox demo | No mapped-purchase cohort yet |
 | Encrypted daily local backup and restore probe | Yes | Yes | Local restore probe passed; independent copy not configured |
 | Independent encrypted Azure Blob backup copy | Yes, optional | No | No remote restore drill |
 | Tenant-scoped reference course grants | Yes | Both Azure apps deployed together 2026-11-02 | No completed grant and lesson acceptance |
 
 CI now enforces a platform-stable floor of 87% line and 81% branch coverage. The review target of 90% for both remains open; local all-files runs measured about 87% line and 82% branch. Do not report the coverage target as met.
 
-The `8b42d3c` source archive was deployed to the public Azure sandbox demo through a private, short-lived Azure Blob package and the Azure OneDeploy control plane on 2026-11-03. SCM basic publishing authentication stayed disabled. Live `/recovery.html` contains the Prevention Studio tab, `/prevention-view.mjs` and `/focus-case-design.mjs` return HTTP 200, and the latter contains the condensed first-look layout. `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/ --require-connected` passed for routes and configured provider flags. This is deployment verification, not a completed connected recovery. Draft PR #3 remains unmerged.
+The `8b42d3c` source archive was deployed to the public Azure sandbox demo through a private, short-lived Azure Blob package and the Azure OneDeploy control plane on 2026-11-03. SCM basic publishing authentication stayed disabled. This was an earlier deployment; PR #3 was subsequently merged. Its route and configuration checks were deployment verification, not a completed connected recovery.
 
 Commit `d0bea60` was also deployed to the Azure sandbox demo via OneDeploy on 2026-11-03. The deployment completed, `/health` returned 200, and a separate fictional `gpt-4o-mini` smoke review completed eight specialist calls with zero access writes. Aggregate Application Insights queries found `invoke_agent` spans for Ledger, Relay, Patch, and Prism. These are externally registered agents; Foundry does not host their runtime. See [Foundry agents](FOUNDRY-AGENTS.md). This test does not close the PayPal buyer-to-lesson acceptance gap.
 
@@ -29,3 +29,5 @@ On 2026-11-03, commit `58c471a` was deployed to the Azure sandbox demo. The 305-
 On 2026-11-04, a fresh `/health` request returned 503 because the active Azure SQLite database failed `PRAGMA quick_check`. A non-destructive `VACUUM INTO` produced a separate database whose full integrity check passed and whose row counts matched all 39 application tables, including 164 cases; the damaged original remains on disk. Azure was switched to the clean copy and `/health` returned 200. PR #3 then passed 313 local tests, coverage gates, and GitHub CI, merged into `main` as `6850345`, and was deployed to Azure. Deployment reported `RuntimeSuccessful`; the post-deploy hosted preflight passed every listed route and five configured-provider flags, `/health` returned 200, and unauthenticated `/api/cases` returned 401. These are configuration and boundary checks, not a buyer-approved PayPal-to-course acceptance run.
 
 Render Workflow version `wfv-dbl7gq7f3r2c73dqobl0`, built from documentation commit `2ee9eb4` on the same branch, reached `ready` and registered `investigate`, `recover`, and their five supporting tasks. This confirms a compatible task definition is available; a new PayPal-connected task run and callback still need the buyer checkout acceptance test.
+
+On 2026-11-05, commit `2409dec` simplified the recovery desk and case decision journey and was pushed to public `main`. Azure ZIP deployment reported `RuntimeSuccessful` on its single instance; `/health`, `/focus.html`, `/recovery.html`, and the new CSS/module assets returned HTTP 200. The live pages contained the new simplified navigation and grouped Recovery Center tools. This confirms the UI deployment, not a completed PayPal-connected recovery. The buyer checkout, model-backed investigation on that purchase, approved Render recovery, and protected-lesson acceptance remain open.

@@ -1,3 +1,37 @@
+import {checks,fingerprint,reviewIsCurrent} from './core.mjs';
+import {proofIsCurrent} from './operations.mjs';
+
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+export function recoveryReadiness(s,{uncertain=false,backend=false}={}){
+ const purchase=checks(s).slice(0,5).every(item=>item.ok)&&s.evidenceAvailable!==false&&s.sources?.payment?.status!=='unavailable';
+ const access=s.sources?.access?.status!=='unavailable'&&(!backend||s.sources?.access?.status==='available')&&!s.entitlement?.active;
+ const review=reviewIsCurrent(s)&&(!backend||s.review?.mode==='model');
+ const objections=review&&s.review?.outcome==='ready'&&!s.review?.objections?.some(item=>item.status==='open');
+ const preview=!!s.rehearsal&&s.rehearsal.passed===true&&s.rehearsal.fingerprint===fingerprint(s);
+ const approval=preview&&s.approval?.planId===s.rehearsal.id&&s.approval.fingerprint===s.rehearsal.fingerprint;
+ return [
+  {label:'Payment matches this purchase',ok:purchase,detail:purchase?'Completed capture and exact purchase fields agree':'Confirm the completed capture and purchase fields'},
+  {label:'Missing access confirmed',ok:access,detail:access?'Course access is inactive':'Refresh the course access record'},
+  {label:'AI review supports a correction',ok:objections,detail:review?objections?'No open objection':'Resolve the review objection before a grant':backend?'Run a current model review':'Run the sample specialist review'},
+  {label:'Exact correction previewed',ok:preview,detail:preview?'One purchase-bound access change':'Preview the customer, course, and change'},
+  {label:'Merchant authorization recorded',ok:approval,detail:approval?'Approved for this exact preview':'Approval is required before applying'}
+ ].map(item=>({...item,ok:item.ok&&!uncertain,detail:uncertain?'Refresh current status before relying on this check':item.detail}));
+}
+
+export function readinessMarkup(s,options={}){
+ const steps=recoveryReadiness(s,options),passed=steps.filter(item=>item.ok).length,source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':s.capture?'Sample payment':'Payment not confirmed';
+ const sample=options.backend&&source==='Sample payment';
+ return `<section class="case-readiness" aria-label="Recovery readiness"><div class="case-readiness-head"><span class="eyebrow">DECISION CHECKLIST · ${esc(source)}</span><strong>${options.uncertain?'Refresh current status':sample?'Illustrative case · not connected':passed===steps.length?'Approval recorded · final checks remain':`${passed} of ${steps.length} checks ready`}</strong>${sample?'<small>Sample records show the decision path. A PayPal sandbox case is needed for connected proof.</small>':passed===steps.length?'<small>The server rereads payment and access before any grant.</small>':''}</div><ol>${steps.map(item=>`<li class="${item.ok?'ready':'waiting'}"><span aria-hidden="true">${item.ok?'✓':'·'}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.detail)}</small></div></li>`).join('')}</ol><a href="#case-deep-evidence" data-open-case-evidence>Inspect the supporting records ↗</a></section>`;
+}
+
+export function outcomeSummaryMarkup(s,{uncertain=false}={}){
+ if(uncertain||!proofIsCurrent(s)||s.evidenceAvailable===false||Object.values(s.sources||{}).some(source=>source?.status==='unavailable'))return '';
+ const source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':'Sample payment',change=s.writes===0?'No access change needed':s.writes===1?'One approved access grant recorded':`${s.writes} access writes recorded`;
+ const checked=s.proof?.at&&Number.isFinite(Date.parse(s.proof.at))?new Date(s.proof.at).toLocaleString():'time unavailable';
+ return `<section class="case-outcome-summary" aria-label="Verified recovery summary"><span class="eyebrow">TECHNICAL OUTCOME · ${esc(source)}</span><h3>Access checked and available</h3><p>The saved payment, purchased entitlement, and protected lesson check agree.</p><dl><div><dt>Original issue</dt><dd>${s.writes===0?'Reported access problem; the course service restored access before a PayTrace grant.':'Paid purchase; digital access was missing.'}</dd></div><div><dt>Correction</dt><dd>${esc(change)}</dd></div><div><dt>Lesson proof</dt><dd>Protected lesson opened in the technical check · ${esc(checked)}</dd></div><div><dt>Customer</dt><dd>Ask the buyer to open it on their device; confirmation is separate.</dd></div></dl><a href="#case-customer-updates">See the customer update ↗</a></section>`;
+}
+
 // Present the existing controls in a focused layout; authorization stays on the server.
 export function arrangeCase(root,s){
  document.body.classList.toggle('focus-case-open',!!s);
@@ -26,7 +60,7 @@ export function arrangeCase(root,s){
 
 // Keep the decision, three purchase facts, and customer update in the first
 // reading path. The detailed instruments remain available without dominating it.
-export function finishCaseLayout(root,s){
+export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const sheet=root.querySelector('.case-redesign'),main=sheet?.querySelector('.case-evidence-column'),layout=sheet?.querySelector('.case-layout'),communication=sheet?.querySelector('.case-communication-area');
  if(!main||!layout||!communication||!s)return;
  const exact=!!s.capture&&s.capture.status==='COMPLETED'&&s.capture.orderId===s.order.id&&s.capture.userId===s.order.userId&&s.capture.courseId===s.order.courseId&&s.capture.amount===s.order.amount&&s.capture.currency===s.order.currency;
@@ -49,20 +83,17 @@ export function finishCaseLayout(root,s){
  for(const child of [...rail.children])if(child.matches('.story-brief-panel,.customer-preview-disclosure,.case-priority-panel,.exact-approval'))deep.append(child);
  for(const selector of ['.summary','.merchant-decision','.case-change-preview','.consent','.actionbar']){const child=rail.querySelector(':scope > '+selector);if(child)rail.append(child);}
  const decision=rail.querySelector(':scope > .merchant-decision');
- if(decision&&rail.querySelector(':scope > .summary')){
-  // The summary already names the next step; keep this card about supporting facts.
-  const eyebrow=decision.querySelector(':scope > .eyebrow'),heading=decision.querySelector(':scope > h2');
-  if(eyebrow)eyebrow.textContent='SUPPORTING EVIDENCE';
-  if(heading)heading.textContent='Why this step';
-  decision.querySelector(':scope > p')?.remove();
- }
- if(preview)decision?.querySelector('.decision-change')?.remove();
- // Before a correction exists, the read-only next step can lead; once a
- // preview exists, supporting evidence remains ahead of consent and approval.
- if(!preview&&decision)rail.append(decision);
+ if(!s.review)rail.querySelector(':scope > .summary > p')?.remove();
+ // Keep the full recommendation and its objections together for inspection.
+ // The primary column only needs the readiness result and next action.
+ if(decision)deep.append(decision);
+ const outcome=outcomeSummaryMarkup(s,{uncertain});
+ if(outcome)rail.insertAdjacentHTML('afterbegin',outcome);
+ else rail.insertAdjacentHTML('afterbegin',readinessMarkup(s,{uncertain,backend}));
  const stepper=root.querySelector('.review-shell > .stepper');
  if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}
  main.append(communication);
  layout.after(deep);
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
+ root.querySelector('[data-open-case-evidence]')?.addEventListener('click',()=>{deep.open=true;});
 }

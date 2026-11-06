@@ -30,8 +30,8 @@ Codex helped build the merchant and customer flows, integrate and compare fronte
 
 - PayPal sandbox order/capture integration with fresh payment checks and webhook handling.
 - Separate tenant-scoped reference course service for entitlement reads, idempotent grants, suspensions, and protected-lesson probes.
-- Guided merchant desk with case queue, evidence, AI consultations, exact correction preview, approval, activity, and run report.
-- Private customer case tracker with progress updates, messages, information requests, lesson access, and separate buyer confirmation.
+- Guided merchant desk with an attention-first queue, five-check recovery readiness, cited AI consultations, exact correction preview, approval, compact technical outcome, and full run report.
+- Private customer case tracker with the latest merchant reply, planned update time, messages, lesson access, and separate buyer confirmation.
 - Durable worker, retry and payment-hold behavior, optional bounded sandbox autopilot, and audit trail.
 - Connection studio, Recovery Passport, judge walkthrough, and clear labels for demo versus connected evidence.
 
@@ -44,7 +44,7 @@ The Node 24 PayTrace app runs on Azure App Service with SQLite for its single-in
 1. Open the [judge walkthrough](https://paytrace-recover-sagitta.azurewebsites.net/judge.html) and follow the labeled fictional sample.
 2. Open the [merchant workspace](https://paytrace-recover-sagitta.azurewebsites.net/focus.html). The Connections view shows which providers are configured; configuration is not an end-to-end pass.
 3. For a connected test, create a sandbox case, complete a PayPal sandbox buyer checkout, run investigation, inspect the cited findings, rehearse and approve the exact grant, apply it, then verify the protected lesson. Download the run report and open the private customer tracker.
-4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. The current review-fix branch passed 313 automated tests on November 4; CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
+4. Locally, use Node 24: `npm ci`, `npm test`, and `npm run test:coverage`. CI gates 87% line and 81% branch coverage as a floor. The 90% review target is still open.
 5. Run `npm run hosted:preflight -- https://paytrace-recover-sagitta.azurewebsites.net/` to check public routes and provider configuration. It does not prove a checkout or grant.
 
 ## Public Demo Link
@@ -55,7 +55,7 @@ https://paytrace-recover-sagitta.azurewebsites.net/judge.html
 
 https://github.com/sagitta414/paytrace-recover
 
-The feature and security-fix [PR #3](https://github.com/sagitta414/paytrace-recover/pull/3) was merged into public `main` as commit `6850345` and deployed to the Azure sandbox demo on November 4. Its SQLite database was rebuilt into a separate integrity-clean copy after `/health` returned 503. After deployment, `/health` and hosted route/configuration preflight passed, and an unauthenticated cases request returned 401. The complete PayPal-connected recovery has not been recorded.
+The feature and security-fix [PR #3](https://github.com/sagitta414/paytrace-recover/pull/3) was merged into public `main` as commit `6850345`. The later `2409dec` UI simplification is also deployed to the Azure sandbox demo. After that deployment, `/health` and the changed public page assets returned HTTP 200. An earlier SQLite database integrity failure was repaired into a separate checked copy; managed storage remains a pilot requirement. The complete PayPal-connected recovery has not been recorded.
 
 ## Demo Video
 
@@ -64,14 +64,14 @@ TODO: Record a video under three minutes, upload it publicly to YouTube, and put
 ## Screenshot Shot List
 
 1. Judge page showing the problem and honest readiness labels.
-2. Merchant case evidence with payment and access mismatch.
+2. Merchant case showing the readiness checklist, next action, and payment/access mismatch.
 3. Four specialist findings and objections tied to sources.
 4. Exact before/after grant preview and approval control.
-5. Protected-lesson proof, Recovery Passport, and customer progress view.
+5. Compact technical outcome, protected-lesson proof, Recovery Passport, and the latest merchant update on the customer page.
 
 ## Submission Readiness Notes
 
-The code-level security fixes passed CI and are merged into public `main`. The paired Azure apps were updated on 2026-11-02. On November 4, the PayTrace database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy. The merged commit `6850345` was deployed to PayTrace Azure App Service. The post-deploy `/health`, hosted routes, five provider configuration flags, and unauthenticated case boundary passed. These checks do not prove that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
+The code-level security fixes passed CI and are merged into public `main`. The paired Azure apps were updated on 2026-11-02. On November 4, the PayTrace database failed integrity checking and caused `/health` to return 503. A separate SQLite rebuild passed integrity checking and matched row counts in all 39 application tables; Azure now uses that copy. The later `2409dec` UX deployment passed its health and changed-asset checks. These checks do not prove that a complete connected recovery works. Save a redacted run report and Render run IDs only after an actual checkout-to-lesson acceptance run.
 
 ## Known Limitations
 
