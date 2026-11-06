@@ -1,6 +1,9 @@
 import {assessAcceptance} from '../server/acceptance-check.mjs';
 
-const {PAYTRACE_ACCEPTANCE_URL:site,PAYTRACE_ACCEPTANCE_CASE_ID:caseId,PAYTRACE_ACCEPTANCE_COOKIE:cookie,PAYTRACE_ACCEPTANCE_MODE:mode='connected'}=process.env;
+const {PAYTRACE_ACCEPTANCE_URL:site,PAYTRACE_ACCEPTANCE_CASE_ID:caseId,PAYTRACE_ACCEPTANCE_COOKIE:cookie,PAYTRACE_ACCEPTANCE_MODE:configuredMode='connected'}=process.env;
+const modeArgument=process.argv.slice(2);
+if(modeArgument.length>1||modeArgument.some(value=>!/^--mode=(connected|hackathon|refund|failed-verification)$/.test(value)))throw Error('Use --mode=connected, --mode=hackathon, --mode=refund or --mode=failed-verification.');
+const mode=modeArgument.length?modeArgument[0].slice('--mode='.length):configuredMode;
 if(!site||!caseId||!cookie)throw Error('Set PAYTRACE_ACCEPTANCE_URL, PAYTRACE_ACCEPTANCE_CASE_ID, and PAYTRACE_ACCEPTANCE_COOKIE in your private shell.');
 const base=new URL(site);
 if(base.username||base.password||base.search||base.hash||!['https:','http:'].includes(base.protocol)||base.protocol==='http:'&&!['localhost','127.0.0.1'].includes(base.hostname))throw Error('Use HTTPS or local HTTP for the acceptance URL.');

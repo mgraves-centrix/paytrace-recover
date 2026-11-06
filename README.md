@@ -8,6 +8,12 @@ A write is not proof of recovery. Current technical verification, a buyer-browse
 
 [Project overview](dist/project.html) · [Interactive sample](dist/demo.html) · [Judge walkthrough](dist/judge.html) · [Feature acceptance matrix](docs/FEATURE-ACCEPTANCE.md) · [Review results](docs/VALIDATION-2026-11-04.md)
 
+## Hackathon submission kit
+
+Start with [current submission status](docs/SUBMISSION-STATUS.md), [Devpost description and tools disclosure](docs/DEVPOST-SUBMISSION.md), [judge testing instructions](docs/JUDGE-TESTING.md) and [2:40 recording plan](docs/VIDEO-RECORDING.md). These are prepared materials, not proof of a completed video or submitted entry. November 5 dependency audit reported zero vulnerabilities; hosted preflight timed out from the review session.
+
+For a configured case, `npm run acceptance:check -- --mode=hackathon` checks core PayPal/model/approval/external lesson evidence without optional Render execution. The default `connected` mode still requires all six sources. Both are read-only saved-evidence checks, not official eligibility determinations. Private provider access is needed to complete a genuine connected run.
+
 ## Status and evidence
 
 This review starts from GitHub `main` commit `eff16c73a128db0ff23a9277d431e9ae35c8e815`, fetched November 4, 2026. The unchanged baseline passed **276 automated tests** with no failures or skips. See the validation report for checks after the documentation/page changes.
