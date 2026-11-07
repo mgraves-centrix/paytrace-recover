@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {COURSE} from '../dist/core.mjs';
+import {validatePurchaseIntent,trustedPurchaseDigest} from './trusted-intake.mjs';
 
 // A merchant-operated sandbox storefront. It uses the same validated intake
 // service as /api/intake/purchase, without pretending to be an external store.
@@ -13,13 +14,15 @@ export function demoStore(store,paypal,service){
    let row=store.demoCheckout(owner,requestId);const normalizedEmail=email.trim().toLowerCase(),name=customerName.trim();
    if(row&&(row.customerName!==name||row.email!==normalizedEmail)){const error=Error('This checkout request belongs to different purchase details.');error.status=409;throw error;}
    if(!row){const suffix=randomUUID().replaceAll('-','').slice(0,16).toUpperCase();row={requestId,caseId:'CL-STORE-'+suffix,purchaseId:'store-'+suffix,learnerId:'learner-'+suffix,customerName:name,email:normalizedEmail,orderId:null,status:'started',createdAt:new Date().toISOString()};store.saveDemoCheckout(owner,requestId,row);}
-   if(!row.orderId){const orderId=await paypal.create({id:row.caseId});row={...row,orderId,status:'awaiting-buyer'};store.saveDemoCheckout(owner,requestId,row);}
+   if(row.orderId&&!row.paypalCustomId)throw Error('This checkout predates purchase binding. Start a new checkout.');
+   if(!row.paypalCustomId){const fields=validatePurchaseIntent({caseId:row.caseId,purchaseId:row.purchaseId,learnerId:row.learnerId,customerName:row.customerName,email:row.email,courseId:COURSE.id,amount:COURSE.price,currency:COURSE.currency});const intent=store.savePurchaseIntent(owner,fields,trustedPurchaseDigest(fields));row={...row,paypalCustomId:intent.paypalCustomId};store.saveDemoCheckout(owner,requestId,row);}
+   if(!row.orderId){const orderId=await paypal.create({id:row.caseId,paypalCustomId:row.paypalCustomId});row={...row,orderId,status:'awaiting-buyer'};store.saveDemoCheckout(owner,requestId,row);}
    return publicDraft(row);
   });
  }
  async function complete(owner,body){const {requestId,orderId}=body||{};const row=draft(owner,requestId);if(!row||!row.orderId||orderId!==row.orderId){const error=Error('Checkout order does not match this store purchase.');error.status=409;throw error;}
   if(row.status==='case-created')return {...publicDraft(row),intake:'duplicate'};
-  const payment={id:row.caseId,paypalOrderId:row.orderId,order:{id:row.caseId,userId:row.learnerId,courseId:COURSE.id,amount:COURSE.price,currency:COURSE.currency}};
+  const payment={id:row.caseId,paypalOrderId:row.orderId,paypalCustomId:row.paypalCustomId,order:{id:row.caseId,userId:row.learnerId,courseId:COURSE.id,amount:COURSE.price,currency:COURSE.currency}};
   const capture=await paypal.capture(payment);if(capture.status!=='COMPLETED')throw Error('Sandbox payment is not completed. No recovery case was created.');
   const intake=await service.intakePurchase(owner,{caseId:row.caseId,purchaseId:row.purchaseId,paypalOrderId:row.orderId,learnerId:row.learnerId,customerName:row.customerName,email:row.email,courseId:COURSE.id,amount:COURSE.price,currency:COURSE.currency});
   const updated={...row,status:'case-created',completedAt:new Date().toISOString()};store.saveDemoCheckout(owner,requestId,updated);

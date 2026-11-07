@@ -11,7 +11,7 @@ import {buildRunReport} from '../dist/run-report.mjs';
 import {withRecoverySpan,noteSpecialistProgress} from './recovery-trace.mjs';
 import {expireWorkflow,workflowTimeout} from './workflow-lifecycle.mjs';
 import {detectIncident} from '../dist/intelligence-lab.mjs';
-import {validateTrustedPurchase,trustedPurchaseDigest} from './trusted-intake.mjs';
+import {validateTrustedPurchase,validatePurchaseIntent,trustedPurchaseDigest} from './trusted-intake.mjs';
 export function createService(store,env=process.env,{fetcher=fetch,paypal=paypalClient(env,fetcher),probe,access=(owner,s)=>store.readAccess(owner,s),course=courseAccessClient(env,fetcher)}={}){
  const timeoutMs=workflowTimeout(env);
  const verificationMaxAgeMs=verificationAge(env);
@@ -214,13 +214,16 @@ export function createService(store,env=process.env,{fetcher=fetch,paypal=paypal
    case 'verify':s=await verifyFresh(id);break;
    default:throw Error('Unknown action.');
   }store.save(id,s);if(body.action==='scenario')store.seedAccess(id,s);return {state:s}})}
+ async function registerPurchaseIntent(owner,body){const intent=validatePurchaseIntent(body);return store.lock(owner,()=>store.savePurchaseIntent(owner,intent,trustedPurchaseDigest(intent)));}
  async function intakePurchase(owner,body,{connectorRevision=null}={}){const input=validateTrustedPurchase(body),digest=trustedPurchaseDigest(input);return store.lock(owner,async()=>{
   const existing=store.listCases(owner).find(item=>item.id===input.caseId);
   if(existing){if(existing.externalIntake?.digest!==digest){const error=Error('This case ID already belongs to a different purchase.');error.status=409;throw error;}return {status:'duplicate',caseId:existing.id};}
+  const {paypalOrderId,...intentFields}=input,intent=store.purchaseIntent(owner,input.caseId);
+  if(!intent||intent.purchaseId!==input.purchaseId||intent.digest!==trustedPurchaseDigest(intentFields)){const error=Error('Register this merchant purchase before PayPal checkout. No case was created.');error.status=409;throw error;}
   if(store.listCases(owner).length>=100)throw Error('This demo workspace has reached its 100-case limit.');
-  const s=createCase('match',input.caseId);s.customerName=input.customerName;s.intakeMode='sandbox';s.paypalOrderId=input.paypalOrderId;s.order={id:input.caseId,userId:input.learnerId,courseId:input.courseId,amount:input.amount,currency:input.currency};s.currentAccountId=input.learnerId;s.entitlement={userId:input.learnerId,courseId:input.courseId,active:false,captureId:null};s.fulfillment={code:null,cause:'unknown'};
+  const s=createCase('match',input.caseId);s.customerName=input.customerName;s.intakeMode='sandbox';s.paypalOrderId=input.paypalOrderId;s.paypalCustomId=intent.paypalCustomId;s.order={id:input.caseId,userId:input.learnerId,courseId:input.courseId,amount:input.amount,currency:input.currency};s.currentAccountId=input.learnerId;s.entitlement={userId:input.learnerId,courseId:input.courseId,active:false,captureId:null};s.fulfillment={code:null,cause:'unknown'};
   const capture=await paypal.refresh(s);
-  if(capture.source!=='paypal-sandbox'||capture.status!=='COMPLETED'||capture.orderId!==s.order.id||capture.userId!==s.order.userId||capture.courseId!==s.order.courseId||capture.amount!==s.order.amount||capture.currency!==s.order.currency)throw Error('Fresh PayPal sandbox capture does not match the trusted purchase. No case was created.');
+  if(capture.source!=='paypal-sandbox'||capture.status!=='COMPLETED'||capture.paypalCustomId!==intent.paypalCustomId||capture.orderId!==s.order.id||capture.userId!==s.order.userId||capture.courseId!==s.order.courseId||capture.amount!==s.order.amount||capture.currency!==s.order.currency)throw Error('Fresh PayPal sandbox capture does not match the registered purchase. No case was created.');
   s.capture=capture;s.paidAt=new Date().toISOString();s.phase='paid';s.revision++;s.externalIntake={purchaseId:input.purchaseId,digest,receivedAt:s.paidAt,channel:Number.isInteger(connectorRevision)&&connectorRevision>0?'mapped-event':'direct-purchase',connectorRevision:Number.isInteger(connectorRevision)&&connectorRevision>0?connectorRevision:null};record(s,'Trusted store purchase matched a fresh PayPal sandbox capture. Access has not been changed.');
   store.saveCase(owner,s);store.support.contact(owner,s.id,input.email);store.support.requestLink(s.id,input.email);store.durable.queue({id:'intake:'+owner+':'+s.id,owner,kind:'scan'});store.center.audit(owner,{action:'purchase.trusted-intake',caseId:s.id,detail:'Fresh matching sandbox capture; zero access writes.'});
   return {status:'created',caseId:s.id,payment:'matched',accessChange:false};
@@ -280,6 +283,7 @@ export function createService(store,env=process.env,{fetcher=fetch,paypal=paypal
   lesson,customerLesson,customerSelfCheck,
   paypalCreate:(id,caseId)=>traced('paypal-create',id,()=>paypalCreate(id,caseId)),
   paypalCapture:(id,orderId,caseId)=>traced('paypal-capture',id,()=>paypalCapture(id,orderId,caseId)),
+  registerPurchaseIntent:(owner,body)=>traced('purchase-intent',owner,()=>registerPurchaseIntent(owner,body)),
   intakePurchase:(owner,body,options)=>traced('trusted-intake',owner,()=>intakePurchase(owner,body,options)),
   paypalWebhook:event=>withRecoverySpan('paypal-webhook',event?.resource?.supplementary_data?.related_ids?.order_id,()=>paypalWebhook(event)),
   // The 30-second monitor can scan many demo owners; tracing idle polls would

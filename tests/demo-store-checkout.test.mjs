@@ -7,8 +7,8 @@ test('demo storefront captures a sandbox order, sends one trusted mapping, and c
  const db=openStore(':memory:');let creates=0,captures=0,reads=0;
  const paypal={
   create:async s=>{creates++;return 'PAYPAL-'+s.id;},
-  capture:async s=>{captures++;return {id:'CAPTURE-'+s.id,orderId:s.id,userId:s.order.userId,courseId:s.order.courseId,amount:s.order.amount,currency:s.order.currency,status:'COMPLETED',source:'paypal-sandbox'};},
-  refresh:async s=>{reads++;return {id:'CAPTURE-'+s.id,orderId:s.id,userId:s.order.userId,courseId:s.order.courseId,amount:s.order.amount,currency:s.order.currency,status:'COMPLETED',source:'paypal-sandbox'};}
+  capture:async s=>{captures++;return {id:'CAPTURE-'+s.id,orderId:s.id,paypalCustomId:s.paypalCustomId,userId:s.order.userId,courseId:s.order.courseId,amount:s.order.amount,currency:s.order.currency,status:'COMPLETED',source:'paypal-sandbox'};},
+  refresh:async s=>{reads++;return {id:'CAPTURE-'+s.id,orderId:s.id,paypalCustomId:s.paypalCustomId,userId:s.order.userId,courseId:s.order.courseId,amount:s.order.amount,currency:s.order.currency,status:'COMPLETED',source:'paypal-sandbox'};}
  };
  const {server}=createApp({PUBLIC_URL:'http://localhost',DEMO_OPERATOR_KEY:'test-key',PAYPAL_CLIENT_ID:'sandbox-id',PAYPAL_CLIENT_SECRET:'sandbox-secret'},db,{paypal});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
