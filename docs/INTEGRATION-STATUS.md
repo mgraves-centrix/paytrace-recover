@@ -1,10 +1,10 @@
-# Integration status — 2026-11-06
+# Integration status — 2026-11-07
 
 | Capability | Implemented in source | Configured on Azure demo | Live acceptance recorded |
 | --- | --- | --- | --- |
 | PayPal sandbox order, capture, fresh read | Yes | Yes | No complete buyer-to-lesson run |
 | PayPal signature-verified webhook | Yes, optional | Not confirmed | No live delivery recorded |
-| Merchant-bound purchase intent and shared-account reporting guard | Yes, source change pending deployment | No | Local ownership and isolation tests passed; connected checkout not recorded |
+| Merchant-bound purchase intent and shared-account reporting guard | Yes | Yes, source from PR #4 deployed to Azure demo | 326 local tests and public route checks passed; connected checkout not recorded |
 | Separate reference course access | Yes | Yes, tenant-scoped package deployed 2026-11-02 | Authenticated tenant-scoped read passed; no completed recovery |
 | Azure OpenAI specialist review | Yes | Yes | Fictional evaluation passed; no complete connected case |
 | Foundry external specialist inventory and safe traces | Yes | Four external registrations in dedicated PayTrace project; connected to existing Application Insights | Fictional eight-call model review emitted all four agent IDs with zero access writes; no PayPal-connected recovery acceptance |
@@ -36,3 +36,5 @@ On 2026-11-05, commit `2409dec` simplified the recovery desk and case decision j
 Commit `b6904d0` added a compact five-check merchant readiness view, a technical outcome summary, a visible latest merchant reply and update guidance on the private customer page, and copy/source-label cleanup. All 318 local tests and the coverage gate passed. Azure reported `RuntimeSuccessful`; `/health`, merchant/customer pages, and both changed modules returned HTTP 200 with the new markers. These are deployment and presentation checks only. No buyer-approved PayPal-to-lesson recovery or customer-device confirmation was performed in this update.
 
 On 2026-11-06, an existing case read again surfaced a malformed SQLite database and `/health` returned 503. The active file was preserved. A server-side SQLite dump produced a separate database whose logical dump hash matched the active file, whose full integrity and foreign-key checks passed, and which retained all 208 cases. The most recent encrypted backup had only 171 cases, so it was not substituted for current data. Azure was pointed at the verified 208-case copy and explicitly restarted; `/health` returned 200, and the same existing case opened twice. Commit `a13cc86` then improved the merchant UI, safe database error messaging, and demo-resource organization. All 322 local tests passed. The commit was pushed to `main` and Azure ZIP deployment completed; `/health`, the merchant page, Recovery Center, account page, new demo resources, and the updated overview asset returned 200. The deployed overview and case view rendered in the browser. This restores availability and improves presentation; it does not establish a connected buyer-to-lesson recovery or an off-site backup restore drill.
+
+On 2026-11-07, PR #4 merged as `647b9af` and its source archive was deployed to the Azure sandbox demo. Azure's deployment record reported success, App Service reported `Running` with normal availability, `/health` and the merchant, Intelligence Lab, and Connection Studio pages returned HTTP 200, and the new paused-reporting module was served. Unauthenticated `/api/intelligence/discover` returned 401. The 326-test local suite passed before merge. This verifies release and access boundaries; no new buyer-approved sandbox checkout, model-backed decision for that purchase, course grant, or protected-lesson acceptance was recorded.
