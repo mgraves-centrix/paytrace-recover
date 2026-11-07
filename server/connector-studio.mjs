@@ -1,4 +1,4 @@
-import {validateTrustedPurchase} from './trusted-intake.mjs';
+import {validateTrustedPurchase,validatePurchaseIntent,trustedPurchaseDigest} from './trusted-intake.mjs';
 import {aiEndpoint} from './ai-endpoint.mjs';
 
 export const CONNECTOR_FIELDS=['caseId','purchaseId','paypalOrderId','learnerId','customerName','email','courseId','amount','currency'];
@@ -45,9 +45,10 @@ export async function suggestMapping(sample,env=process.env,fetcher=fetch){
   return {mapping,paths,mode:'ai',notice:'AI matched field names only. Confirm every source before saving.'};
  }catch{return {mapping:fallback,paths,mode:'field-name',notice:'AI suggestion was unavailable. Review every field manually.'};}
 }
-export async function checkMappedPayment(purchase,paypal){
- try{const capture=await paypal.refresh({id:purchase.caseId,paypalOrderId:purchase.paypalOrderId,order:{id:purchase.caseId,userId:purchase.learnerId,courseId:purchase.courseId,amount:purchase.amount,currency:purchase.currency}});
-  const matched=capture.source==='paypal-sandbox'&&capture.status==='COMPLETED'&&capture.orderId===purchase.caseId&&capture.userId===purchase.learnerId&&capture.courseId===purchase.courseId&&capture.amount===purchase.amount&&capture.currency===purchase.currency;
+export async function checkMappedPayment(purchase,paypal,intent){
+ if(!intent||intent.purchaseId!==purchase.purchaseId||intent.digest!==trustedPurchaseDigest(validatePurchaseIntent(purchase)))return {matched:false,reason:'Register this merchant purchase before PayPal checkout. No connection was activated.'};
+ try{const capture=await paypal.refresh({id:purchase.caseId,paypalOrderId:purchase.paypalOrderId,paypalCustomId:intent.paypalCustomId,order:{id:purchase.caseId,userId:purchase.learnerId,courseId:purchase.courseId,amount:purchase.amount,currency:purchase.currency}});
+  const matched=capture.source==='paypal-sandbox'&&capture.status==='COMPLETED'&&capture.paypalCustomId===intent.paypalCustomId&&capture.orderId===purchase.caseId&&capture.userId===purchase.learnerId&&capture.courseId===purchase.courseId&&capture.amount===purchase.amount&&capture.currency===purchase.currency;
   return {matched,reason:matched?'Fresh completed PayPal sandbox capture matches all purchase fields.':'Fresh PayPal capture is incomplete or does not match. No connection was activated.'};
  }catch{return {matched:false,reason:'PayPal sandbox order or capture could not be confirmed. No connection was activated.'};}
 }

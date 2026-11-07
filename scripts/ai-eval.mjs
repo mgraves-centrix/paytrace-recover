@@ -1,4 +1,4 @@
-import {createCase,simulatePayment} from '../dist/core.mjs';
+import {createCase,simulatePayment,scriptedReview} from '../dist/core.mjs';
 import {analyze} from '../server/ai.mjs';
 
 if(!process.env.OPENAI_API_KEY||!process.env.OPENAI_MODEL)throw Error('Set a server-side AI key and model before running this evaluation.');
@@ -24,10 +24,12 @@ const results=[];
 for(const item of cases){
  const state=simulatePayment(createCase(item.scenario,'EVAL-'+item.id));
  item.mutate?.(state);
+ const baseline=scriptedReview(state),started=Date.now();let apiRequests=0;
  try{
-  const analysis=await analyze(state,process.env);
-  results.push({case:item.id,expected:item.expected,actual:analysis.review.outcome,pass:analysis.review.outcome===item.expected,openCategories:analysis.review.objections.filter(o=>o.status==='open').map(o=>o.category||'unknown'),calls:analysis.review.exchange.filter(x=>x.kind==='Finding'||x.kind==='Proposal'||x.kind==='Independent conclusion').length,accessWrites:state.writes});
- }catch(error){results.push({case:item.id,expected:item.expected,actual:'review-error',pass:false,error:error.message,accessWrites:state.writes});}
+  const analysis=await analyze(state,process.env,async(...args)=>{apiRequests++;return fetch(...args)});
+  const conclusion=analysis.review.exchange.findLast(x=>x.kind==='Independent conclusion');
+  results.push({case:item.id,expected:item.expected,actual:analysis.review.outcome,pass:analysis.review.outcome===item.expected,baseline:{outcome:baseline.outcome,proposal:baseline.proposal,decision:baseline.exchange.at(-1).summary},modelExplanation:conclusion?{summary:conclusion.summary,unknown:conclusion.unknown,sources:conclusion.sources}:null,openCategories:analysis.review.objections.filter(o=>o.status==='open').map(o=>o.category||'unknown'),apiRequests,elapsedMs:Date.now()-started,accessWrites:state.writes});
+ }catch(error){results.push({case:item.id,expected:item.expected,actual:'review-error',pass:false,error:error.message,apiRequests,elapsedMs:Date.now()-started,accessWrites:state.writes});}
 }
 console.log(JSON.stringify({model:process.env.OPENAI_MODEL,results,passed:results.filter(r=>r.pass).length,total:results.length}));
 if(results.some(r=>!r.pass))process.exitCode=1;

@@ -18,3 +18,8 @@ export function validateTrustedPurchase(input){
 }
 
 export function trustedPurchaseDigest(purchase){return createHash('sha256').update(JSON.stringify(purchase)).digest('hex');}
+export function validatePurchaseIntent(input){
+ const purchase=validateTrustedPurchase({...input,paypalOrderId:'pending-order'});
+ const {paypalOrderId,...intent}=purchase;
+ return intent;
+}

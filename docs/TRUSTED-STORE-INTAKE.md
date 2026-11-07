@@ -10,9 +10,9 @@ Open **Connections → Run demo store checkout**, or visit `/store-demo.html`. U
 
 ### Merchant Connection Studio
 
-Open **Connections → Configure store event** or `/connection-studio.html`. Paste one example JSON event from your store. The Studio suggests which fields correspond to PayTrace's purchase contract; when AI is configured, it receives **field paths and primitive types only**, not buyer names, email addresses, order IDs, or values. Review and correct each field, choose cents or dollars, and preview the normalized purchase. Save the mapping as an inactive draft. To activate it, supply a real completed sandbox order in the sample: PayTrace rereads PayPal and requires the capture's case ID, learner, course, amount, and currency to match. Editing an active mapping deactivates it until the new version passes that check. The Studio does not grant course access or create a case during setup.
+Open **Connections → Configure store event** or `/connection-studio.html`. Paste one example JSON event from your store. The Studio suggests which fields correspond to PayTrace's purchase contract; when AI is configured, it receives **field paths and primitive types only**, not buyer names, email addresses, order IDs, or values. Review and correct each field, choose cents or dollars, and preview the normalized purchase. Save the mapping as an inactive draft. Before the test checkout, register its purchase intent from the store server as described below and place the returned opaque `paypalCustomId` in PayPal's `custom_id`. To activate the mapping, supply that completed sandbox order in the sample. PayTrace rereads PayPal and requires its capture and checkout binding to match. Editing an active mapping deactivates it until the new version passes that check. The Studio does not grant course access or create a case during setup.
 
-Once active, send the store's JSON event from its **server** to `POST /api/intake/event` with `Authorization: Bearer YOUR_PRIVATE_STORE_KEY` and `Content-Type: application/json`. The event must follow the saved mapping. PayTrace maps it to the canonical purchase below, then runs the same trusted intake and fresh PayPal verification as `/api/intake/purchase`. This is a configurable adapter, not an automatic connection to an independent store: the store still needs to emit the event and include the PayTrace case ID in the PayPal order's `custom_id`.
+Once active, send the store's JSON event from its **server** to `POST /api/intake/event` with `Authorization: Bearer YOUR_PRIVATE_STORE_KEY` and `Content-Type: application/json`. The event must follow the saved mapping. PayTrace maps it to the canonical purchase below, then runs the same trusted intake and fresh PayPal verification as `/api/intake/purchase`. This is a configurable adapter, not an automatic connection to an independent store: the store must register each purchase before checkout, use the issued `paypalCustomId`, then emit the completed event.
 
 The reference course remains fixed to `course-light` at USD $128. The preview and activation refuse mismatched purchases. Use fictional customer details in test events and keep the private store key out of browser code.
 
@@ -20,8 +20,9 @@ The reference course remains fixed to `course-light` at USD $128. The preview an
 
 1. Open **Connections** in the merchant workspace and unlock merchant controls.
 2. Choose **Create store key**. Copy the key immediately into a private environment variable on the **store server**. It is displayed only once. Rotating it revokes the previous key.
-3. Configure the store checkout to put the new PayTrace case ID in the PayPal order's sole purchase unit as `custom_id`. The order must have exactly one purchase unit and one completed capture. The case ID in the intake event must match that `custom_id` exactly.
-4. After checkout is captured, send the event below from the store server. Never put the key in browser JavaScript, a mobile app, a repository, or a URL.
+3. Before checkout, send the purchase fields below **without `paypalOrderId`** to `POST /api/intake/intent` using the store key. Keep the case ID and purchase ID stable. PayTrace returns an opaque `paypalCustomId`; a repeat with identical fields returns the same value, while changed fields return `409`.
+4. Put that exact `paypalCustomId` in the PayPal order's sole purchase unit as `custom_id`, and put the case ID in `reference_id`. The order must have exactly one purchase unit and one completed capture. An order created before intent registration or with another workspace's custom ID cannot be imported.
+5. After checkout is captured, send the event below from the store server. Never put the key in browser JavaScript, a mobile app, a repository, or a URL.
 
 ```http
 POST /api/intake/purchase HTTP/1.1
@@ -42,9 +43,9 @@ Content-Type: application/json
 }
 ```
 
-The `amount` field is in cents. `201` means the case was created. Repeating the identical event returns the existing case with `status: "duplicate"`. A changed event for the same case ID returns `409`. An invalid mapping or a PayPal order/capture that does not match is rejected without creating a case. Store requests are server-to-server; browser requests with an `Origin` header are rejected. Keep the `purchaseId` stable for retries.
+The `amount` field is in cents. Send the same fields apart from `paypalOrderId` to the intent endpoint first. `201` on intake means the case was created. Repeating the identical event returns the existing case with `status: "duplicate"`. A changed event for the same case ID returns `409`. An invalid mapping, missing registered intent, or PayPal order/capture that does not match is rejected without creating a case. Store requests are server-to-server; browser requests with an `Origin` header are rejected. Keep the `purchaseId` stable for retries.
 
-The current prototype supports one reference product, **The Light & Story Workshop** (`course-light`, USD $128). A production connector should add a merchant-managed product catalog and signed mapping contract before accepting other courses or prices. PayPal reporting discovery remains read-only and cannot infer learner identity or course entitlement by itself.
+The current prototype supports one reference product, **The Light & Story Workshop** (`course-light`, USD $128). A production connector should add a merchant-managed product catalog and signed mapping contract before accepting other courses or prices. PayPal reporting discovery is disabled while the sandbox credentials are shared across workspaces; its unlinked rows cannot safely be attributed to a merchant.
 
 ## Customer updates
 

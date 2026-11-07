@@ -48,7 +48,7 @@ Four model-backed specialist perspectives support the investigation when AI is c
 | **Merchant desk** | Prioritizes cases, shows the decision and next action first, then exposes source evidence, specialist findings, customer messages, and the case timeline. |
 | **Recovery Passport** | Records payment, investigation, authorization, correction, lesson proof, buyer-browser receipt, and customer confirmation as separate stages. |
 | **Customer view** | Gives the buyer a private progress path, a way to reply or ask for help, and a separate chance to confirm whether access works. |
-| **Connection Studio** | Maps a store’s purchase event into the trusted intake contract and rehearses changes before activation against a fresh sandbox capture. |
+| **Connection Studio** | Maps a store event and checks a sandbox capture against a purchase intent registered before checkout. Shared-account reporting discovery is paused until merchant-scoped credentials are available. |
 | **Recovery Center** | Provides notifications, audit history, incident views, prevention signals, read-only simulations, and bounded opt-in sandbox automation. |
 
 The working example is **one paid course with missing access**. Membership and download connectors are future work. [Explore the feature-to-test matrix.](docs/FEATURE-ACCEPTANCE.md)

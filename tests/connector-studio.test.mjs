@@ -27,7 +27,7 @@ test('AI field suggestion receives paths and types, never event values',async()=
 
 test('connector activation requires a matching fresh capture, then raw events use saved mapping',async t=>{
  const db=openStore(':memory:');let mismatch=false,reads=0;
- const paypal={refresh:async s=>{reads++;return {source:'paypal-sandbox',status:'COMPLETED',orderId:s.order.id,userId:s.order.userId,courseId:s.order.courseId,amount:mismatch?1:s.order.amount,currency:s.order.currency,id:'CAP-10001'};}};
+ const paypal={refresh:async s=>{reads++;return {source:'paypal-sandbox',status:'COMPLETED',orderId:s.order.id,paypalCustomId:s.paypalCustomId,userId:s.order.userId,courseId:s.order.courseId,amount:mismatch?1:s.order.amount,currency:s.order.currency,id:'CAP-10001'};}};
  const {server}=createApp({PUBLIC_URL:'http://localhost',DEMO_OPERATOR_KEY:'test-key'},db,{paypal});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  t.after(()=>new Promise(resolve=>server.close(()=>{db.close();resolve();})));
@@ -37,6 +37,7 @@ test('connector activation requires a matching fresh capture, then raw events us
  assert.equal((await merchant('operator',{key:'test-key'})).status,200);
  const key=(await(await merchant('intake/key',{})).json()).key;
  const intake=event=>fetch(base+'/api/intake/event',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(event)});
+ const purchase=mapStoreEvent(sample,mapping),intent=await fetch(base+'/api/intake/intent',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify(purchase)});assert.equal(intent.status,200);assert.match((await intent.json()).paypalCustomId,/^PT-/);
  assert.equal((await intake(sample)).status,400);
  const suggestion=await(await merchant('connector/suggest',{sample})).json();assert.equal(suggestion.mode,'field-name');
  const draft=await(await merchant('connector/mapping',{sample,mapping,expectedRevision:0})).json();assert.equal(draft.active,false);assert.equal(draft.revision,1);

@@ -48,7 +48,7 @@ Complete recorded sandbox acceptance, restore healthy hosting, validate identity
 
 ## Tools disclosure
 
-- PayPal Developer Platform: sandbox checkout/capture, authoritative reads, verified webhook triggers and optional reporting discovery.
+- PayPal Developer Platform: sandbox checkout/capture, authoritative reads and verified webhook triggers. Shared-account reporting discovery is paused until purchases can be scoped to one merchant.
 - AI Responses API: specialist findings, challenge/response reviews and read-only follow-ups. Enter the actual provider/model deployment used in the recorded run in Devpost; scripts are not model execution.
 - Azure: App Service hosting, Azure OpenAI specialist runtime and Application Insights traces. A passing health check is not connected recovery proof.
 - Render: optional task integration. Describe it as executed only when a saved run proves it.

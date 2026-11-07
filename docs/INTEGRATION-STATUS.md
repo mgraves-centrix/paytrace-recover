@@ -4,6 +4,7 @@
 | --- | --- | --- | --- |
 | PayPal sandbox order, capture, fresh read | Yes | Yes | No complete buyer-to-lesson run |
 | PayPal signature-verified webhook | Yes, optional | Not confirmed | No live delivery recorded |
+| Merchant-bound purchase intent and shared-account reporting guard | Yes, source change pending deployment | No | Local ownership and isolation tests passed; connected checkout not recorded |
 | Separate reference course access | Yes | Yes, tenant-scoped package deployed 2026-11-02 | Authenticated tenant-scoped read passed; no completed recovery |
 | Azure OpenAI specialist review | Yes | Yes | Fictional evaluation passed; no complete connected case |
 | Foundry external specialist inventory and safe traces | Yes | Four external registrations in dedicated PayTrace project; connected to existing Application Insights | Fictional eight-call model review emitted all four agent IDs with zero access writes; no PayPal-connected recovery acceptance |
