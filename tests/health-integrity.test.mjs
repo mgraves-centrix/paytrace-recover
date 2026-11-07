@@ -14,3 +14,19 @@ test('health reports database integrity failure instead of claiming a healthy ap
  store.databaseCheck=()=>{throw Error('database disk image is malformed');};
  const failure=await fetch(base+'/health');assert.equal(failure.status,503);assert.deepEqual(await failure.json(),{ok:false,error:'Database integrity check failed.'});
 });
+
+test('database failures do not expose SQLite details to a merchant',async t=>{
+ const store=openStore(':memory:'),{server}=createApp({PUBLIC_URL:'http://localhost'},store);
+ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+ t.after(()=>new Promise(resolve=>server.close(()=>{store.close();resolve();})));
+ const base='http://127.0.0.1:'+server.address().port;
+ const bootstrap=await fetch(base+'/api/state?bootstrap=1');
+ assert.equal(bootstrap.status,200);
+ const cookie=bootstrap.headers.get('set-cookie').split(';')[0];
+ store.listCases=()=>{throw Error('database disk image is malformed');};
+ const response=await fetch(base+'/api/state?bootstrap=1',{headers:{Cookie:cookie}});
+ assert.equal(response.status,503);
+ const body=await response.json();
+ assert.match(body.error,/Case records are temporarily unavailable.*PT-[A-F0-9]{8}/);
+ assert.doesNotMatch(body.error,/database|SQLite|malformed/i);
+});

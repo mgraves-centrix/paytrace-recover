@@ -47,3 +47,106 @@
 .case-outcome-summary a{color:var(--pt-lime)}
 
 @media(forced-colors:active){.today-result.connected .button.primary{border:2px solid ButtonText}}
+
+/* Task-first merchant workspace and consistent readable controls. */
+.desk-heading{margin-bottom:12px}
+.desk-heading h1{font-size:clamp(26px,3vw,32px)}
+.desk-heading p{font-size:15px;line-height:1.5}
+.desk-heading .button,.workspace-nav button,.workspace-more>summary,.button{font-size:14px;min-height:44px}
+.recovery-pulse{padding:16px}
+.today-head h2{font-size:clamp(22px,2.5vw,26px)}
+.today-head p,.today-lane-head p{font-size:14px}
+.today-lanes{margin:13px 0}
+.today-lane-head h3{font-size:17px}
+.today-case{min-height:54px}
+.today-case strong{font-size:16px}
+.today-case small,.today-details summary{font-size:14px}
+.today-secondary{display:grid;gap:12px;margin:18px 0}
+.recovery-pulse .today-result{margin:0}
+.recovery-pulse .today-result.pending{display:block;padding:0;background:#fff;color:#173858;border:1px solid #d7e5f3;box-shadow:none}
+.today-result.pending summary{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;color:#173858;cursor:pointer;font-size:14px}
+.today-result.pending summary span{color:#45698c}
+.today-result.pending p{padding:0 16px 14px;margin:0;color:#315a7d;font-size:14px}
+.sample-success{margin:0;padding:16px 18px;border-radius:12px;box-shadow:none}
+.sample-success h3{font-size:18px}
+.sample-success p{font-size:14px}
+.sample-success .button{min-height:44px}
+.guide-toggle,.tour-button,.guide-dismiss,.dialog-close,.guide-show,.tour-skip{min-height:44px;min-width:44px;font-size:14px}
+.tour-button{color:#405b7b}
+.guide-toggle{color:#36597e}
+.guide-message p,.tour-copy,.profile-scope p,.persona-note{font-size:14px;line-height:1.55}
+.guide-message .eyebrow,.tour-preview,.tour-person small{font-size:12px}
+.guide-dialog .tour-bottom .button{min-height:44px;font-size:14px}
+.guide-dialog{display:flex;flex-direction:column;max-height:min(90dvh,720px);overflow:hidden}
+.guide-dialog:not([open]){display:none}
+.tour-bottom,.tour-skip{flex-shrink:0}
+.tour-copy,.profile-scope{overflow:auto}
+.new-case-dialog{padding:0;max-height:calc(100dvh - 24px);overflow:hidden}
+.new-case-dialog form{display:flex;flex-direction:column;max-height:calc(100dvh - 24px)}
+.new-case-header{display:flex;align-items:start;justify-content:space-between;gap:12px;padding:18px 22px 10px;flex:none}
+.new-case-header h2{margin:4px 0;font-size:25px}
+.new-case-close{border:0;background:transparent;color:#36597e;min-width:44px;min-height:44px;font-size:28px;cursor:pointer}
+.new-case-content{overflow-y:auto;padding:0 22px 14px;min-height:0}
+.new-case-content>p:first-child{margin:0;font-size:14px;line-height:1.45}
+.new-case-actions{position:sticky;bottom:0;z-index:1;flex:none;margin:0;padding:12px 22px;border-top:1px solid #d7e5f3;background:#fff}
+.new-case-actions .button{min-height:44px}
+.new-case-dialog input,.new-case-dialog select,.search-wrap .search,.queue-tools select{font-size:16px}
+.case-redesign .purchase small,.case-redesign .case-decision-column .summary p,.case-redesign .sheet-body p,.case-redesign .merchant-decision p{font-size:14px;line-height:1.5}
+.queue-tabs button,.case-row strong,.case-row small,.case-status,.team-mini strong,.team-mini small{font-size:14px}
+.case-row{min-height:76px}
+.team-panel .human-hello,.team-panel .human-card>b{display:none}
+.team-panel .human-card strong,.team-panel .human-card small{font-size:14px}
+.team-panel .human-portrait{width:40px;height:40px}
+.team-spark,.start-card .access-visual{display:none}
+.start-card{background:#f6faff;color:#173858;border:1px solid #d7e5f3;box-shadow:none}
+.start-card .eyebrow,.start-card h2{color:#0c3569}
+.start-card p,.start-reason{color:#45698c;font-size:14px}
+.start-card .button{background:#075fbb;color:#fff;border:1px solid #075fbb}
+.start-card .queue-jump{color:#075fbb;font-size:14px}
+.case-outcome-summary{background:#f6faff;color:#173858;border:1px solid #c6ddef}
+.case-outcome-summary .eyebrow,.case-outcome-summary h3,.case-outcome-summary dd{color:#0c3569}
+.case-outcome-summary p,.case-outcome-summary dt{color:#45698c}
+.case-outcome-summary dl>div{border-color:#d7e5f3}
+.analysis-role{display:flex;align-items:center;gap:11px;padding:8px 0}
+.analysis-role strong{display:block;font-size:14px;color:#173858}
+.analysis-role small{display:block;font-size:12px;color:#526c86}
+@media(max-width:550px){
+ main{padding-top:12px}
+ .case-create-toolbar{margin-bottom:8px}
+ .case-create-toolbar button{width:auto;min-height:44px}
+ .desk-heading{display:flex;flex-direction:row;align-items:center;margin-bottom:10px}
+ .desk-heading h1{font-size:25px;margin:0}
+ .desk-heading p,.desk-heading .eyebrow{display:none}
+ .desk-heading>.button{font-size:13px;min-height:44px}
+ .workspace-subbar{height:52px;min-height:52px;flex-wrap:nowrap;gap:6px}
+ #workspace-navigation{display:flex;min-width:0;flex:1}
+ .workspace-nav{height:52px;width:100%;min-height:0;flex-wrap:nowrap;gap:4px;justify-content:space-between}
+ .workspace-nav button{font-size:11px;gap:0;white-space:nowrap;padding:0 2px}
+ .workspace-nav button svg{display:none}
+ .workspace-more{flex:none}
+ .workspace-more>div .guide-tools{display:grid;border-top:1px solid #e4edf6;padding:6px 0;margin-top:5px}
+ .workspace-more>div .guide-tools button{width:100%;text-align:left;padding:10px 12px}
+ .recovery-pulse{padding:12px}
+ .today-head h2{font-size:21px}
+ .today-head p{font-size:12px}
+ .today-lane{padding:12px}
+ .today-lanes{margin:10px 0}
+ .today-lane-head p{font-size:13px}
+ .today-case{margin-top:8px;padding:9px 11px}
+ .today-result.pending summary{display:grid}
+ .new-case-header{padding:12px 16px 8px}
+ .new-case-content{padding:0 16px 12px}
+ .new-case-actions{padding:10px 16px;gap:8px;flex-wrap:nowrap}
+ .new-case-actions .button{padding:9px 11px}
+ .guide-dialog{padding:17px 16px}
+ .guide-dialog>h2{font-size:21px;margin:6px 0}
+ .tour-person{margin-bottom:8px}
+ .tour-person .human-portrait{width:42px;height:42px}
+ .tour-copy{font-size:14px;line-height:1.45}
+ .tour-preview{padding:8px;margin:9px 0}
+ .tour-skip{margin:5px auto 0}
+}
+@media(max-width:360px){
+ .workspace-more>summary{font-size:0;width:44px;height:44px;padding:0;display:grid;place-items:center}
+ .workspace-more>summary:after{content:'⋯';font-size:22px;line-height:1;margin:0}
+}

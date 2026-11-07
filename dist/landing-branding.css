@@ -11,3 +11,6 @@
 .hero .text-link{color:#e0eeff}
 .hero-team{border-top-color:#c8e1ff30}
 .story-bottom{color:#c9dcf3}
+.hero-story{transform:none;box-shadow:none}
+.hero-story .payment-pill,.hero-story .customer-note{transform:none;box-shadow:none;margin-left:0;width:100%}
+.hero-story .course-cover{transform:none;box-shadow:none}

@@ -18,7 +18,7 @@ export function mountPulse(root,{cases,backend,busy,uncertain,operator,onSelect}
   loading=true;box.innerHTML='<p role="status">Checking the attention list…</p>';
   try{const data=backend?await api('workspace'):workspaceOverview(cases);if(!box.isConnected)return;
    box.innerHTML=pulseMarkup(data,{backend,operator});
-   box.querySelector('[data-pulse-refresh]').onclick=load;
+   box.querySelector('[data-pulse-refresh]')?.addEventListener('click',load);
    if(operator)box.querySelector('[data-pulse-export]').onclick=()=>{if(backend){const a=document.createElement('a');a.href='/api/workspace/export';a.download='paytrace-queue.csv';a.click();}else downloadCsv(data);};
    box.querySelectorAll('[data-pulse-case]').forEach(b=>b.onclick=()=>onSelect(b.dataset.pulseCase));
   }catch(e){if(!box.isConnected)return;box.innerHTML=`<h2>Recovery pulse unavailable</h2><p role="status">${esc(e.message)}</p><button class="button" data-pulse-retry>Retry pulse</button>`;box.querySelector('button').onclick=load;}

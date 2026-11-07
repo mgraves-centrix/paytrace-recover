@@ -27,7 +27,7 @@ test('connected report requires all six independently recorded criteria',()=>{
  const overview=workspaceOverview([s],{backend:true});
  assert.equal(overview.connectedResult.caseId,s.id);
  assert.match(todayMarkup(overview),/CONNECTED SANDBOX RESULT/);
- assert.match(todayMarkup(overview),/Inspect the verified case/);
+ assert.match(todayMarkup(overview),/Inspect verified case/);
 });
 
 test('scripted and local evidence cannot be presented as a connected sandbox run',()=>{
@@ -39,7 +39,7 @@ test('scripted and local evidence cannot be presented as a connected sandbox run
  assert.equal(report.checks.find(c=>c.id==='verification').status,'demo');
  assert.doesNotMatch(caseExperience(s,{backend:true}),/Connected sandbox proof/);
  assert.equal(workspaceOverview([s],{backend:true}).connectedResult,null);
- assert.match(todayMarkup(workspaceOverview([s],{backend:true})),/NOT YET RECORDED/);
+ assert.match(todayMarkup(workspaceOverview([s],{backend:true})),/No connected recovery verified/);
 });
 
 test('failed Render verification or stale proof removes the connected claim',()=>{

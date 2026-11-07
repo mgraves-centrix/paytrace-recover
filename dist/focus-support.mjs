@@ -23,7 +23,7 @@ function mountUpdatePromise(root,panel,caseId,current,notifications=[]){
  form.querySelector('[data-open-conversation]').onclick=()=>{const disclosure=root.querySelector('.case-conversation-disclosure');if(disclosure){disclosure.open=true;disclosure.scrollIntoView({behavior:'smooth',block:'start'});disclosure.querySelector('#support-text')?.focus({preventScroll:true});}};
 }
 export function mountSupport(root,s,{backend,onSelect}){
- if(!s){if(backend)mountInbox(root,onSelect);return;}const target=root.querySelector('.case-communication-area');if(!target)return;
+ if(!s){if(backend&&root.querySelector('.overview'))mountInbox(root,onSelect);return;}const target=root.querySelector('.case-communication-area');if(!target)return;
  const disclosure=document.createElement('details');disclosure.className='case-conversation-disclosure';disclosure.id='case-conversation';const heading=document.createElement('summary');heading.innerHTML='<span><span class="eyebrow">CUSTOMER COMMUNICATION</span><strong>Customer conversation</strong><small>Messages, questions, and notification activity</small></span><span aria-hidden="true">+</span>';disclosure.append(heading);const panel=document.createElement('section');panel.className='support-panel';disclosure.append(panel);target.append(disclosure);
  if(!backend){mountTimeline(root,s,null);const sample=document.createElement('p');sample.className='case-sample-update';sample.innerHTML='Sample case · no customer message is sent here. <a href="story.html">See the guided customer conversation ↗</a>';disclosure.before(sample);panel.innerHTML='<h2>Customer communication</h2><p>Messaging and private customer links require the server-backed app.</p>';return;}
  let pending=null,busy=false;

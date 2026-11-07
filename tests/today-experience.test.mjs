@@ -15,10 +15,11 @@ test('Today gives each case one clear group without changing case data',()=>{
  const before=structuredClone(data),groups=todayGroups(data);
  assert.deepEqual(groups.map(g=>g.rows.map(r=>r.caseId)),[['A','D'],['B'],['C']]);
  assert.deepEqual(data,before);
- const html=todayMarkup(data,{operator:true});assert.match(html,/Know what needs you next/);assert.match(html,/Export queue CSV/);
+ const html=todayMarkup(data,{operator:true});assert.match(html,/Recovery overview/);assert.match(html,/Export queue CSV/);
  assert.match(html,/FICTIONAL COMPLETED SAMPLE/);
  assert.match(html,/demo\.html\?step=7/);
- assert.match(html,/CONNECTED RESULT · NOT YET RECORDED/);
+ assert.match(html,/No connected recovery verified/);
+ assert.ok(html.indexOf('class="today-lanes"')<html.indexOf('class="today-secondary"'));
  const connected=todayMarkup({...data,connectedResult:{checksPassed:6,checksTotal:6,customerName:'Alex',verifiedAt:new Date().toISOString(),caseId:'A'}});
  assert.match(connected,/CONNECTED SANDBOX RESULT/);
  assert.doesNotMatch(connected,/FICTIONAL COMPLETED SAMPLE/);
