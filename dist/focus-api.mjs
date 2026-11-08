@@ -12,4 +12,9 @@ export function createApi({fetcher=fetch,timeoutMs=45000}={}){return async funct
  }catch(e){if(e instanceof RequestFailure)throw e;throw new RequestFailure(controller.signal.aborted?'timeout':'network',controller.signal.aborted?'The request timed out. Its result is not yet confirmed.':'The connection was interrupted. Its result is not yet confirmed.');}finally{clearTimeout(timer);}
 };}
 export async function loadSnapshot(api,selected){const [portfolio,detail]=await Promise.all([api('operations'),selected?api('case?caseId='+encodeURIComponent(selected)):Promise.resolve(null)]);if(!Array.isArray(portfolio?.cases))throw new RequestFailure('response','Case records were incomplete. Your previous view has been retained.');portfolio.cases.forEach(validateCase);if(selected&&(!detail?.state||detail.state.id!==selected))throw new RequestFailure('changed','The active case changed. Return to the queue and open it again.');if(detail?.state)validateCase(detail.state);return {cases:portfolio.cases,state:detail?.state};}
+export async function selectEntryCase(api,caseId,serverCaseId){
+ if(caseId===serverCaseId)return;
+ const result=await api('action',{action:'select-case',caseId});
+ if(result?.state?.id!==caseId)throw new RequestFailure('changed','The requested case was not selected. Open it from the queue before taking an action.');
+}
 export function sourcesUnavailable(s){return !!s?.sources&&Object.values(s.sources).some(source=>source.status!=='available');}
