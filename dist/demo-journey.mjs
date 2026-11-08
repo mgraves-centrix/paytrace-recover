@@ -45,7 +45,7 @@ function render(){
    <section class="demo-stage" aria-labelledby="moment-title">
     <div class="demo-stage-top"><span class="demo-label">${esc(stages[step])} / ${esc(moment.signal)}</span><span class="demo-case-id">CL-SAMPLE-JOURNEY</span></div>
     <h2 id="moment-title" tabindex="-1">${esc(moment.lead)}</h2>
-    <div class="demo-story"><span class="demo-label">MAYA’S STORY · CHAPTER ${step+1}</span><p>${esc(moment.story)}</p></div>
+    <div class="demo-story"><span class="demo-label">MAYA’S STORY · CHAPTER ${step+1}</span><p>${esc(moment.story)}</p><blockquote>“${esc(buyerText)}”</blockquote></div>
     <div class="demo-app-frame">
      <div class="demo-app-body">
       ${step===2?investigationView(s):`<div class="demo-evidence-head"><span class="demo-label">CURRENT EVIDENCE</span><span class="demo-sample-chip">SAMPLE RECORD</span><p>${esc(moment.detail)}</p></div>
@@ -62,6 +62,7 @@ function render(){
     <div class="demo-facts" aria-label="Current sample evidence"><div><span>Purchase checks</span><strong>${payment?'6 / 6 shown':'Awaiting purchase'}</strong></div><div><span>Access grants</span><strong>${s.writes} recorded</strong></div><div><span>Customer confirmation</span><strong>${confirmed?'Received':'Pending'}</strong></div></div>`}
     ${step>=3?`<div class="demo-delta"><span>EXACT CORRECTION</span><div><strong>Before <em>Purchased course locked</em></strong><b aria-hidden="true">→</b><strong>After <em>Purchased course active</em></strong></div><small>${step<5?'Preview only. No real or sample grant has been applied yet.':step===5?'One sample grant applied; verification pending.':'One sample grant applied; independent checks passed.'}</small></div>`:''}
     ${step===7?`<div class="demo-finish"><span aria-hidden="true">✓</span><div><strong>Complete in this fictional sample</strong><p>Purchase matched · one approved correction · lesson opened · customer confirmed</p></div></div>`:''}
+    ${step===2?'':`<details class="demo-case-details"><summary>Evidence and decision details</summary><p><strong>Merchant question:</strong> ${esc(merchantQuestions[step])}</p><p><strong>Purchase:</strong> ${esc(COURSE.name)} · $128.00 USD · one fictional learner.</p><p><strong>Current gates:</strong> preview ${step>=4?'approved':'pending'}; grant ${access?'recorded':'pending'}; protected lesson ${verified?'opened':'not verified'}; buyer confirmation ${confirmed?'received':'pending'}.</p></details>`}
      </div>
     </div>
    </section>

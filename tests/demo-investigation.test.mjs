@@ -12,6 +12,10 @@ test('scripted investigation presents exact evidence, agent limits, and no inven
  assert.match(html,/NO LIVE MODEL CALL/);
  assert.match(html,/not a measured AI probability/);
  assert.match(html,/no access has changed/);
+ for(const name of ['Ledger','Relay','Patch','Prism'])assert.match(html,new RegExp(name));
+ for(const label of ['High for payment match','Low for root cause','Conditional','High for safety checks'])assert.match(html,new RegExp(label));
+ assert.equal((html.match(/Confidence · /g)||[]).length,4);
+ assert.match(html,/Evidence used/);
  assert.doesNotMatch(html,/\d+%/);
 });
 
