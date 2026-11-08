@@ -4,7 +4,9 @@ PayTrace Recover can open a case when a store reports a captured PayPal sandbox 
 
 ## Try the merchant-operated demo store
 
-Open **Connections → Run demo store checkout**, or visit `/store-demo.html`. Unlock merchant controls, enter a fictional buyer name and a test inbox, then use a **PayPal sandbox buyer account** to approve the $128.00 checkout. The app creates a stable case ID in the PayPal order, captures the approved order, and passes the purchase mapping through the same trusted intake service used by the external-store endpoint. After PayTrace rereads the sandbox capture, the new case opens in the recovery desk. A canceled or pending checkout creates no case; retries use the saved order. This storefront is a simulator hosted inside PayTrace, not evidence that an independent merchant store has been integrated.
+Open **Recovery desk → Run a PayPal sandbox test**, or visit `/store-demo.html`. Choose an access condition—**paid, access missing**, **buyer in the wrong account**, or **access term expired**—then unlock merchant controls, enter a fictional buyer name and a test inbox, and use a **PayPal sandbox buyer account** to approve the $128.00 checkout. Each test is a separate checkout and case. The selected access condition is a controlled sandbox fixture; the payment is still a fresh PayPal sandbox capture matched to the exact order, learner, course, amount, and currency. Wrong-account and expired-access cases are held for review and do not authorize a grant.
+
+The app creates a stable case ID in the PayPal order, captures the approved order, and passes the purchase mapping through the same trusted intake service used by the external-store endpoint. After PayTrace rereads the sandbox capture, the new case opens in the recovery desk. A canceled or pending checkout creates no case; retries use the saved order and selected condition. This storefront is a simulator hosted inside PayTrace, not evidence that an independent merchant store has been integrated.
 
 ## Set up
 

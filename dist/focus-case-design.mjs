@@ -3,6 +3,7 @@ import {proofIsCurrent} from './operations.mjs';
 import {caseAgentSummary} from './focus-case-review.mjs';
 import {caseReplayMarkup} from './focus-case-replay.mjs';
 import {caseOrigin} from './focus-model.mjs';
+import {sandboxScenario} from './sandbox-scenarios.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -47,6 +48,7 @@ export function arrangeCase(root,s){
  const originBand=document.createElement('div');originBand.className=`case-origin case-origin-${origin.kind}`;originBand.setAttribute('aria-label','Case origin');
  const originName=document.createElement('strong'),originDetail=document.createElement('span');originName.textContent=origin.label;originDetail.textContent=origin.detail;originBand.append(originName,originDetail);
  head.querySelector('.case-meta')?.after(originBand);
+ if(s.sandboxFixture){const fixture=document.createElement('div');fixture.className='case-sandbox-fixture';const title=document.createElement('strong');title.textContent='SANDBOX TEST CONDITION · '+(sandboxScenario(s.sandboxScenario)?.label||'Access condition');const detail=document.createElement('span');detail.textContent='PayPal payment was verified in sandbox. This access condition was injected for testing; review the current records before any decision.';fixture.append(title,detail);originBand.after(fixture);}
  const layout=document.createElement('div');layout.className='case-layout';const main=document.createElement('div');main.className='case-evidence-column';main.id='case-evidence';const rail=document.createElement('aside');rail.className='case-decision-column';rail.id='case-decision';rail.setAttribute('aria-label','Next action and customer experience');
  const heading=document.createElement('div');heading.className='case-column-title';heading.innerHTML='<span class="eyebrow">PURCHASE EVIDENCE</span><h2>The facts behind the next step</h2>';
  main.append(heading);

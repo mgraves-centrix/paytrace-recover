@@ -25,6 +25,16 @@
         <div class="product-copy"><span>THE TEST PURCHASE</span><h2>The Light &amp; Story Workshop</h2><p>One digital workshop</p></div>
         <div class="price"><strong>$128.00</strong><span>USD / sandbox</span></div>
       </div>
+      <div class="scenario-choice">
+        <label for="sandbox-scenario">Choose an access condition to test</label>
+        <select id="sandbox-scenario" name="scenario" aria-describedby="scenario-detail">
+          <option value="missing-access">Paid, access missing</option>
+          <option value="wrong-account">Buyer in the wrong account</option>
+          <option value="expired-access">Access term expired</option>
+        </select>
+        <p id="scenario-detail">The payment matches, but the purchased lesson is still locked.</p>
+        <small>A completed checkout uses real PayPal sandbox evidence. Access conditions are controlled test fixtures.</small>
+      </div>
       <div id="operator-gate" class="operator-gate" hidden>
         <div class="task-heading"><span class="step-number">01</span><div><h3>Unlock checkout</h3><p>Use your demo operator key to unlock this merchant session.</p></div></div>
         <form id="operator-form"><label for="operator-key">Demo operator key</label><div class="operator-controls"><input id="operator-key" name="key" type="password" required autocomplete="off"><button type="submit">Unlock checkout <span aria-hidden="true">→</span></button></div></form>
