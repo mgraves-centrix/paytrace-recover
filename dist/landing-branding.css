@@ -78,3 +78,37 @@
 @media(max-width:760px){.hero-team{display:none}.hero-shell:after{inset:auto -45% 0 10%;height:45%}}
 @media(max-width:540px){.hero h1{max-width:none}.hero-story{box-shadow:0 18px 48px #000b314d}.hero .paypal-context{font-size:12px}.hero .fine{font-size:12px}.story-label{font-size:12px}.story-bottom{gap:6px}.partner-strip{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.hero .paypal-context,.hero h1,.hero>div>p,.hero-actions,.hero-story,.story-track,.preview-record.is-changing,.preview-finding.is-changing{animation:none!important}.evidence-switch button,.integration-grid article{transition:none}}
+
+/* A compact evidence frame: the gap is the focal point, not a fabricated success. */
+.hero-shell{background:radial-gradient(ellipse at 76% 24%,#258dff65,transparent 38%),radial-gradient(ellipse at 0 100%,#112f6966,transparent 55%),linear-gradient(118deg,#061629 0%,#09254c 54%,#08428e 100%)}
+.hero-shell:after{inset:0 0 0 48%;height:auto;background-image:linear-gradient(#a9d9ff0a 1px,transparent 1px),linear-gradient(90deg,#a9d9ff0a 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(90deg,transparent,#000 38%,#000 82%,transparent);z-index:0}
+.hero{z-index:1;padding-top:50px;padding-bottom:54px}
+.hero-story{overflow:hidden;background:linear-gradient(145deg,#ffffff21,#ffffff07 64%),#0a3975;border:1px solid #b9e4ff72;box-shadow:0 34px 80px #00081f6b,inset 0 1px 0 #fff6;padding:21px 22px 19px}
+.hero-story:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#72d4ff 0%,#e6f8ff 35%,#2289f7 75%,transparent);opacity:.8}
+.story-label{margin-bottom:17px;color:#d1e8ff;font-weight:700}
+.story-label:before{content:"●  ●  ●";color:#8bcfff;letter-spacing:2px}
+.payment-pill{position:relative;padding:15px 18px;border:1px solid #d9eaff;border-radius:16px;box-shadow:0 16px 34px #00183c40,inset 0 1px 0 #fff}
+.payment-pill:before{content:"";position:absolute;left:0;top:15px;bottom:15px;width:3px;border-radius:0 3px 3px 0;background:#0070e0}
+.payment-pill strong{font-size:27px}
+.hero .tick{width:31px;height:31px;font-size:16px;font-weight:800}
+.handoff-connector{position:relative;z-index:2;display:flex;align-items:center;gap:10px;height:29px;margin:0 0 -7px 30px;color:#dceeff}
+.handoff-connector span{height:100%;width:2px;background:linear-gradient(#86cfff,#cdeeff);box-shadow:0 0 10px #74d0ff}
+.handoff-connector b{font-size:10px;letter-spacing:.16em;font-weight:700}
+.hero .course-cover{height:229px;margin-top:0;margin-left:26px;padding:21px 23px;background:radial-gradient(circle at 87% 9%,#64c9ff66,transparent 42%),linear-gradient(140deg,#002a72,#0054bd 65%,#0879e8);border:1px solid #88d9ffb0;box-shadow:0 16px 34px #000b345c,inset 0 1px 0 #ffffff40}
+.hero .course-cover:after{content:"";position:absolute;inset:0;background:linear-gradient(118deg,transparent 55%,#ffffff11 56%,transparent 59%);pointer-events:none}
+.hero .course-cover>strong{font-size:35px;margin-top:16px}
+.hero .course-cover .sun{width:105px;height:105px;right:14px;top:19px}
+.hero .course-cover .arch{height:220px;bottom:-83px}
+.hero .course-cover .arch-two{bottom:-136px}
+.hero .cover-lock{background:#eaf7ff;border:1px solid #bce5ff;color:#004791;font-weight:700;padding:7px 11px}
+.hero .customer-note{margin-top:-8px;padding:13px 16px;border:1px solid #d9eaff;box-shadow:0 12px 25px #00112d4d}
+.hero .customer-note .initial{width:35px;height:35px}
+.hero .customer-note p{color:#495b77}
+.hero .story-bottom{margin-top:16px;padding:11px 13px;border:1px solid #b9dfff38;border-radius:12px;background:#001d5280}
+.hero .story-step small{color:#e3efff}
+@media(max-width:760px){.hero-shell:after{inset:28% 0 0 0;mask-image:linear-gradient(180deg,transparent,#000 25%,#000 80%,transparent)}.hero{padding-top:36px;padding-bottom:42px}}
+@media(max-width:1000px){.hero .course-cover .sun{right:-40px}}
+@media(max-width:540px){.hero-story{padding:19px 16px}.story-label{margin-bottom:15px}.story-label:after{display:none}.hero .course-cover{height:227px;margin-left:15px;padding:19px}.hero .course-cover>strong{font-size:32px}.hero .course-cover .sun{width:94px;height:94px}.hero .customer-note{padding:12px}.hero .story-bottom{padding:10px 8px}.handoff-connector{margin-left:22px}}
+@media(prefers-reduced-motion:no-preference){.handoff-connector span{transform-origin:top;animation:handoff-draw .7s .45s ease-out both}.hero .story-bottom{animation:hero-enter .4s .75s ease-out both}}
+@keyframes handoff-draw{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.handoff-connector span,.hero .story-bottom{animation:none!important}}

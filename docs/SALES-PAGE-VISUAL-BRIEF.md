@@ -6,6 +6,8 @@ Feeling: assured, precise, human.
 
 Direction: Keep PayTrace's navy, electric blue, white, rounded product surfaces, and course artwork. Compose the hero as a confident editorial promise beside a live HTML example. A short payment-to-access status trail makes the missing handoff visible without suggesting the fictional case is already repaired.
 
+Refinement from the photographed laptop view: Treat the example as a compact evidence frame rather than three floating rectangles. A faint technical grid, restrained edge lighting, and a single drawn connector put the paid-to-locked handoff in focus. Keep the course cover as the dominant color field and bring the unresolved status into the initial desktop view where height permits.
+
 Hierarchy: One dominant sample-walkthrough action, a quieter workspace link, then the interactive evidence preview. On narrow screens, show the example card before the specialist teaser. Use existing Manrope and DM Sans families; make small marketing labels and controls easier to read.
 
 Motion: One short entrance sequence introduces the promise and sample card. The evidence panel responds to a deliberate record switch. No looping animation, parallax, autoplay media, or delayed interaction. Reduced-motion users receive the fully visible static composition.
