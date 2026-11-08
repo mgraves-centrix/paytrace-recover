@@ -76,3 +76,75 @@ main{padding-top:19px}
 @media(max-width:700px){.demo-hero{display:block;padding:30px 27px}.demo-hero h1{font-size:clamp(2.35rem,7vw,3.2rem)}.demo-hero-scene{display:none}}
 @media(max-width:520px){.demo-hero{padding:24px 22px}.demo-hero h1{font-size:clamp(2.25rem,10vw,2.9rem);margin:14px 0}.demo-hero p{font-size:.93rem;line-height:1.5}.demo-progress{margin-top:18px}.demo-stage h2{font-size:1.85rem}.demo-story{margin:16px 0 18px;padding:17px 18px}.demo-story p{font-size:1.13rem}.demo-actions{gap:8px;margin-bottom:18px}.demo-actions button{min-height:45px}.demo-evidence-head{display:block;padding-top:17px}.demo-evidence-head p{margin-top:5px}.demo-signal-board{min-height:0}}
 @media(forced-colors:active){.demo-hero,.demo-hero-scene,.demo-story{border:1px solid CanvasText}.demo-story{border-left-width:4px}}
+
+/* Scenario workspace: keep the journey, case record, and next action in view. */
+main{max-width:1500px;padding:16px 24px 64px}
+.demo-intro{display:flex;align-items:center;justify-content:space-between;gap:30px;padding:16px 25px;border-radius:16px;background:linear-gradient(104deg,#071d3e,#123e71 68%,#1d5d9c);color:#fff}
+.demo-intro>div{min-width:0}
+.demo-intro-label{color:#a9d6fa;font-size:.75rem;font-weight:800;letter-spacing:.12em}
+.demo-intro h1{max-width:850px;margin:6px 0 0;color:#fff;font-size:clamp(1.5rem,2vw,2rem);line-height:1.14;letter-spacing:-.045em}
+.demo-intro h1 em{font-style:normal;color:#9ed9ff}
+.demo-intro p{flex:0 1 320px;margin:0;padding-left:22px;border-left:1px solid #89b8e175;color:#e1efff;font-size:.875rem;line-height:1.5}
+.demo-progress{margin:18px 0 12px}
+.demo-workbench{display:grid;grid-template-columns:212px minmax(0,1fr);gap:16px;align-items:start}
+.demo-rail{position:sticky;top:14px;min-width:0;padding:18px 12px;border:1px solid #d6e4f1;border-radius:16px;background:#fff;box-shadow:0 12px 30px #0b376407}
+.demo-rail-heading{display:block;padding:0 10px 12px;color:#54718e;font-size:.75rem;font-weight:800;letter-spacing:.13em}
+.demo-rail ol{list-style:none;margin:0;padding:0}
+.demo-rail li+li{margin-top:3px}
+.demo-rail button{display:flex;align-items:flex-start;gap:10px;width:100%;min-height:53px;padding:9px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:#435e78;text-align:left}
+.demo-rail button:hover{background:#eff7ff;color:#0755a1}
+.demo-rail button.current{border-color:#b3d9f9;background:#eaf5ff;color:#083f7a}
+.demo-rail button.complete{color:#2d6270}
+.demo-rail-number{display:grid;place-items:center;flex:none;width:25px;height:25px;border-radius:50%;background:#eaf0f6;color:#315d86;font-size:.75rem;font-weight:800}
+.demo-rail button.current .demo-rail-number{background:#0873d5;color:#fff}
+.demo-rail button.complete .demo-rail-number{background:#e0f3ea;color:#17684f}
+.demo-rail button strong,.demo-rail button small{display:block;overflow-wrap:anywhere}
+.demo-rail button strong{font-size:.875rem;line-height:1.35}
+.demo-rail button small{margin-top:2px;color:#647e98;font-size:.75rem;line-height:1.3}
+.demo-rail p{margin:17px 10px 0;padding-top:14px;border-top:1px solid #e0e9f2;color:#5d7590;font-size:.75rem;line-height:1.5}
+.demo-workbench-main{min-width:0}
+.demo-mobile-steps{display:none}
+.demo-layout{grid-template-columns:minmax(0,1.65fr) minmax(275px,.78fr);gap:14px}
+.demo-stage,.demo-side{border-radius:16px;box-shadow:0 12px 30px #0b376408}
+.demo-stage{padding:24px}
+.demo-stage{scroll-margin-top:12px}
+.demo-stage h2{max-width:700px;margin:10px 0 0;font-size:clamp(1.7rem,2.2vw,2.3rem)}
+.demo-story{margin:15px 0 19px;padding:15px 18px;background:#f0f7ff}
+.demo-story p{font-size:clamp(1rem,1.28vw,1.18rem);line-height:1.52}
+.demo-app-frame{overflow:hidden;border:1px solid #c9dbea;border-radius:13px;background:#fff;box-shadow:0 8px 20px #18385b0c}
+.demo-app-toolbar{display:flex;align-items:center;gap:8px;min-height:48px;padding:7px 13px;border-bottom:1px solid #dbe7f2;background:#f4f8fd;color:#173d66;font-size:.875rem}
+.demo-app-mark{display:grid;place-items:center;width:25px;height:25px;border-radius:6px;background:#0b63bc;color:#fff;font-weight:900}
+.demo-toolbar-path{color:#52718c}
+.demo-sample-chip{margin-left:auto;padding:5px 8px;border:1px solid #a8cbea;border-radius:999px;color:#125790;font-size:.75rem;font-weight:800;letter-spacing:.04em;white-space:nowrap}
+.demo-app-body{padding:18px}
+.demo-evidence-head{display:block;margin:0 0 13px;padding:0;border:0}
+.demo-evidence-head p{margin-top:5px;font-size:.875rem}
+.demo-signal-board{grid-template-columns:minmax(145px,.54fr) minmax(0,1.46fr);min-height:176px;border:1px solid #d4e3f0;border-radius:12px;background:#f4f9ff;color:#092f59}
+.demo-signal-intro{padding:18px;background:linear-gradient(155deg,#0b2d58,#0d5598);color:#fff}
+.demo-signal-intro strong{font-size:clamp(1.25rem,1.8vw,1.8rem)}
+.demo-signal-intro small{color:#daedff}
+.demo-signal-flow{padding:18px}
+.demo-signal{color:#3e6488}
+.demo-signal strong{color:#0b355f}
+.demo-signal small{color:#415f7d}
+.demo-signal-icon{border-color:#a6c3df;background:#e4f0fb;color:#1e598d}
+.demo-signal.is-on .demo-signal-icon{background:#126b58;box-shadow:none}
+.demo-signal.is-alert .demo-signal-icon{background:#985c1d}
+.demo-connector{background:#adc5de}
+.demo-connector.is-on{background:#16856c}
+.demo-facts{margin:14px 0 0}
+.demo-facts>div{padding-top:12px;padding-bottom:12px}
+.demo-side{padding:22px}
+.demo-action-dock{position:sticky;bottom:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:12px;padding:12px 16px;border:1px solid #c7dceb;border-radius:13px;background:#fff;box-shadow:0 -8px 25px #0a2e5820}
+.demo-action-dock>span{display:grid;gap:3px;min-width:0}
+.demo-action-dock>span strong{color:#0c3c6c;font-size:.875rem}
+.demo-action-dock>span small{max-width:430px;color:#476481;font-size:.75rem;line-height:1.35}
+.demo-actions{display:flex;justify-content:flex-end;gap:8px;flex:none;margin:0}
+.demo-actions button{min-height:44px}
+.demo-next-short{display:none}
+@media(max-width:1150px){.demo-layout{grid-template-columns:1fr}.demo-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.demo-perspective,.demo-control{border-bottom:0;padding:0}.demo-deep,.demo-boundary{grid-column:1/-1;margin-top:0}}
+@media(max-width:900px){.demo-workbench{display:block}.demo-rail{display:none}.demo-mobile-steps{display:grid;gap:7px;margin-bottom:13px;color:#143e68;font-size:.875rem;font-weight:800}.demo-mobile-steps select{width:100%;min-height:44px;padding:9px 12px;border:1px solid #a7c4df;border-radius:10px;background:#fff;color:#0b3d72;font:inherit}.demo-intro{padding:20px 23px}.demo-intro p{flex-basis:280px}}
+@media(max-width:700px){.demo-intro{display:block}.demo-intro p{max-width:650px;margin-top:12px;padding:0;border:0}.demo-signal-board{grid-template-columns:1fr}.demo-signal-intro{padding:17px}.demo-signal-flow{padding:18px}}
+@media(max-width:520px){main{padding:12px 13px 45px}.demo-intro{padding:17px 19px;border-radius:13px}.demo-intro h1{font-size:1.65rem}.demo-progress{margin:14px 0 10px}.demo-stage,.demo-side{padding:17px}.demo-story{margin:13px 0 16px;padding:14px 15px}.demo-app-toolbar{flex-wrap:wrap}.demo-toolbar-path{display:none}.demo-app-body{padding:13px}.demo-side{display:block}.demo-control{padding-top:22px}.demo-deep{margin-top:18px}.demo-boundary{margin-top:18px}.demo-action-dock{align-items:stretch;flex-direction:column;gap:9px;padding:10px 12px}.demo-action-dock>span small{display:none}.demo-actions{display:grid;grid-template-columns:1fr 1.55fr}.demo-actions button{width:100%;padding:9px 10px}.demo-signal-intro strong{font-size:1.45rem}}
+@media(max-width:360px){.demo-action-dock{padding:8px}.demo-actions{grid-template-columns:1fr 1fr}.demo-actions button{min-height:44px}.demo-action-dock>span,.demo-next-long{display:none}.demo-next-short{display:inline}.demo-signal-flow{gap:2px;padding:13px 7px}.demo-signal-icon{width:38px;height:38px}.demo-signal small{font-size:.69rem}}
+@media(forced-colors:active){.demo-intro,.demo-app-frame,.demo-rail,.demo-action-dock,.demo-signal-board{border:1px solid CanvasText}.demo-rail button.current{outline:2px solid Highlight}}
