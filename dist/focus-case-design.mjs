@@ -1,6 +1,7 @@
 import {checks,fingerprint,reviewIsCurrent} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
 import {caseAgentSummary} from './focus-case-review.mjs';
+import {caseReplayMarkup} from './focus-case-replay.mjs';
 import {caseOrigin} from './focus-model.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -86,7 +87,9 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  main.prepend(facts);
  if(heading)main.prepend(heading);
  const agents=caseAgentSummary(s);
- if(agents)facts.insertAdjacentHTML('afterend',agents);
+ if(agents&&(s.agentRun?.status==='running'||s.agentRun?.status==='failed'||s.phase==='review-failed'||s.job?.pending))facts.insertAdjacentHTML('afterend',agents);
+ const replay=document.createElement('div');replay.className='case-replay-mount';replay.innerHTML=caseReplayMarkup(s,{uncertain});
+ facts.after(replay);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
  const deep=document.createElement('details');deep.className='case-deep-dive';deep.id='case-deep-evidence';const title=document.createElement('summary');title.innerHTML='<span><strong>Inspect full evidence and audit</strong><small>Agent findings, source records, workflow, verification, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
@@ -94,7 +97,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const chapter=sheet.querySelector('.sheet-body > .case-chapter');if(chapter)deep.append(chapter);
  const freshness=sheet.querySelector('.freshness-band');if(freshness)deep.append(freshness);
  const automation=sheet.querySelector('.sheet-body > .automation-card');if(automation)deep.append(automation);
- for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-agent-summary,.case-change-preview'))deep.append(child);
+ for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-agent-summary,.case-replay-mount,.case-change-preview'))deep.append(child);
  const rail=layout.querySelector('.case-decision-column');
  for(const child of [...rail.children])if(child.matches('.story-brief-panel,.customer-preview-disclosure,.case-priority-panel,.exact-approval'))deep.append(child);
  for(const selector of ['.summary','.merchant-decision','.case-change-preview','.consent','.actionbar']){const child=rail.querySelector(':scope > '+selector);if(child)rail.append(child);}
@@ -118,11 +121,18 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  dossier.innerHTML='<span class="eyebrow">CASE RECORD</span><h2>Follow the proof from payment to outcome.</h2><p>Open a section to inspect the saved records, agent reasoning, and audit trail. A recommendation never replaces merchant approval or a fresh access check.</p>';
  title.after(dossier);
  const groups=[
-  ['01','Evidence & decision gates','Payment, purchase match, access, and source freshness',false,'.case-readiness,.source-disclosure,.detail,.breakpoint-map,.freshness-band,.access-journey'],
-  ['02','AI investigation','Specialist findings, challenges, and recommendation',false,'.clarity-specialists,.ci-disagreement,.agent-workbench,.story-brief-panel:not(.story-outcome-panel),.merchant-decision'],
+  ['01','Evidence & decision gates','Payment, purchase match, access, and source freshness',false,'.case-readiness,.source-disclosure,.purchase-evidence-detail,.breakpoint-map,.freshness-band,.access-journey'],
+  ['02','AI investigation','Specialist findings, challenges, and recommendation',false,'.specialist-review-detail,.clarity-specialists,.ci-disagreement,.agent-workbench,.story-brief-panel:not(.story-outcome-panel),.merchant-decision'],
   ['03','Recovery & verification','Workflow stages, technical proof, and measured outcome',false,'.automation-card,.access-promise,.ci-flight-mount,.case-experience,.story-outcome-panel'],
-  ['04','Audit & customer context','Case history, priority, customer view, and next update',false,'.communication-timeline,.case-priority-panel,.customer-preview-disclosure,.clarity-handoff,.case-chapter']
+  ['04','Audit & customer context','Case history, priority, customer view, and next update',false,'.recovery-timeline-detail,.customer-reply-detail,.communication-timeline,.case-priority-panel,.customer-preview-disclosure,.clarity-handoff,.case-chapter']
  ];
+ for(const detail of deep.querySelectorAll(':scope > details.detail')){
+  const title=detail.querySelector('summary')?.textContent?.trim()||'';
+  if(title.startsWith('Purchase evidence'))detail.classList.add('purchase-evidence-detail');
+  else if(title.startsWith('Specialist review'))detail.classList.add('specialist-review-detail');
+  else if(title.startsWith('Recovery timeline'))detail.classList.add('recovery-timeline-detail');
+  else if(title.startsWith('Customer reply'))detail.classList.add('customer-reply-detail');
+ }
  const groupNodes=[];
  for(const [number,label,description,open,selectors] of groups){
   const group=document.createElement('details');group.className='case-record-group';group.open=open;
