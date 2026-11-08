@@ -13,6 +13,7 @@ body[data-demo-step="2"] .demo-progress{margin:12px 0 10px}
 .investigation{color:#14304f}
 .investigation-heading{display:flex;justify-content:space-between;align-items:start;gap:12px;padding:20px 22px 16px;background:#f4f8fd}
 .investigation-heading h3{margin:5px 0 0;color:#102e58;font-size:1.35rem;line-height:1.25;letter-spacing:-.025em}
+.investigation-heading p{margin:6px 0 0;color:#244d76;font-size:.9rem;line-height:1.4}
 .investigation-heading .demo-sample-chip{white-space:nowrap}
 .investigation-evidence{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid #cadbea;background:#fff}
 .investigation-evidence>div{display:grid;align-content:start;gap:3px;min-width:0;padding:14px 16px}
