@@ -30,6 +30,20 @@ test('Today escapes customer names and keeps detailed metrics behind a disclosur
  const html=todayMarkup(data);assert.ok(!html.includes('<img'));assert.match(html,/&lt;img/);assert.match(html,/<details class="today-details">/);
 });
 
+test('dashboard keeps the priority queue compact and labels sample proof honestly',()=>{
+ const rows=Array.from({length:7},(_,index)=>({caseId:`CASE-${index}`,customerName:`Buyer ${index}`,actionable:true,reasons:['Follow-up is due'],nextStep:'Reply'}));
+ const data={checkedAt:new Date().toISOString(),counts:{total:7,verified:0,updatesDue:2,followupsDue:7,customerWaiting:0,verificationNeeded:0,overdueAccess:0,sourceIssues:0,workflowIssues:0},rows};
+ const html=todayMarkup(data);
+ assert.match(html,/WORKSPACE DASHBOARD/);
+ assert.match(html,/What needs you next/);
+ assert.match(html,/2 more in the full queue below/);
+ assert.equal((html.match(/data-pulse-case=/g)||[]).length,5);
+ assert.ok(html.indexOf('Buyer 0')<html.indexOf('Buyer 4'));
+ assert.doesNotMatch(html,/Buyer 5/);
+ assert.match(html,/No connected recovery verified/);
+ assert.match(html,/FICTIONAL COMPLETED SAMPLE/);
+});
+
 test('decision brief never calls a sample grant verified before proof',()=>{
  const s=simulatePayment(createCase());investigate(s);rehearse(s);
  let html=decisionCardMarkup(s);assert.match(html,/Your decision/);assert.match(html,/What changes/);assert.match(html,/Lesson proof/);assert.doesNotMatch(html,/Verified outcome/);
