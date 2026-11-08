@@ -34,3 +34,45 @@ footer{padding:26px 24px;border-top:1px solid #e0e9f2;text-align:center;color:#5
 .demo-actions{margin:0 0 24px}.demo-actions button.primary:hover:not(:disabled){border-color:#055bb2;background:#055bb2;color:#fff}.demo-actions button.primary:active:not(:disabled){background:#034b94;color:#fff}.demo-actions button.primary:focus-visible{color:#fff}.demo-control li:before{content:""}.demo-control li.done:before{content:"✓"}
 @keyframes signal-arrive{from{transform:scale(.88);opacity:.6}to{transform:scale(1);opacity:1}}.demo-signal.is-on .demo-signal-icon{animation:signal-arrive .28s ease-out both}@media(prefers-reduced-motion:reduce){.demo-signal.is-on .demo-signal-icon{animation:none}}
 .demo-story{max-width:680px;margin:22px 0 4px;padding-left:19px;border-left:3px solid #2286d5}.demo-story p{margin:8px 0 0;color:#2b4d70;font-size:1rem;line-height:1.62}
+
+/* The walkthrough opens as a human story. Operational proof follows each chapter. */
+body{background:#f6f8fc}
+main{padding-top:19px}
+.demo-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.8fr);gap:32px;align-items:center;min-height:0;padding:43px clamp(28px,4vw,58px);border:1px solid #d8e6f5;border-radius:24px;background:radial-gradient(circle at 91% 2%,#d9eeff 0,transparent 35%),linear-gradient(115deg,#fff 2%,#f1f7ff 100%);color:#092b59;box-shadow:0 20px 55px #153e6412}
+.demo-hero:after{display:none}
+.demo-hero-copy{position:relative;z-index:1}
+.demo-hero .eyebrow{display:inline-flex;align-items:center;gap:10px;color:#17558e;font-size:.72rem}
+.demo-hero{padding-top:29px;padding-bottom:29px}
+.eyebrow-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#147bd1;box-shadow:0 0 0 5px #d7edff}
+.demo-hero h1{max-width:620px;margin:14px 0 14px;color:#092b59;font-size:clamp(2.5rem,4.2vw,4rem);line-height:1.035;letter-spacing:-.065em}
+.demo-hero h1 em{color:#0c6cbd;font-style:normal}
+.demo-hero p{max-width:530px;color:#3c5873;font-size:1.04rem;line-height:1.63}
+.demo-hero-scene{position:relative;z-index:1;display:grid;align-content:center;justify-items:center;min-height:225px;padding:19px;border:1px solid #cbdff3;border-radius:19px;background:linear-gradient(145deg,#0d3264,#0a58ae);box-shadow:0 18px 32px #0c43872e,inset 0 1px #ffffff3b;transform:rotate(1deg)}
+.demo-hero-scene:before{content:"";position:absolute;inset:14px;border:1px solid #ffffff26;border-radius:12px;pointer-events:none}
+.scene-receipt{position:relative;z-index:1;display:flex;align-items:center;gap:13px;width:min(100%,310px);padding:13px 16px;border:1px solid #d8e8f9;border-radius:12px;background:#fff;box-shadow:0 10px 20px #001e4266;transform:rotate(-3deg)}
+.scene-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:8px;background:#e9f4ff;color:#0964b2;font-size:1.5rem;font-weight:900}
+.scene-receipt small,.scene-receipt strong{display:block}.scene-receipt small{color:#47637c;font-size:.64rem;font-weight:800;letter-spacing:.08em}.scene-receipt strong{margin-top:2px;color:#0a315c;font-size:1.32rem}.scene-check{margin-left:auto;color:#0c6cbd;font-size:1.35rem;font-weight:900}
+.scene-thread{display:flex;align-items:center;gap:8px;z-index:1;width:195px;margin:9px 0;color:#e5f2ff;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-align:center}.scene-thread i{height:1px;flex:1;background:#9dcbf0}.scene-thread i:first-child{transform:rotate(20deg)}.scene-thread i:last-child{transform:rotate(-20deg)}
+.scene-lesson{position:relative;z-index:1;display:grid;gap:9px;width:min(100%,290px);padding:20px 20px 15px;border:1px solid #70b4e9;border-radius:12px;background:radial-gradient(circle at 95% 10%,#45b8ed 0,#146dbd 27%,#0c4a98 70%);color:#fff;box-shadow:0 10px 20px #001e4259;transform:rotate(3deg)}
+.scene-lesson-mark{font-size:.58rem;font-weight:800;letter-spacing:.13em;color:#cce8ff}.scene-lesson strong{font-size:1.55rem;line-height:1.05;letter-spacing:-.04em}.scene-lock{justify-self:start;padding:5px 8px;border-radius:999px;background:#fff;color:#8a4a21;font-size:.63rem;font-weight:900;letter-spacing:.07em}
+.demo-progress{margin-top:23px}
+.demo-stage,.demo-side{box-shadow:0 14px 35px #0b376408}
+.demo-stage{padding:clamp(23px,3vw,38px)}
+.demo-stage h2{max-width:690px;margin:14px 0 0;font-size:clamp(1.9rem,3vw,2.65rem)}
+.demo-story{max-width:none;margin:20px 0 22px;padding:22px 25px;border:0;border-left:4px solid #0f77c9;border-radius:0 14px 14px 0;background:linear-gradient(105deg,#eef7ff,#f8fbff)}
+.demo-story p{max-width:700px;margin:8px 0 0;color:#173f65;font-family:Georgia,"Times New Roman",serif;font-size:clamp(1.12rem,1.65vw,1.38rem);line-height:1.5;letter-spacing:-.017em}
+.demo-actions{margin:0 0 26px}
+.demo-actions button{box-shadow:0 2px 4px #0b37640b}
+.demo-actions .primary{box-shadow:0 8px 17px #005ab33b}
+.demo-evidence-head{display:flex;align-items:baseline;gap:14px;margin:0 0 10px;border-top:1px solid #dce7f2;padding-top:23px}
+.demo-evidence-head .demo-label{flex:none}
+.demo-evidence-head p{margin:0;color:#405e79;font-size:.92rem;line-height:1.45}
+.demo-signal-board{min-height:190px;background:radial-gradient(circle at 97% -10%,#15549c,transparent 43%),#081f45}
+.demo-signal-intro{padding:22px}
+.demo-signal-flow{padding:18px 19px 18px 0}
+.demo-side{background:#fbfdff}
+.demo-perspective blockquote{background:#eaf5ff}
+@media(max-width:900px){.demo-hero{grid-template-columns:minmax(0,1fr) minmax(230px,.6fr);gap:16px}.demo-hero-scene{min-height:225px;padding:16px}}
+@media(max-width:700px){.demo-hero{display:block;padding:30px 27px}.demo-hero h1{font-size:clamp(2.35rem,7vw,3.2rem)}.demo-hero-scene{display:none}}
+@media(max-width:520px){.demo-hero{padding:24px 22px}.demo-hero h1{font-size:clamp(2.25rem,10vw,2.9rem);margin:14px 0}.demo-hero p{font-size:.93rem;line-height:1.5}.demo-progress{margin-top:18px}.demo-stage h2{font-size:1.85rem}.demo-story{margin:16px 0 18px;padding:17px 18px}.demo-story p{font-size:1.13rem}.demo-actions{gap:8px;margin-bottom:18px}.demo-actions button{min-height:45px}.demo-evidence-head{display:block;padding-top:17px}.demo-evidence-head p{margin-top:5px}.demo-signal-board{min-height:0}}
+@media(forced-colors:active){.demo-hero,.demo-hero-scene,.demo-story{border:1px solid CanvasText}.demo-story{border-left-width:4px}}
