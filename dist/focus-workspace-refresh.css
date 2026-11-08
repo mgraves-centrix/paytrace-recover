@@ -243,6 +243,11 @@ body{background:var(--work-canvas);color:var(--work-ink)}
 .recovery-pulse .today-head h2{max-width:none;margin:8px 0 6px;color:#fff;font-size:clamp(1.65rem,2.8vw,2.3rem);line-height:1.12;letter-spacing:-.045em}
 .recovery-pulse .today-head p{max-width:56ch;margin:0;color:#deedfc;font-size:.9375rem;line-height:1.5}
 .recovery-pulse .today-head small{display:block;margin-top:11px;color:#b6d3ec;font-size:.75rem}
+.recovery-pulse .today-demo-entry{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;margin-top:16px}
+.recovery-pulse .today-demo-entry a{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;padding:10px 16px;border:1px solid #d7ecff;border-radius:9px;background:#e8f5ff;color:#103c64;font-size:.875rem;font-weight:750;line-height:1.3;text-decoration:none;box-shadow:0 3px 12px #071a3050;transition:background-color .16s ease,transform .16s ease}
+.recovery-pulse .today-demo-entry a:hover{background:#fff;color:#103c64;transform:translateY(-1px)}
+.recovery-pulse .today-demo-entry a:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.recovery-pulse .today-demo-entry>span{color:#d3e8f8;font-size:.75rem;line-height:1.4}
 .today-head-mark{position:relative;z-index:1;display:flex;align-items:center;gap:10px;flex:none;min-width:185px;height:74px}
 .today-head-mark:before,.today-head-mark:after{content:'';position:absolute;top:34px;left:24px;right:24px;height:2px;background:#7bc9ff88}
 .today-head-mark:after{left:95px;right:24px;background:#7bc9ff55}
