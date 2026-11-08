@@ -52,7 +52,7 @@ export function arrangeCase(root,s){
  if(sources){const wrapper=document.createElement('details');wrapper.className='source-disclosure';const title=document.createElement('summary');title.textContent='Connection checks & freshness';wrapper.append(title,sources);main.append(wrapper);}
  while(body.firstChild)main.append(body.firstChild);
  layout.append(rail,main);
- const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Decision</a><a href="#case-customer-updates"><b>02</b> Customer update</a><a href="#case-deep-evidence"><b>03</b> Full evidence</a>';
+ const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Jump to case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Next action</a><a href="#case-evidence"><b>02</b> Evidence & agents</a><a href="#case-customer-updates"><b>03</b> Conversation</a><a href="#case-deep-evidence"><b>04</b> Full record</a>';
  const communication=document.createElement('section');communication.id='case-customer-updates';communication.className='case-communication-area';communication.innerHTML='<div class="case-communication-heading"><span class="eyebrow">CUSTOMER CONVERSATION</span><h2>Keep the buyer informed.</h2><p>Review the latest reply, set a progress update, or send a message.</p></div>';
  const customerCard=document.createElement('section');customerCard.className='case-customer-card';customerCard.setAttribute('aria-label','Customer conversation status');
  const customerLabel=document.createElement('span');customerLabel.className='eyebrow';customerLabel.textContent='CUSTOMER CONVERSATION';
@@ -112,9 +112,11 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
  const customerCard=rail.querySelector(':scope > .case-customer-card');if(customerCard)rail.append(customerCard);
  const stepper=root.querySelector('.review-shell > .stepper');
- if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);}}
+ if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);steps.forEach((step,index)=>{if(index===active)step.setAttribute('aria-current','step');else step.removeAttribute?.('aria-current');step.classList.toggle('completed',index<active);});}}
  layout.after(communication);
  communication.after(deep);
+ const sectionLinks=[...root.querySelectorAll('.case-wayfinding a')];
+ if(sectionLinks.length){const target=sectionLinks.find(link=>link.hash===window.location.hash)||sectionLinks[0];sectionLinks.forEach(link=>{if(link===target)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');link.addEventListener('click',()=>{sectionLinks.forEach(item=>item.removeAttribute('aria-current'));link.setAttribute('aria-current','location');});});}
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
  root.querySelector('[data-open-case-evidence]')?.addEventListener('click',()=>{deep.open=true;});
 }
