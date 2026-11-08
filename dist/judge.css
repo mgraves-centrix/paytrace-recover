@@ -14,3 +14,4 @@ footer{max-width:1320px;display:flex;justify-content:space-between;gap:20px;marg
 @media(max-width:440px){.site-header .brand{font-size:16px}.site-header .nav-workspace{font-size:12px}.hero-actions{align-items:stretch;flex-direction:column}.hero-actions .button{width:100%}.story-visual{padding:14px}.visual-node{padding:12px}.visual-top,.visual-footer{font-size:10px}.status-grid{grid-template-columns:1fr}.status-grid>div{min-height:0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.route-card{transition:none}.route-card:hover{transform:none}}
 @media(forced-colors:active){.hero,.story-visual,.route-card,.working-app,.proof,.more-links a,.status-grid>div{border:1px solid CanvasText}.button{border:1px solid CanvasText}}
+.route-more-link{display:inline-block;margin-top:16px;color:#075fb8;font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:4px}

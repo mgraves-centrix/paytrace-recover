@@ -16,9 +16,9 @@ test('activity labels useful categories and exposes full event dates for review'
 });
 
 test('first connected case checklist distinguishes configuration from case evidence',()=>{
- const empty=connectionReadiness([],true,{paypal:false,courseAccess:true,ai:true});assert.match(empty,/0 of 4 checkpoints complete/);
+ const empty=connectionReadiness([],true,{paypal:false,courseAccess:true,ai:true});assert.match(empty,/0 of 4 case milestones complete/);assert.match(empty,/not the health of every service/);
  const s=simulatePayment(createCase());s.capture.source='paypal-sandbox';s.sources={payment:{status:'available'},access:{status:'available',system:'External course access service'}};s.review={mode:'model'};
- const ready=connectionReadiness([s],true,{paypal:true});assert.match(ready,/4 of 4 checkpoints complete/);assert.match(ready,/Model review recorded for the case/);
+ const ready=connectionReadiness([s],true,{paypal:true});assert.match(ready,/4 of 4 case milestones complete/);assert.match(ready,/Model review recorded for the case/);
 });
 
 test('sandbox intake is unavailable until the server advertises PayPal credentials',()=>{
