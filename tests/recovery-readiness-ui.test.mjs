@@ -15,7 +15,9 @@ test('readiness follows the saved purchase, review, exact preview and approval',
  assert.equal(recoveryReadiness(s).filter(step=>step.ok).length,4);
  approve(s,s.rehearsal.id);
  assert.equal(recoveryReadiness(s).filter(step=>step.ok).length,5);
- assert.match(readinessMarkup(s),/Approval recorded · final checks remain/);
+ assert.match(readinessMarkup(s),/Authorization recorded · final checks remain/);
+ s.approval.mode='policy';
+ assert.match(readinessMarkup(s),/Authorized by the enabled merchant policy/);
  assert.match(readinessMarkup(s,{backend:true}),/Illustrative case · not connected/);
  assert.equal(recoveryReadiness(s,{uncertain:true}).filter(step=>step.ok).length,0);
  assert.equal(recoveryReadiness(s,{backend:true})[2].ok,false,'scripted sample review cannot count as a model review');

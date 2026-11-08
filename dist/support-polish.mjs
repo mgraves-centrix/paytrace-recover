@@ -20,10 +20,14 @@ export function emailActivityGuidance(notifications=[]){
 }
 
 export function resolutionSteps(state,support){return [
- {label:'Access record active',done:!!state.entitlement?.active,detail:'The stored entitlement is active; this alone does not prove the purchase opens.'},
+ {label:'Access record',done:!!state.entitlement?.active,detail:'An active entitlement alone does not prove the purchase opens.'},
  {label:'Technical verification',done:!!support.verified,detail:'Current payment, entitlement, and protected content checks must agree.'},
  {label:'Customer confirmation',done:!!support.verified&&!!support.confirmedAt&&!support.help,detail:support.help?'The customer still needs help. Follow up in the conversation.':'The customer separately confirms that their purchase works.'}
  ];}
+
+export function resolutionMarkup(state,support){
+ return `<span class="eyebrow">WHAT IS ACTUALLY COMPLETE?</span><div class="resolution-steps">${resolutionSteps(state,support).map(step=>`<div class="${step.done?'complete':''}"><span class="resolution-status">${step.done?'Complete':'Not yet'}</span><strong>${esc(step.label)}</strong><p>${esc(step.detail)}</p></div>`).join('')}</div>`;
+}
 
 export function replyTemplates(support){return [
  ['Progress update',support.verified?'The technical access check has passed. Please open your purchase from your private case page and let us know whether it works for you.':'We are reviewing your purchase and access records. Your request is still open. We will record the next update here.'],
@@ -34,7 +38,7 @@ export function replyTemplates(support){return [
 export function mountSupportPolish(panel,state,support){
  const thread=panel.querySelector('.customer-thread'),form=panel.querySelector('#support-reply');if(!thread||!form)return;
  const resolution=document.createElement('section');resolution.className='support-resolution';resolution.setAttribute('aria-label','Resolution milestones');
- resolution.innerHTML=`<span class="eyebrow">WHAT IS ACTUALLY COMPLETE?</span><div class="resolution-steps">${resolutionSteps(state,support).map(step=>`<div class="${step.done?'complete':''}"><span aria-hidden="true">${step.done?'✓':'○'}</span><strong>${step.label}</strong><p>${esc(step.detail)}</p></div>`).join('')}</div>`;thread.before(resolution);
+ resolution.innerHTML=resolutionMarkup(state,support);thread.before(resolution);
  const input=form.querySelector('textarea'),kind=form.querySelector('select'),submit=form.querySelector('[type=submit]');
  const preview=document.createElement('section');preview.className='support-preview';preview.setAttribute('aria-label','Message preview');form.querySelector('.support-actions').before(preview);
  const templates=document.createElement('div');templates.className='support-templates';templates.innerHTML='<span>Start with a draft</span>'+replyTemplates(support).map(([label],i)=>`<button type="button" data-template="${i}">${label}</button>`).join('');input.before(templates);

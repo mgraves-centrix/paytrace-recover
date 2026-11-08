@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {emailStatus,emailActivityGuidance,resolutionSteps,replyTemplates} from '../dist/support-polish.mjs';
+import {emailStatus,emailActivityGuidance,resolutionSteps,resolutionMarkup,replyTemplates} from '../dist/support-polish.mjs';
 import {updatePromiseState} from '../dist/focus-support.mjs';
 
 test('resolution distinguishes active access from verification and reopened customer help',()=>{
@@ -8,6 +8,10 @@ test('resolution distinguishes active access from verification and reopened cust
  assert.deepEqual(resolutionSteps(state,{verified:false,confirmedAt:'old'}).map(s=>s.done),[true,false,false]);
  assert.deepEqual(resolutionSteps(state,{verified:true,confirmedAt:'now',help:true}).map(s=>s.done),[true,true,false]);
  assert.deepEqual(resolutionSteps(state,{verified:true,confirmedAt:'now',help:false}).map(s=>s.done),[true,true,true]);
+ const markup=resolutionMarkup({entitlement:{active:false}},{verified:false,confirmedAt:null});
+ assert.match(markup,/<strong>Access record<\/strong>/);
+ assert.equal((markup.match(/class="resolution-status">Not yet<\/span>/g)||[]).length,3);
+ assert.doesNotMatch(markup,/<strong>Access record active<\/strong>/);
 });
 test('email labels and suggested replies do not overstate delivery or access',()=>{
  assert.match(emailStatus('accepted-by-provider')[1],/does not prove/);

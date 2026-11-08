@@ -15,14 +15,14 @@ export function recoveryReadiness(s,{uncertain=false,backend=false}={}){
   {label:'Missing access confirmed',ok:access,detail:access?'Course access is inactive':'Refresh the course access record'},
   {label:'AI review supports a correction',ok:objections,detail:review?objections?'No open objection':'Resolve the review objection before a grant':backend?'Run a current model review':'Run the sample specialist review'},
   {label:'Exact correction previewed',ok:preview,detail:preview?'One purchase-bound access change':'Preview the customer, course, and change'},
-  {label:'Merchant authorization recorded',ok:approval,detail:approval?'Approved for this exact preview':'Approval is required before applying'}
+  {label:'Merchant authorization recorded',ok:approval,detail:approval?s.approval?.mode==='policy'?'Authorized by the enabled merchant policy':'Approved for this exact preview':'Approve this preview or use an enabled merchant policy'}
  ].map(item=>({...item,ok:item.ok&&!uncertain,detail:uncertain?'Refresh current status before relying on this check':item.detail}));
 }
 
 export function readinessMarkup(s,options={}){
  const steps=recoveryReadiness(s,options),passed=steps.filter(item=>item.ok).length,source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':s.capture?'Sample payment':'Payment not confirmed';
  const sample=options.backend&&source==='Sample payment';
- return `<section class="case-readiness" aria-label="Recovery readiness"><div class="case-readiness-head"><span class="eyebrow">DECISION CHECKLIST · ${esc(source)}</span><strong>${options.uncertain?'Refresh current status':sample?'Illustrative case · not connected':passed===steps.length?'Approval recorded · final checks remain':`${passed} of ${steps.length} checks ready`}</strong>${sample?'<small>Sample records show the decision path. A PayPal sandbox case is needed for connected proof.</small>':passed===steps.length?'<small>The server rereads payment and access before any grant.</small>':''}</div><ol>${steps.map(item=>`<li class="${item.ok?'ready':'waiting'}"><span aria-hidden="true">${item.ok?'✓':'·'}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.detail)}</small></div></li>`).join('')}</ol><a href="#case-deep-evidence" data-open-case-evidence>Inspect the supporting records ↗</a></section>`;
+ return `<section class="case-readiness" aria-label="Recovery readiness"><div class="case-readiness-head"><span class="eyebrow">DECISION CHECKLIST · ${esc(source)}</span><strong>${options.uncertain?'Refresh current status':sample?'Illustrative case · not connected':passed===steps.length?'Authorization recorded · final checks remain':`${passed} of ${steps.length} checks ready`}</strong>${sample?'<small>Sample records show the decision path. A PayPal sandbox case is needed for connected proof.</small>':passed===steps.length?'<small>The server rereads payment and access before any grant.</small>':''}</div><ol>${steps.map(item=>`<li class="${item.ok?'ready':'waiting'}"><span aria-hidden="true">${item.ok?'✓':'·'}</span><div><strong>${esc(item.label)}</strong><small>${esc(item.detail)}</small></div></li>`).join('')}</ol><a href="#case-deep-evidence" data-open-case-evidence>Inspect the supporting records ↗</a></section>`;
 }
 
 export function outcomeSummaryMarkup(s,{uncertain=false}={}){
