@@ -94,8 +94,12 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const outcome=outcomeSummaryMarkup(s,{uncertain});
  const summary=rail.querySelector(':scope > .summary');
  if(outcome)rail.insertAdjacentHTML('afterbegin',outcome);
- else if(summary)summary.insertAdjacentHTML('afterend',readinessMarkup(s,{uncertain,backend}));
- else rail.insertAdjacentHTML('afterbegin',readinessMarkup(s,{uncertain,backend}));
+ else{
+  const steps=recoveryReadiness(s,{uncertain,backend}),passed=steps.filter(item=>item.ok).length;
+  const count=uncertain?'Refresh current status':`${passed} of ${steps.length} decision checks ready`;
+  if(summary)summary.insertAdjacentHTML('afterend',`<div class="case-gate-summary"><span>${esc(count)}</span><a href="#case-deep-evidence" data-open-case-evidence>Inspect checks ↗</a></div>`);
+  deep.insertAdjacentHTML('beforeend',readinessMarkup(s,{uncertain,backend}));
+ }
  // Before any correction is previewed, the safe next action belongs directly
  // below the decision so it remains visible without scrolling.
  if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
