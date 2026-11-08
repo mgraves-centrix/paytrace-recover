@@ -123,6 +123,34 @@ body.focus-case-open .case-redesign .case-deep-dive { border-radius: 12px; }
 body.focus-case-open .case-redesign .case-communication-area { margin-top: 22px !important; padding: 22px; }
 body.focus-case-open .case-redesign .case-deep-dive { margin-top: 18px; }
 body.focus-case-open .case-redesign .case-deep-dive > summary { min-height: 64px; }
+body.focus-case-open .case-redesign .case-deep-dive[open] { background: #f3f7fb; }
+body.focus-case-open .case-redesign .case-deep-dive > summary { background: #fff; }
+body.focus-case-open .case-redesign .case-deep-dive > summary strong { font-size: 1.05rem; }
+body.focus-case-open .case-redesign .case-deep-dive > summary small { color: #45637e; font-size: .8125rem; line-height: 1.5; }
+body.focus-case-open .case-redesign .case-record-intro { padding: 23px 24px 6px; }
+body.focus-case-open .case-redesign .case-record-intro .eyebrow { color: #1769a9; font-size: .75rem; }
+body.focus-case-open .case-redesign .case-record-intro h2 { margin: 6px 0 7px; color: #102e50; font-size: clamp(1.25rem, 2vw, 1.6rem); line-height: 1.25; letter-spacing: -.025em; }
+body.focus-case-open .case-redesign .case-record-intro p { max-width: 72ch; margin: 0; color: #415d78; font-size: .875rem; line-height: 1.55; }
+body.focus-case-open .case-redesign .case-record-group { margin: 14px 18px !important; border: 1px solid #c8d9e9; border-radius: 12px; background: #fff; box-shadow: 0 5px 18px #123e6410; overflow: hidden; }
+body.focus-case-open .case-redesign .case-record-group:last-child { margin-bottom: 18px !important; }
+body.focus-case-open .case-redesign .case-record-group > summary { display: flex; align-items: center; gap: 16px; min-height: 72px; padding: 15px 20px; list-style: none; cursor: pointer; }
+body.focus-case-open .case-redesign .case-record-group > summary::-webkit-details-marker { display: none; }
+body.focus-case-open .case-redesign .case-record-group[open] > summary { border-bottom: 1px solid #d9e6f1; background: #eef6fd; }
+body.focus-case-open .case-redesign .case-record-group > summary:hover { background: #e9f3fb; }
+body.focus-case-open .case-redesign .case-record-group > summary:focus-visible { outline: 3px solid #0873d1; outline-offset: -3px; }
+body.focus-case-open .case-redesign .case-record-number { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 9px; background: #123e6c; color: #fff; font-size: .875rem; font-weight: 800; }
+body.focus-case-open .case-redesign .case-record-label { min-width: 0; flex: 1; }
+body.focus-case-open .case-redesign .case-record-label strong,
+body.focus-case-open .case-redesign .case-record-label small { display: block; }
+body.focus-case-open .case-redesign .case-record-label strong { color: #102e50; font-size: 1rem; line-height: 1.3; }
+body.focus-case-open .case-redesign .case-record-label small { margin-top: 4px; color: #47617a; font-size: .8125rem; line-height: 1.4; }
+body.focus-case-open .case-redesign .case-record-chevron { flex: none; width: 10px; height: 10px; border-right: 2px solid #23577f; border-bottom: 2px solid #23577f; transform: rotate(45deg); }
+body.focus-case-open .case-redesign .case-record-group[open] .case-record-chevron { transform: rotate(225deg); }
+body.focus-case-open .case-redesign .case-record-group > :not(summary) { max-width: none; margin: 16px 18px !important; }
+body.focus-case-open .case-redesign .case-record-group > .case-readiness { padding: 18px; border: 1px solid #d1e0ed; background: #f8fbfe; }
+body.focus-case-open .case-redesign .case-record-group .case-readiness li strong { color: #153b5e; font-size: .875rem; line-height: 1.4; }
+body.focus-case-open .case-redesign .case-record-group .case-readiness li small { color: #47617a; font-size: .8125rem; line-height: 1.45; }
+body.focus-case-open .case-redesign .case-record-group .detail > summary { min-height: 48px; font-size: .875rem; }
 
 .today-case-name { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 9px; }
 .case-origin-tag {
@@ -145,6 +173,10 @@ body.focus-case-open .case-redesign .case-deep-dive > summary { min-height: 64px
   body.focus-case-open .case-redesign .case-evidence-column { grid-column: 1; grid-row: 2; }
 }
 @media (max-width: 650px) {
+  body.focus-case-open .case-redesign .case-record-intro { padding: 18px 15px 2px; }
+  body.focus-case-open .case-redesign .case-record-group { margin: 10px 12px !important; }
+  body.focus-case-open .case-redesign .case-record-group > summary { gap: 11px; padding: 13px 14px; }
+  body.focus-case-open .case-redesign .case-record-group > :not(summary) { margin: 12px !important; }
   body.focus-case-open .review-shell > .stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   body.focus-case-open .review-shell > .stepper > span,
   body.focus-case-open .review-shell > .stepper > span.active { min-height: 48px; padding: 9px 11px; font-size: .8125rem; }

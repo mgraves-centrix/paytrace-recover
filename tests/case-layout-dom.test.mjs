@@ -46,7 +46,7 @@ test('case layout keeps the decision action first and moves full records into in
   arrangeCase(f.root,s);finishCaseLayout(f.root,s,{backend:true});
   const rail=f.root.querySelector('.case-decision-column'),deep=f.root.querySelector('.case-deep-dive'),main=f.root.querySelector('.case-evidence-column');
   assert.ok(rail.children.includes(f.summary));assert.ok(rail.children.includes(f.actionbar));
-  assert.ok(deep.children.includes(f.decision));
+  assert.equal(deep.querySelector('.merchant-decision'),f.decision);
   const communication=f.root.querySelector('#case-customer-updates');
   assert.equal(communication.previousElementSibling,f.root.querySelector('.case-layout'));
   assert.equal(communication.nextElementSibling,deep);
@@ -70,6 +70,6 @@ test('verified layout presents a compact outcome while retaining the exact previ
   const rail=f.root.querySelector('.case-decision-column'),deep=f.root.querySelector('.case-deep-dive');
   assert.match(rail.inserted[0].html,/Access checked and available/);
   assert.ok(rail.querySelector('.case-change-preview'));
-  assert.ok(deep.children.includes(f.decision));
+  assert.equal(deep.querySelector('.merchant-decision'),f.decision);
  }finally{globalThis.document=oldDocument;}
 });

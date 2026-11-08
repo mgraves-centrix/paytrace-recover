@@ -112,6 +112,36 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
   if(summary)summary.insertAdjacentHTML('afterend',`<div class="case-gate-summary"><span>${esc(count)}</span><a href="#case-deep-evidence" data-open-case-evidence>Inspect checks ↗</a></div>`);
   deep.insertAdjacentHTML('beforeend',readinessMarkup(s,{uncertain,backend}));
  }
+ // Turn the long technical appendix into four browsable dossiers. Move the
+ // existing controls and records rather than recreating their behavior.
+ const dossier=document.createElement('div');dossier.className='case-record-intro';
+ dossier.innerHTML='<span class="eyebrow">CASE RECORD</span><h2>Follow the proof from payment to outcome.</h2><p>Open a section to inspect the saved records, agent reasoning, and audit trail. A recommendation never replaces merchant approval or a fresh access check.</p>';
+ title.after(dossier);
+ const groups=[
+  ['01','Evidence & decision gates','Payment, purchase match, access, and source freshness',false,'.case-readiness,.source-disclosure,.detail,.breakpoint-map,.freshness-band,.access-journey'],
+  ['02','AI investigation','Specialist findings, challenges, and recommendation',false,'.clarity-specialists,.ci-disagreement,.agent-workbench,.story-brief-panel:not(.story-outcome-panel),.merchant-decision'],
+  ['03','Recovery & verification','Workflow stages, technical proof, and measured outcome',false,'.automation-card,.access-promise,.ci-flight-mount,.case-experience,.story-outcome-panel'],
+  ['04','Audit & customer context','Case history, priority, customer view, and next update',false,'.communication-timeline,.case-priority-panel,.customer-preview-disclosure,.clarity-handoff,.case-chapter']
+ ];
+ const groupNodes=[];
+ for(const [number,label,description,open,selectors] of groups){
+  const group=document.createElement('details');group.className='case-record-group';group.open=open;
+  const heading=document.createElement('summary');heading.innerHTML=`<span class="case-record-number">${number}</span><span class="case-record-label"><strong>${label}</strong><small>${description}</small></span><span class="case-record-chevron" aria-hidden="true"></span>`;
+  group.append(heading);
+  for(const selector of selectors.split(','))for(const child of [...deep.children])if(child!==title&&child!==dossier&&child.matches(selector))group.append(child);
+  if(group.children.length>1){deep.append(group);groupNodes.push([group,selectors]);}
+ }
+ // The activity stream and chapter can mount after the first render. Keep
+ // late records in their named section without disturbing an open dossier.
+ if(typeof MutationObserver!=='undefined'){
+  const observer=new MutationObserver(()=>{
+   if(!deep.isConnected){observer.disconnect();return;}
+   for(const child of [...deep.children])if(child!==title&&child!==dossier&&!child.classList.contains('case-record-group')){
+    const match=groupNodes.find(([,selectors])=>child.matches(selectors));
+    if(match){if(child.matches('.communication-timeline'))match[0].querySelector('summary').after(child);else match[0].append(child);}
+   }
+  });observer.observe(deep,{childList:true});
+ }
  // Before any correction is previewed, the safe next action belongs directly
  // below the decision so it remains visible without scrolling.
  if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
@@ -123,5 +153,5 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const sectionLinks=[...root.querySelectorAll('.case-wayfinding a')];
  if(sectionLinks.length){const target=sectionLinks.find(link=>link.hash===window.location.hash)||sectionLinks[0];sectionLinks.forEach(link=>{if(link===target)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');link.addEventListener('click',()=>{sectionLinks.forEach(item=>item.removeAttribute('aria-current'));link.setAttribute('aria-current','location');});});}
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
- root.querySelector('[data-open-case-evidence]')?.addEventListener('click',()=>{deep.open=true;});
+ root.querySelectorAll('[data-open-case-evidence]').forEach(link=>link.addEventListener('click',()=>{deep.open=true;const first=deep.querySelector('.case-record-group');if(first)first.open=true;}));
 }
