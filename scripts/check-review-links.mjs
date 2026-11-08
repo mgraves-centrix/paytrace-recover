@@ -4,7 +4,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const files=['README.md','docs/JUDGE-TESTING.md','docs/DEVPOST-SUBMISSION.md','docs/VIDEO-RECORDING.md','docs/FEATURE-ACCEPTANCE.md','dist/judge.html'];
+const files=['README.md','docs/JUDGE-TESTING.md','docs/DEVPOST-SUBMISSION.md','docs/VIDEO-RECORDING.md','docs/FEATURE-ACCEPTANCE.md','dist/judge.html','dist/digital-orders.html'];
 let checked=0;
 for(const relative of files){
  const file=path.join(root,relative),content=await readFile(file,'utf8');

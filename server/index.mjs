@@ -27,7 +27,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
   const url=new URL(req.url,publicUrl);const route=url.pathname;
   res.setHeader('X-Frame-Options','DENY');res.setHeader('Referrer-Policy','no-referrer');
   if(publicUrl.protocol==='https:')res.setHeader('Strict-Transport-Security','max-age=31536000');
-  if(['/account.html','/recovery.html','/intelligence.html','/customer.html','/connection-studio.html','/passport.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+  if(['/account.html','/recovery.html','/intelligence.html','/customer.html','/connection-studio.html','/passport.html','/digital-orders.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(['/focus.html','/store-demo.html'].includes(route))res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' https://www.paypal.com https://www.paypalobjects.com; connect-src 'self' https://www.paypal.com https://www.sandbox.paypal.com; frame-src https://www.paypal.com https://www.sandbox.paypal.com; style-src 'self' 'unsafe-inline' https://www.paypalobjects.com; img-src 'self' data: https://www.paypal.com https://www.paypalobjects.com; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
   if(route==='/auth/config')return json(200,auth.config());
   if(route==='/auth/login'&&req.method==='GET'){
