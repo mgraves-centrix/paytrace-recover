@@ -1,5 +1,6 @@
 import {checks,fingerprint,reviewIsCurrent} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
+import {caseAgentSummary} from './focus-case-review.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -13,7 +14,7 @@ export function recoveryReadiness(s,{uncertain=false,backend=false}={}){
  return [
   {label:'Payment matches this purchase',ok:purchase,detail:purchase?'Completed capture and exact purchase fields agree':'Confirm the completed capture and purchase fields'},
   {label:'Missing access confirmed',ok:access,detail:access?'Course access is inactive':'Refresh the course access record'},
-  {label:'AI review supports a correction',ok:objections,detail:review?objections?'No open objection':'Resolve the review objection before a grant':backend?'Run a current model review':'Run the sample specialist review'},
+  {label:s.review?.mode==='model'||backend?'AI review supports a correction':'Specialist review supports a preview',ok:objections,detail:review?objections?'No open objection':'Resolve the review objection before a grant':backend?'Run a current model review':'Run the sample specialist review'},
   {label:'Exact correction previewed',ok:preview,detail:preview?'One purchase-bound access change':'Preview the customer, course, and change'},
   {label:'Merchant authorization recorded',ok:approval,detail:approval?s.approval?.mode==='policy'?'Authorized by the enabled merchant policy':'Approved for this exact preview':'Approve this preview or use an enabled merchant policy'}
  ].map(item=>({...item,ok:item.ok&&!uncertain,detail:uncertain?'Refresh current status before relying on this check':item.detail}));
@@ -41,7 +42,7 @@ export function arrangeCase(root,s){
  const avatar=document.createElement('span');avatar.className='customer-monogram';avatar.textContent=(s.customerName||'?').slice(0,1).toUpperCase();
  const info=document.createElement('div'),label=document.createElement('span'),name=document.createElement('strong');label.textContent='CUSTOMER ACCESS';name.textContent=s.customerName;info.append(label,name);identity.append(avatar,info);head.prepend(identity);
  const layout=document.createElement('div');layout.className='case-layout';const main=document.createElement('div');main.className='case-evidence-column';main.id='case-evidence';const rail=document.createElement('aside');rail.className='case-decision-column';rail.id='case-decision';rail.setAttribute('aria-label','Next action and customer experience');
- const heading=document.createElement('div');heading.className='case-column-title';heading.innerHTML='<span class="eyebrow">CASE ESSENTIALS</span><h2>What matters for this decision.</h2><p>Check the purchase, decide the next step, and tell the customer when they will hear from you.</p>';
+ const heading=document.createElement('div');heading.className='case-column-title';heading.innerHTML='<span class="eyebrow">PURCHASE EVIDENCE</span><h2>The facts behind the next step</h2>';
  main.append(heading);
  const summary=body.querySelector('.summary'),consent=body.querySelector('.consent'),actions=sheet.querySelector('.actionbar');
  if(summary)rail.append(summary);if(consent)rail.append(consent);if(actions)rail.append(actions);
@@ -70,8 +71,10 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const items=[['Payment',s.capture?.status==='COMPLETED'?'Completed':'Not confirmed',source],['Purchase match',exact?'Exact fields agree':'Needs review','Order, learner, course, amount, currency'],['Purchased access',access?'Matching entitlement':'Missing or unconfirmed',s.proof?.passed?'Lesson proof recorded':'Protected lesson not yet proven']];
  for(const [label,value,detail] of items){const card=document.createElement('div');for(const [tag,className,content] of [['span','case-first-look-label',label],['strong','',value],['small','',detail]]){const node=document.createElement(tag);if(className)node.className=className;node.textContent=content;card.append(node);}facts.append(card);}
  const heading=main.querySelector('.case-column-title');
- if(heading)main.prepend(heading);
  main.prepend(facts);
+ if(heading)main.prepend(heading);
+ const agents=caseAgentSummary(s);
+ if(agents)facts.insertAdjacentHTML('afterend',agents);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
  const deep=document.createElement('details');deep.className='case-deep-dive';deep.id='case-deep-evidence';const title=document.createElement('summary');title.innerHTML='<span><strong>Inspect full evidence and audit</strong><small>Agent findings, source records, workflow, verification, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
@@ -79,7 +82,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const chapter=sheet.querySelector('.sheet-body > .case-chapter');if(chapter)deep.append(chapter);
  const freshness=sheet.querySelector('.freshness-band');if(freshness)deep.append(freshness);
  const automation=sheet.querySelector('.sheet-body > .automation-card');if(automation)deep.append(automation);
- for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-change-preview'))deep.append(child);
+ for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-agent-summary,.case-change-preview'))deep.append(child);
  const rail=layout.querySelector('.case-decision-column');
  for(const child of [...rail.children])if(child.matches('.story-brief-panel,.customer-preview-disclosure,.case-priority-panel,.exact-approval'))deep.append(child);
  for(const selector of ['.summary','.merchant-decision','.case-change-preview','.consent','.actionbar']){const child=rail.querySelector(':scope > '+selector);if(child)rail.append(child);}

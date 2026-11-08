@@ -49,7 +49,8 @@ test('case layout keeps the decision action first and moves full records into in
   assert.ok(deep.children.includes(f.decision));assert.ok(main.children.some(child=>child.id==='case-customer-updates'));
   assert.equal(f.progress.parent,null);assert.equal(f.purchase.open,true);
   assert.match(f.summary.inserted[0].html,/Illustrative case · not connected/);
-  assert.equal(main.children[0].className,'case-first-look');
+  assert.equal(main.children[0].className,'case-column-title');
+  assert.equal(main.children[1].className,'case-first-look');
   assert.equal(f.summary.parent,rail);
   assert.equal(rail.children.indexOf(f.actionbar),rail.children.indexOf(f.summary)+1);
   assert.equal(f.stepper.attributes['aria-label'].includes('step 1 of 2'),true);

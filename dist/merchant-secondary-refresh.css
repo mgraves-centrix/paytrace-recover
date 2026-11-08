@@ -1,0 +1,41 @@
+/* Shared merchant surfaces: restrained workbench styling for supporting routes. */
+:root{--merchant-navy:#11233e;--merchant-ink:#132b49;--merchant-muted:#4c6580;--merchant-line:#d7e1eb;--merchant-canvas:#f3f6fa;--merchant-blue:#075eaf}
+body{background:var(--merchant-canvas);color:var(--merchant-ink)}
+body.merchant-recovery>header,body.merchant-intelligence>.top,body.merchant-passport>.passport-page-head{min-height:66px;padding:12px clamp(16px,3vw,32px);background:var(--merchant-navy);border-bottom:0;color:#fff}
+body.merchant-recovery>header a,body.merchant-recovery>header .brand,body.merchant-recovery>header #identity,body.merchant-intelligence>.top a,body.merchant-intelligence>.top .brand,body.merchant-passport>.passport-page-head a{color:#edf5ff}
+body.merchant-recovery>header .brand b,body.merchant-intelligence>.top .brand b,body.merchant-passport>.passport-page-head .passport-brand b{color:#acd9ff}
+body.merchant-recovery main,body.merchant-intelligence main,body.merchant-passport main{max-width:1360px;margin:0 auto;padding:24px clamp(16px,3vw,32px) 56px}
+body.merchant-recovery .intro{margin-bottom:18px}
+body.merchant-recovery .intro h1,body.merchant-intelligence .hero h1,body.merchant-passport .passport-page-intro h1{margin:4px 0 5px;font-size:clamp(1.6rem,2.5vw,2rem);line-height:1.17;letter-spacing:-.035em}
+body.merchant-recovery .intro p,body.merchant-intelligence .hero p,body.merchant-passport .passport-page-intro p{margin:0;font-size:.9375rem;line-height:1.5}
+body.merchant-recovery .recovery-groups{gap:8px;padding:0 0 12px;border-bottom:1px solid var(--merchant-line)}
+body.merchant-recovery .recovery-groups>details{min-width:142px;border-color:var(--merchant-line);border-radius:9px;box-shadow:none}
+body.merchant-recovery .recovery-groups>details>summary{padding:10px 13px}
+body.merchant-recovery .recovery-groups button{font-size:.875rem}
+body.merchant-recovery section,body.merchant-recovery .card,body.merchant-intelligence .lab-card{border-color:var(--merchant-line);border-radius:11px;box-shadow:none}
+body.merchant-recovery section,body.merchant-recovery .card{padding:20px}
+body.merchant-recovery .metric{border-color:var(--merchant-line);border-radius:9px;box-shadow:none}
+body.merchant-recovery .eyebrow,body.merchant-intelligence .eyebrow,body.merchant-passport .passport-page-intro span{font-size:.75rem;letter-spacing:.09em}
+body.merchant-intelligence .hero{min-height:0;padding:22px 26px;border-radius:11px;background:var(--merchant-navy);box-shadow:none}
+body.merchant-intelligence .hero p{color:#dce8f6}
+body.merchant-intelligence .lab-grid{gap:14px}
+body.merchant-intelligence .lab-card{padding:20px}
+body.merchant-intelligence .lab-card h2{margin:8px 0;font-size:1.25rem}
+body.merchant-intelligence .lab-card>p,body.merchant-intelligence .lab-card .fine{font-size:.875rem}
+body.merchant-intelligence .button,body.merchant-intelligence .lab-card label{font-size:.875rem}
+body.merchant-intelligence .button{min-height:44px}
+body.merchant-passport .passport-page-intro{padding:0 0 18px;border-bottom:1px solid var(--merchant-line)}
+body.merchant-passport .passport-page-intro h1{color:var(--merchant-ink)}
+body.merchant-passport .passport-page-intro p{max-width:760px;color:var(--merchant-muted)}
+body.merchant-passport .passport-page-actions button{min-height:44px;border-radius:8px}
+body.merchant-passport .passport-page-limit{font-size:.875rem}
+@media(max-width:650px){
+ body.merchant-recovery main,body.merchant-intelligence main,body.merchant-passport main{padding:16px 14px 40px}
+ body.merchant-recovery>header,body.merchant-intelligence>.top,body.merchant-passport>.passport-page-head{gap:9px;flex-wrap:wrap}
+ body.merchant-recovery .intro .pill{margin-top:8px}
+ body.merchant-recovery .recovery-groups{grid-template-columns:1fr}
+ body.merchant-recovery section,body.merchant-recovery .card,body.merchant-intelligence .lab-card{padding:15px}
+ body.merchant-intelligence .hero{padding:18px}
+}
+@media print{body.merchant-recovery>header,body.merchant-intelligence>.top,body.merchant-passport>.passport-page-head{display:none}}
+@media(forced-colors:active){body.merchant-recovery>header,body.merchant-intelligence>.top,body.merchant-passport>.passport-page-head{border:1px solid CanvasText}}
