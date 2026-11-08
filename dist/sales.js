@@ -8,4 +8,9 @@ document.querySelectorAll('[data-evidence]').forEach(button=>button.addEventList
  document.querySelectorAll('[data-evidence]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
  for(const key of ['source','title','copy','code','status','agent','finding'])document.getElementById('preview-'+key).textContent=record[key];
  document.getElementById('preview-avatar').className='portrait p'+record.portrait;
+ for(const panel of document.querySelectorAll('.preview-record,.preview-finding')){
+  panel.classList.remove('is-changing');
+  void panel.offsetWidth;
+  panel.classList.add('is-changing');
+ }
 }));

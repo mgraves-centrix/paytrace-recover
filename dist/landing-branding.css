@@ -14,3 +14,67 @@
 .hero-story{transform:none;box-shadow:none}
 .hero-story .payment-pill,.hero-story .customer-note{transform:none;box-shadow:none;margin-left:0;width:100%}
 .hero-story .course-cover{transform:none;box-shadow:none}
+
+/* The sample stays unresolved: the animated trail stops at the access check. */
+.hero-shell{isolation:isolate}
+.hero-shell:after{content:"";position:absolute;inset:auto -10% 0 48%;height:70%;background:radial-gradient(ellipse at center,#168bff25,transparent 68%);pointer-events:none;z-index:-1}
+.hero h1{max-width:11.5ch;text-wrap:balance}
+.hero h1 em{color:#9bdcff}
+.hero .paypal-context{font-size:12px;letter-spacing:.13em}
+.hero>div>p{max-width:45ch}
+.hero .fine{font-size:12px;line-height:1.6;max-width:48ch}
+.hero .text-link,.nav nav{font-size:14px}
+.hero .text-link{text-decoration:underline;text-underline-offset:5px;text-decoration-color:#a4d9ff88}
+.hero .text-link:hover{text-decoration-color:currentColor}
+.hero-team strong{font-size:13px}
+.hero-team small{font-size:12px}
+.hero-story{border-color:#a4d9ff68;box-shadow:0 28px 80px #000b315c,inset 0 1px 0 #ffffff2e}
+.story-label{font-size:12px;letter-spacing:.11em;line-height:1.5}
+.hero .payment-pill small,.hero .payment-pill strong span{font-size:12px}
+.hero .course-cover>span:first-of-type,.hero .course-cover>small{font-size:12px;letter-spacing:.08em}
+.hero .cover-lock{font-size:12px}
+.hero .customer-note strong{font-size:13px}
+.hero .customer-note p{font-size:12px;line-height:1.45}
+.story-bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(32px,.55fr) minmax(0,1fr);align-items:center;gap:10px;margin-top:22px;font-size:12px}
+.story-step{display:grid;grid-template-columns:18px 1fr;gap:0 7px;align-items:center;min-width:0}
+.story-step i{width:11px;height:11px;border-radius:50%;grid-row:span 2;background:#d9f4ff;box-shadow:0 0 0 4px #2a8cdd55}
+.story-step.waiting i{background:transparent;border:2px solid #a7c6e9;box-shadow:none}
+.story-step strong{font-size:12px;line-height:1.2;color:#fff}
+.story-step small{font-size:12px;line-height:1.35;color:#c7dcf4}
+.story-track{height:2px;border-radius:2px;background:linear-gradient(90deg,#8ddaff 0%,#7dc7f5 46%,#6b92c3 100%);transform-origin:left center}
+.partner-strip{font-size:13px;line-height:1.5}
+.sales-problem .eyebrow,.sales-workspace .eyebrow,.desk-section .eyebrow,.how>.eyebrow,.team-section .eyebrow,.sales-proof .eyebrow,.sales-integrations .eyebrow,.sales-faq .eyebrow,.closing .eyebrow{font-size:12px;letter-spacing:.12em}
+.sales-value span{font-size:14px;line-height:1.5}
+.sales-workspace .workspace-preview{box-shadow:0 26px 70px #0030871d,0 4px 12px #0030870d}
+.preview-toolbar{font-size:12px}
+.preview-badge{font-size:11px;white-space:normal;text-align:right}
+.preview-case>p,.preview-person b,.preview-person small,.preview-case dl,.preview-case .text-link{font-size:12px}
+.preview-case .text-link{text-decoration:underline;text-underline-offset:3px}
+.evidence-switch button{font-size:14px;transition:background-color .18s,border-color .18s,box-shadow .18s,transform .18s}
+.evidence-switch button:hover{transform:translateY(-2px);border-color:#469ce7}
+.evidence-switch button:focus-visible{outline:3px solid #003087;outline-offset:3px}
+.preview-record.is-changing,.preview-finding.is-changing{animation:record-reveal .3s ease-out both}
+.preview-record .eyebrow,.preview-record code,.preview-record-bottom>span{font-size:12px}
+.preview-finding b{font-size:13px}
+.preview-finding p{font-size:14px}
+.preview-disclosure,.workspace-caption p{font-size:12px}
+.workspace-caption>span{font-size:12px;line-height:1.5}
+.sales-proof .text-link,.integration-honesty a{font-size:14px;text-decoration:underline;text-underline-offset:4px}
+.integration-grid article{transition:transform .2s,box-shadow .2s,border-color .2s}
+.integration-grid article:hover{transform:translateY(-3px);border-color:#a8c9ee;box-shadow:0 15px 34px #00308712}
+.integration-status{font-size:12px;line-height:1.4}
+.integration-grid p{font-size:14px;line-height:1.65}
+.integration-honesty p{font-size:14px}
+.sales-faq summary{font-size:16px;min-height:44px;display:flex;align-items:center}
+.sales-faq summary:hover{color:#005eb8}
+.closing{overflow:hidden;isolation:isolate}
+.closing:after{content:"";position:absolute;width:min(50vw,590px);aspect-ratio:1;right:-7%;top:-120%;border:1px solid #b7e4ff3d;border-radius:50%;box-shadow:0 0 0 65px #b7e4ff0b,0 0 0 130px #b7e4ff08;pointer-events:none;z-index:-1}
+@keyframes hero-enter{from{transform:translateY(10px)}to{transform:translateY(0)}}
+@keyframes trail-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes record-reveal{from{opacity:.65;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:no-preference){.hero .paypal-context{animation:hero-enter .48s ease-out both}.hero h1{animation:hero-enter .58s .08s ease-out both}.hero>div>p,.hero-actions{animation:hero-enter .58s .16s ease-out both}.story-track{animation:trail-draw .65s .72s ease-out both}}
+@media(max-width:1000px){.hero .course-cover>small{display:none}}
+@media(max-width:900px){.nav nav{gap:16px}.nav nav>a[href='#workspace'],.nav nav>a[href='#how']{display:none}}
+@media(max-width:760px){.hero-team{display:none}.hero-shell:after{inset:auto -45% 0 10%;height:45%}}
+@media(max-width:540px){.hero h1{max-width:none}.hero-story{box-shadow:0 18px 48px #000b314d}.hero .paypal-context{font-size:12px}.hero .fine{font-size:12px}.story-label{font-size:12px}.story-bottom{gap:6px}.partner-strip{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.hero .paypal-context,.hero h1,.hero>div>p,.hero-actions,.hero-story,.story-track,.preview-record.is-changing,.preview-finding.is-changing{animation:none!important}.evidence-switch button,.integration-grid article{transition:none}}
