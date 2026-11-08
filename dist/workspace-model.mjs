@@ -1,4 +1,4 @@
-import {nextStep} from './focus-model.mjs';
+import {nextStep,caseOrigin} from './focus-model.mjs';
 import {proofIsCurrent,diagnose} from './operations.mjs';
 import {deliveryCheck} from './diagnosis.mjs';
 import {buildRunReport} from './run-report.mjs';
@@ -30,7 +30,7 @@ export function workspaceOverview(cases,{preferences=[],reminders=[],followups=[
   if(preference.priority==='low')score-=10;
   if(!reasons.length&&!verified&&!s.job?.pending){reasons.push(nextStep(s)[1]);score+=5;}
   const actionable=reasons.length>0;
-  return {caseId:s.id,customerName:s.customerName,diagnosis:d.title,nextStep:d.next,priority:preference.priority,preference,verified,phase:s.phase,paymentStatus:s.capture?.status||'NOT_CAPTURED',amount:s.order.amount,currency:s.order.currency,followupAt:reminder?.dueAt||null,updatePromiseAt:promise?.dueAt||null,dueNow,workflowPending:!!s.job?.pending,workflowError:workflowIssue?s.job.error:null,sourceStatus:unavailable?'unavailable':s.sources?'checked':'not-checked',reasons,score,actionable};
+  return {caseId:s.id,customerName:s.customerName,origin:caseOrigin(s,{backend}),diagnosis:d.title,nextStep:d.next,priority:preference.priority,preference,verified,phase:s.phase,paymentStatus:s.capture?.status||'NOT_CAPTURED',amount:s.order.amount,currency:s.order.currency,followupAt:reminder?.dueAt||null,updatePromiseAt:promise?.dueAt||null,dueNow,workflowPending:!!s.job?.pending,workflowError:workflowIssue?s.job.error:null,sourceStatus:unavailable?'unavailable':s.sources?'checked':'not-checked',reasons,score,actionable};
  });
  rows.sort((a,b)=>Number(b.actionable)-Number(a.actionable)||b.score-a.score||(a.followupAt||'9999').localeCompare(b.followupAt||'9999')||a.caseId.localeCompare(b.caseId));
  return {checkedAt:new Date(now).toISOString(),counts,rows,connectedResult,urgent:rows.filter(r=>r.actionable).slice(0,5)};

@@ -15,3 +15,5 @@ Review record:
 - NOT TESTED — The authenticated Azure case during a running model workflow. The local visual review used a fictional sample case. The design does not change model, payment, approval, or grant logic.
 
 The previous case screen had small secondary labels and crowded first-view sections. The changed view raises the new labels and navigation to at least 12px and keeps the existing below-the-fold records available through the full-record disclosure. Older, untouched panels may still contain smaller text; this change does not assert that the whole app meets the shared standard.
+
+Case-origin follow-up (2026-11-08): The case header, dashboard worklist, and full queue now distinguish a completed PayPal sandbox capture from a pending sandbox checkout and a fictional sample. The connected label explicitly says that no live charge was made. The local browser review covered the sample state at desktop and 390px mobile, including no horizontal overflow; the connected state was checked through source classification and rendering tests, not a fresh provider checkout.

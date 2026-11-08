@@ -39,6 +39,18 @@ body.focus-case-open .case-redesign .sheet-head::after {
 }
 body.focus-case-open .case-redesign .sheet-head :is(h1,p,strong,small,.eyebrow) { color: #fff; }
 body.focus-case-open .case-redesign .sheet-head .case-meta .eyebrow { font-size: .75rem; letter-spacing: .075em; color: #d2e8ff; }
+body.focus-case-open .case-redesign .case-origin {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 5px 12px; width: fit-content;
+  max-width: 100%; margin-top: 14px; padding: 9px 13px; border: 1px solid #d7e9fa70;
+  border-radius: 8px; background: #ffffff18; color: #fff;
+}
+body.focus-case-open .case-redesign .case-origin strong { font-size: .875rem; line-height: 1.4; }
+body.focus-case-open .case-redesign .case-origin span { color: #dcecff; font-size: .75rem; line-height: 1.4; }
+body.focus-case-open .case-redesign .case-origin-connected { border-color: #88ddbc; background: #0c694f; }
+body.focus-case-open .case-redesign .case-origin-connected::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #b9ffdc; }
+body.focus-case-open .case-redesign .case-origin-connected span { color: #e0fff1; }
+body.focus-case-open .case-redesign .case-origin-pending { border-color: #e6c994; background: #775217; }
+body.focus-case-open .case-redesign .case-origin-pending span { color: #fff0ce; }
 body.focus-case-open .case-redesign .sheet-head h1 { max-width: 850px; margin: 12px 0 7px; font-size: clamp(1.75rem, 2.8vw, 2.55rem); line-height: 1.14; letter-spacing: -.04em; }
 body.focus-case-open .case-redesign .sheet-head > p { display: block; max-width: 72ch; margin: 0; color: #dcecff; font-size: 1rem; line-height: 1.5; }
 body.focus-case-open .case-redesign .case-customer { display: none; }
@@ -111,6 +123,18 @@ body.focus-case-open .case-redesign .case-deep-dive { border-radius: 12px; }
 body.focus-case-open .case-redesign .case-communication-area { margin-top: 22px !important; padding: 22px; }
 body.focus-case-open .case-redesign .case-deep-dive { margin-top: 18px; }
 body.focus-case-open .case-redesign .case-deep-dive > summary { min-height: 64px; }
+
+.today-case-name { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 9px; }
+.case-origin-tag {
+  display: inline-flex; align-items: center; width: fit-content; max-width: 100%;
+  margin: 4px 0; padding: 3px 8px; border: 1px solid #c8d9e8; border-radius: 999px;
+  background: #f4f7fa; color: #36536f; font-size: .75rem; font-weight: 700; line-height: 1.35;
+  white-space: normal;
+}
+.case-origin-tag-connected { border-color: #a8d8c5; background: #e7f8ef; color: #075c45; }
+.case-origin-tag-pending { border-color: #e6d0a7; background: #fff6e7; color: #80521a; }
+.today-case .case-origin-tag { margin: 0; }
+.case-row .case-origin-tag { margin: 3px 0 2px; }
 
 @media (max-width: 1000px) {
   body.focus-case-open .case-redesign .case-layout { grid-template-columns: minmax(0, 1fr) minmax(275px, 320px); }

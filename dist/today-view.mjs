@@ -18,7 +18,7 @@ export function todayGroups(data){
 }
 
 function caseButton(row,group,busy,compact=false,rank=0){
- return `<button type="button" class="today-case${compact?' compact':''}${rank===1?' lead':''}" data-pulse-case="${esc(row.caseId)}" ${busy?'disabled':''}>${rank?`<span class="today-case-rank" aria-hidden="true">${String(rank).padStart(2,'0')}</span>`:''}<span class="today-case-main"><strong>${esc(row.customerName)}</strong><small>${esc(reasonFor(group,row))}</small></span><span class="today-case-action">Open case <span aria-hidden="true">↗</span></span></button>`;
+ return `<button type="button" class="today-case${compact?' compact':''}${rank===1?' lead':''}" data-pulse-case="${esc(row.caseId)}" ${busy?'disabled':''}>${rank?`<span class="today-case-rank" aria-hidden="true">${String(rank).padStart(2,'0')}</span>`:''}<span class="today-case-main"><span class="today-case-name"><strong>${esc(row.customerName)}</strong>${row.origin?`<span class="case-origin-tag case-origin-tag-${esc(row.origin.kind)}">${esc(row.origin.label)}</span>`:''}</span><small>${esc(reasonFor(group,row))}</small></span><span class="today-case-action">Open case <span aria-hidden="true">↗</span></span></button>`;
 }
 
 function sideList(group,busy){

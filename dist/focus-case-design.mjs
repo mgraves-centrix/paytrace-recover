@@ -1,6 +1,7 @@
 import {checks,fingerprint,reviewIsCurrent} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
 import {caseAgentSummary} from './focus-case-review.mjs';
+import {caseOrigin} from './focus-model.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -41,6 +42,10 @@ export function arrangeCase(root,s){
  const head=sheet.querySelector('.sheet-head'),identity=document.createElement('div');identity.className='case-customer';
  const avatar=document.createElement('span');avatar.className='customer-monogram';avatar.textContent=(s.customerName||'?').slice(0,1).toUpperCase();
  const info=document.createElement('div'),label=document.createElement('span'),name=document.createElement('strong');label.textContent='CUSTOMER ACCESS';name.textContent=s.customerName;info.append(label,name);identity.append(avatar,info);head.prepend(identity);
+ const origin=caseOrigin(s,{backend:globalThis.window?.COURSELATCH_RUNTIME?.backend===true});
+ const originBand=document.createElement('div');originBand.className=`case-origin case-origin-${origin.kind}`;originBand.setAttribute('aria-label','Case origin');
+ const originName=document.createElement('strong'),originDetail=document.createElement('span');originName.textContent=origin.label;originDetail.textContent=origin.detail;originBand.append(originName,originDetail);
+ head.querySelector('.case-meta')?.after(originBand);
  const layout=document.createElement('div');layout.className='case-layout';const main=document.createElement('div');main.className='case-evidence-column';main.id='case-evidence';const rail=document.createElement('aside');rail.className='case-decision-column';rail.id='case-decision';rail.setAttribute('aria-label','Next action and customer experience');
  const heading=document.createElement('div');heading.className='case-column-title';heading.innerHTML='<span class="eyebrow">PURCHASE EVIDENCE</span><h2>The facts behind the next step</h2>';
  main.append(heading);
