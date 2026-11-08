@@ -46,7 +46,11 @@ test('case layout keeps the decision action first and moves full records into in
   arrangeCase(f.root,s);finishCaseLayout(f.root,s,{backend:true});
   const rail=f.root.querySelector('.case-decision-column'),deep=f.root.querySelector('.case-deep-dive'),main=f.root.querySelector('.case-evidence-column');
   assert.ok(rail.children.includes(f.summary));assert.ok(rail.children.includes(f.actionbar));
-  assert.ok(deep.children.includes(f.decision));assert.ok(main.children.some(child=>child.id==='case-customer-updates'));
+  assert.ok(deep.children.includes(f.decision));
+  const communication=f.root.querySelector('#case-customer-updates');
+  assert.equal(communication.previousElementSibling,f.root.querySelector('.case-layout'));
+  assert.equal(communication.nextElementSibling,deep);
+  assert.ok(rail.querySelector('.case-customer-card'));
   assert.equal(f.progress.parent,null);assert.equal(f.purchase.open,true);
   assert.match(f.summary.inserted[0].html,/decision checks ready/);
   assert.match(deep.inserted[0].html,/Illustrative case · not connected/);

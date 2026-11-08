@@ -68,6 +68,34 @@ body{background:var(--work-canvas);color:var(--work-ink)}
 .case-redesign .case-communication-area{margin-top:13px!important;padding:16px;border:1px solid var(--work-line);border-radius:9px;background:#fff}
 .case-redesign .case-communication-heading h2{margin:3px 0;font-size:1.05rem}
 .case-redesign .case-communication-heading p{margin:0 0 12px;font-size:.875rem}
+.case-redesign .case-customer-card{display:grid;gap:6px;margin-top:16px;padding:15px 0 0;border-top:1px solid #c4d8e8}
+.case-redesign .case-customer-card .eyebrow{font-size:.75rem;color:#42607d}
+.case-redesign .case-customer-status{font-size:1rem;line-height:1.3;color:#173655}
+.case-redesign .case-customer-detail{margin:0;color:#4c6580;font-size:.8125rem;line-height:1.45}
+.case-redesign .case-customer-card.needs-response .case-customer-status{color:#8a4d16}
+.case-redesign .case-customer-link{display:inline-flex;align-items:center;min-height:44px;width:max-content;max-width:100%;color:#075eaf;font-size:.875rem;font-weight:750;text-decoration:underline;text-underline-offset:3px}
+.case-redesign .case-communication-area{scroll-margin-top:24px;margin-top:17px!important;padding:20px 22px;background:#fff}
+.case-redesign .case-communication-heading{padding-bottom:12px;border-bottom:1px solid var(--work-line)}
+.case-redesign .case-communication-heading h2{font-size:1.15rem;letter-spacing:-.02em}
+.case-redesign .case-communication-heading p{margin:0;color:var(--work-muted)}
+.case-redesign .customer-update-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,300px);gap:10px 20px;align-items:start;margin:14px 0;padding:16px;border:1px solid var(--work-line);border-radius:8px;background:#f8fafc}
+.case-redesign .customer-update-form>.eyebrow,.case-redesign .customer-update-form>h3,.case-redesign .customer-update-form>p{grid-column:1}
+.case-redesign .customer-update-form>h3{font-size:1rem}
+.case-redesign .customer-update-form>p{max-width:70ch;font-size:.8125rem}
+.case-redesign .customer-update-form .promise-status{grid-column:2;grid-row:1/5;align-self:stretch;border-color:var(--work-line);border-radius:7px}
+.case-redesign .customer-update-form>label,.case-redesign .customer-update-form>input,.case-redesign .customer-update-form>.support-actions,.case-redesign .customer-update-form>.promise-feedback{grid-column:1}
+.case-redesign .customer-update-form>.support-actions{margin-top:2px}
+.case-redesign .customer-update-form [data-open-conversation]{display:none}
+.case-redesign .case-conversation-disclosure{margin:0;border-color:var(--work-line);border-radius:8px;background:#fff}
+.case-redesign .case-conversation-disclosure>summary{min-height:60px;padding:13px 16px}
+.case-redesign .case-conversation-disclosure>summary strong{font-size:.9375rem;color:var(--work-ink)}
+.case-redesign .case-conversation-disclosure>summary small{font-size:.75rem}
+.case-redesign .case-conversation-disclosure .support-panel{padding:20px;background:#fff}
+.case-redesign .case-conversation-disclosure .customer-thread{display:grid;gap:8px;max-height:300px;margin:14px 0}
+.case-redesign .case-conversation-disclosure .customer-message{margin:0;border-radius:7px}
+.case-redesign .case-conversation-disclosure .support-panel h2{font-size:1.15rem}
+.case-redesign .case-conversation-disclosure .support-panel label,.case-redesign .case-conversation-disclosure .support-panel p{font-size:.875rem}
+.case-redesign .case-customer-link:focus-visible,.case-redesign .case-conversation-disclosure>summary:focus-visible{outline:3px solid #0070e0;outline-offset:3px}
 .case-redesign .case-deep-dive{margin-top:14px;border-color:var(--work-line);border-radius:9px;background:#fff}
 .case-agent-summary{margin:0 0 14px;padding:16px;border:1px solid var(--work-line);border-radius:9px;background:#fff}
 .case-agent-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:12px}
@@ -171,6 +199,10 @@ body{background:var(--work-canvas);color:var(--work-ink)}
  .case-redesign .case-evidence-column{grid-column:1;grid-row:2}
  .case-agent-list{display:block}
 }
+@media(max-width:700px){
+ .case-redesign .customer-update-form{grid-template-columns:1fr}
+ .case-redesign .customer-update-form .promise-status{grid-column:1;grid-row:auto}
+}
 @media(max-width:600px){
  .top{height:60px;padding:0 16px}
  .top .brand{font-size:1rem}
@@ -186,6 +218,8 @@ body{background:var(--work-canvas);color:var(--work-ink)}
  .case-redesign .case-first-look>div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:2px 8px;align-items:center;padding:9px 11px}
  .case-redesign .case-first-look>div+div{border-left:0;border-top:1px solid var(--work-line)}
  .case-redesign .case-first-look-label{grid-column:1;grid-row:1/3}
+ .case-redesign .case-communication-area{padding:14px}
+ .case-redesign .customer-update-form{padding:12px}
  .case-redesign .case-first-look strong,.case-redesign .case-first-look small{grid-column:2;margin:0}
  .case-agent-heading{display:block}
  .case-agent-state{display:inline-block;margin-top:8px}
