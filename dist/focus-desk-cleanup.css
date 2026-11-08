@@ -1,0 +1,55 @@
+/* Secondary desk content: one clear dashboard, compact empty work, details on demand. */
+.today-workspace-details .overview:empty{display:none}
+.today-workspace-details[open]>summary{margin-bottom:14px}
+.today-workspace-details>.scenario-launcher,.today-workspace-details>.communication-inbox,.today-workspace-details>.reminders-board,.today-workspace-details>.outcomes-panel,.today-workspace-details>.waiting-panel{margin:0 0 10px}
+.scenario-launcher{display:block;padding:0;background:#fff;color:#173858;border:1px solid #d5e2ef;border-radius:13px;box-shadow:none}
+.scenario-launcher>summary,.outcomes-panel>summary,.waiting-panel>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:13px 18px;cursor:pointer;color:#173858;font-size:.875rem;font-weight:700;list-style:none}
+.scenario-launcher>summary::-webkit-details-marker,.outcomes-panel>summary::-webkit-details-marker,.waiting-panel>summary::-webkit-details-marker{display:none}
+.scenario-launcher>summary:after,.outcomes-panel>summary:after,.waiting-panel>summary:after{content:'+';font-size:1.25rem;font-weight:400;color:#075fbb}
+.scenario-launcher[open]>summary:after,.outcomes-panel[open]>summary:after,.waiting-panel[open]>summary:after{content:'−'}
+.scenario-launcher>summary span{margin-left:auto;color:#526b85;font-size:.75rem;font-weight:500}
+.scenario-launcher p{margin:0;padding:0 18px;color:#526b85;font-size:.875rem;line-height:1.5}
+.scenario-launcher>div{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px 18px}
+.scenario-launcher a{display:inline-flex;align-items:center;min-height:44px;padding:10px 14px;border:1px solid #c8d9ea;border-radius:9px;background:#f5f9fe;color:#0756a7;font-size:.875rem;font-weight:600;text-decoration:none}
+.scenario-launcher a:hover{background:#e7f2ff;color:#003f86}
+.communication-inbox.is-empty,.reminders-board.is-empty{padding:16px 18px;border:1px solid #d5e2ef;border-radius:13px;box-shadow:none;background:#fff}
+.communication-inbox.is-empty .communication-inbox-head{gap:16px}
+.communication-inbox.is-empty h2,.reminders-board.is-empty h2{font-size:1rem;line-height:1.35;letter-spacing:0;margin:0 0 3px;color:#173858}
+.communication-inbox.is-empty p,.reminders-board.is-empty p{font-size:.875rem;line-height:1.5;color:#526b85;margin:0}
+.communication-inbox.is-empty .button{min-height:44px;font-size:.875rem;white-space:nowrap}
+.reminders-board:not(.is-empty) .reminder-heading{margin-bottom:14px}
+.reminders-board:not(.is-empty) .reminder-heading h2{margin:0 0 4px;font-size:1.125rem}
+.reminders-board:not(.is-empty) .reminder-heading p{margin:0;color:#526b85;font-size:.875rem}
+.outcomes-panel,.waiting-panel{padding:0;border:1px solid #d5e2ef;border-radius:13px;background:#fff}
+.outcomes-panel>summary.section-head,.waiting-panel>summary.section-head{margin:0;padding:13px 18px}
+.outcomes-panel>summary .subtle,.waiting-panel>summary .subtle{margin-left:auto;color:#526b85;font-size:.75rem;font-weight:500}
+.outcomes-panel .outcomes-grid,.waiting-panel .waiting-filters,.waiting-panel .waiting-list{margin:0 18px 18px}
+.outcomes-panel .outcomes-note{margin:0 18px 18px}
+.outcomes-panel .outcomes-grid>div{min-height:0;padding:14px}
+.outcomes-panel .outcomes-grid span,.outcomes-panel .outcomes-grid small{font-size:.875rem}
+.waiting-panel .waiting-filters button,.waiting-panel .waiting-list button{min-height:44px;font-size:.875rem}
+.today-workspace-details .queue-tabs button{min-height:44px;font-size:.875rem}
+.today-workspace-details .queue-tools .search,.today-workspace-details .queue-tools select{min-height:44px;font-size:.875rem}
+.scenario-launcher :focus-visible,.outcomes-panel :focus-visible,.waiting-panel :focus-visible,.communication-inbox :focus-visible,.reminders-board :focus-visible{outline:2px solid #075fbb;outline-offset:2px}
+@media(max-width:600px){
+ .scenario-launcher>summary,.outcomes-panel>summary,.waiting-panel>summary{align-items:flex-start;flex-wrap:wrap}
+ .scenario-launcher>summary span,.outcomes-panel>summary .subtle,.waiting-panel>summary .subtle{display:none}
+ .communication-inbox.is-empty .communication-inbox-head{align-items:flex-start;flex-direction:column}
+ .communication-inbox.is-empty .button{width:100%}
+ .today-workspace-details .queue-tools{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+ .today-workspace-details .queue-tools .search-wrap{max-width:none;width:100%}
+ .today-workspace-details .queue-tools select{width:auto;max-width:none}
+ .today-workspace-details .queue-tabs{gap:10px}
+}
+@media(forced-colors:active){.scenario-launcher,.outcomes-panel,.waiting-panel,.communication-inbox.is-empty,.reminders-board.is-empty,.scenario-launcher a{border-color:CanvasText}}
+@media(max-width:380px){
+ #workspace-navigation{display:block;flex:1;min-width:0}
+ .workspace-nav{width:100%;min-width:0;gap:4px;justify-content:space-between}
+ .workspace-nav button{min-height:44px;padding:0 2px;font-size:.75rem;white-space:nowrap}
+ .workspace-nav svg{display:none}
+ .guide-tools{width:100%}
+ .today-workspace-details .queue-tabs{flex-wrap:wrap;gap:0 12px}
+ .today-workspace-details .queue-tabs button{flex:1 1 auto;justify-content:center;line-height:1.3}
+ .today-workspace-details .queue-tools{grid-template-columns:1fr}
+ .today-workspace-details .queue-tools select{width:100%}
+}
