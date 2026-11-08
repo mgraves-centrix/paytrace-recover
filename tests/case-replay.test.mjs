@@ -17,6 +17,8 @@ test('replay follows purchase to verified outcome without claiming a demo is con
  assert.match(caseReplayMarkup(state),/An access write is recorded; fresh verification is still required/);
  verify(state);
  assert.match(caseReplayMarkup(state),/fresh payment, entitlement, and protected lesson check passed/);
+ assert.match(caseReplayMarkup(state),/Decision recorded/);
+ assert.ok(replayAgents(state).every(agent=>agent.scope==='at decision'));
 });
 
 test('replay marks missing or changed evidence as low confidence and escapes findings',()=>{
