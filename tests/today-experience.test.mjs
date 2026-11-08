@@ -15,7 +15,7 @@ test('Today gives each case one clear group without changing case data',()=>{
  const before=structuredClone(data),groups=todayGroups(data);
  assert.deepEqual(groups.map(g=>g.rows.map(r=>r.caseId)),[['A','D'],['B'],['C']]);
  assert.deepEqual(data,before);
- const html=todayMarkup(data,{operator:true});assert.match(html,/Recovery overview/);assert.match(html,/Export queue CSV/);
+ const html=todayMarkup(data,{operator:true});assert.match(html,/RECOVERY HEADQUARTERS/);assert.match(html,/Export queue CSV/);
  assert.match(html,/FICTIONAL COMPLETED SAMPLE/);
  assert.match(html,/demo\.html\?step=7/);
  assert.match(html,/No connected recovery verified/);
@@ -34,7 +34,8 @@ test('dashboard keeps the priority queue compact and labels sample proof honestl
  const rows=Array.from({length:7},(_,index)=>({caseId:`CASE-${index}`,customerName:`Buyer ${index}`,actionable:true,reasons:['Follow-up is due'],nextStep:'Reply'}));
  const data={checkedAt:new Date().toISOString(),counts:{total:7,verified:0,updatesDue:2,followupsDue:7,customerWaiting:0,verificationNeeded:0,overdueAccess:0,sourceIssues:0,workflowIssues:0},rows};
  const html=todayMarkup(data);
- assert.match(html,/WORKSPACE DASHBOARD/);
+ assert.match(html,/RECOVERY HEADQUARTERS/);
+ assert.match(html,/7 cases need your next step/);
  assert.match(html,/What needs you next/);
  assert.match(html,/2 more in the full queue below/);
  assert.equal((html.match(/data-pulse-case=/g)||[]).length,5);
@@ -42,6 +43,7 @@ test('dashboard keeps the priority queue compact and labels sample proof honestl
  assert.doesNotMatch(html,/Buyer 5/);
  assert.match(html,/No connected recovery verified/);
  assert.match(html,/FICTIONAL COMPLETED SAMPLE/);
+ assert.ok(html.indexOf('class="today-queue"')<html.indexOf('class="today-hq-side"'));
 });
 
 test('decision brief never calls a sample grant verified before proof',()=>{
