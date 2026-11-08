@@ -13,52 +13,46 @@
   <a class="skip-link" href="#checkout">Skip to checkout</a>
   <header class="top">
     <a class="brand" href="focus.html" aria-label="PayTrace Recover merchant workspace"><img src="assets/paytrace-recover.svg" alt="" width="34" height="34"><span>PayTrace <b>Recover</b></span></a>
-    <a class="back" href="focus.html?screen=connections">Back to connections <span aria-hidden="true">↗</span></a>
+    <a class="back" href="focus.html?screen=connections"><span class="back-prefix">Back to</span> connections <span aria-hidden="true">↗</span></a>
   </header>
-  <main>
-    <div class="page-heading">
-      <div>
-        <p class="eyebrow">PAYPAL SANDBOX · TEST PURCHASE</p>
-        <h1>Start with a sandbox purchase.</h1>
-        <p class="lead">Buy the sample workshop, verify its PayPal payment, and open a recovery case for review.</p>
+  <main class="workbench">
+    <section class="checkout-pane" id="checkout" aria-labelledby="checkout-title">
+      <div class="pane-top"><span class="eyebrow">MERCHANT TEST / PAYPAL SANDBOX</span><span class="sandbox-tag">No live charge</span></div>
+      <h1 id="checkout-title">Run a sandbox checkout.</h1>
+      <p class="intro">A completed purchase opens a case. You review the evidence before any access correction.</p>
+      <div class="purchase-summary" aria-label="Sample purchase">
+        <div class="product-art" aria-hidden="true"><span>LIGHT<br>&amp; STORY</span><i></i></div>
+        <div class="product-copy"><span>THE TEST PURCHASE</span><h2>The Light &amp; Story Workshop</h2><p>One digital workshop</p></div>
+        <div class="price"><strong>$128.00</strong><span>USD / sandbox</span></div>
       </div>
-    </div>
-    <div class="layout">
-      <section class="checkout-card" id="checkout" aria-labelledby="checkout-title">
-        <div class="section-heading"><div><p class="eyebrow">THE TEST PURCHASE</p><h2 id="checkout-title">The Light &amp; Story Workshop</h2></div><span class="sandbox-tag">Sandbox only</span></div>
-        <div class="product">
-          <div class="product-art" aria-hidden="true"><span>LIGHT<br>&amp; STORY</span><i></i></div>
-          <div class="product-copy"><strong>Digital workshop</strong><p>One course · access expected after purchase</p></div>
-          <div class="price"><strong>$128.00</strong><span>USD · sandbox</span></div>
-        </div>
-        <div id="operator-gate" class="operator-gate" hidden>
-          <div class="gate-heading"><span class="step-number">01</span><div><h3>Unlock the test checkout</h3><p>Enter your demo operator key on this device. It is only used to unlock this merchant session.</p></div></div>
-          <form id="operator-form"><label for="operator-key">Demo operator key</label><div class="operator-controls"><input id="operator-key" name="key" type="password" required autocomplete="off"><button type="submit">Unlock checkout</button></div></form>
-        </div>
-        <div id="purchase-fields" hidden>
-          <div class="form-heading"><span class="step-number">02</span><div><h3>Buyer details</h3><p>Use a fictional name and an inbox you can access for this test.</p></div></div>
-          <form id="buyer-form">
-            <label for="customer-name">Customer display name<input id="customer-name" name="customerName" required maxlength="80" placeholder="Alex Rivera" autocomplete="off"></label>
-            <label for="purchase-email">Test purchase email<input id="purchase-email" name="email" type="email" required maxlength="254" placeholder="name@example.com" autocomplete="email"></label>
-          </form>
-          <div class="payment-action"><div id="paypal-buttons"></div><p>Approve the purchase using a <strong>PayPal sandbox buyer account</strong>. No live charge is made.</p></div>
-        </div>
-        <div id="checkout-status" role="status" aria-live="polite">Checking sandbox checkout…</div>
-        <div id="retry-panel" hidden><button id="retry-complete" type="button">Retry capture and intake safely</button></div>
-        <div id="result" aria-live="polite"></div>
-      </section>
-      <aside class="context" aria-labelledby="after-checkout-title">
-        <div class="context-top"><span class="context-icon" aria-hidden="true">P</span><p class="eyebrow">WHAT HAPPENS NEXT</p></div>
-        <h2 id="after-checkout-title">Payment is evidence. Access is the outcome.</h2>
-        <ol>
-          <li><span>01</span><div><strong>PayPal confirms the capture</strong><p>PayTrace rereads the sandbox payment and matches its buyer, course, amount, and currency.</p></div></li>
-          <li><span>02</span><div><strong>A recovery case opens</strong><p>The case appears in the merchant desk with the purchase evidence attached.</p></div></li>
-          <li><span>03</span><div><strong>You review the correction</strong><p>Checkout does not grant access. The usual review and approval still apply.</p></div></li>
-        </ol>
-        <details class="technical-proof"><summary>What this test covers</summary><p>This merchant-operated simulator uses the same validated intake service as the private external-store API. It places a stable case ID in the PayPal order, rereads the sandbox capture, checks the exact purchase mapping, and makes no entitlement write during intake.</p></details>
-      </aside>
-    </div>
+      <div id="operator-gate" class="operator-gate" hidden>
+        <div class="task-heading"><span class="step-number">01</span><div><h3>Unlock checkout</h3><p>Use your demo operator key to unlock this merchant session.</p></div></div>
+        <form id="operator-form"><label for="operator-key">Demo operator key</label><div class="operator-controls"><input id="operator-key" name="key" type="password" required autocomplete="off"><button type="submit">Unlock checkout <span aria-hidden="true">→</span></button></div></form>
+      </div>
+      <div id="purchase-fields" hidden>
+        <div class="task-heading"><span class="step-number">02</span><div><h3>Buyer details</h3><p>Use a fictional name and an inbox you can access for this test.</p></div></div>
+        <form id="buyer-form">
+          <label for="customer-name">Customer display name<input id="customer-name" name="customerName" required maxlength="80" placeholder="Alex Rivera" autocomplete="off"></label>
+          <label for="purchase-email">Test purchase email<input id="purchase-email" name="email" type="email" required maxlength="254" placeholder="name@example.com" autocomplete="email"></label>
+        </form>
+        <div class="payment-action"><p class="payment-label">CONTINUE WITH PAYPAL SANDBOX</p><div id="paypal-buttons"></div><p>Approve the purchase with a <strong>PayPal sandbox buyer account</strong>.</p></div>
+      </div>
+      <div id="checkout-status" role="status" aria-live="polite">Checking sandbox checkout…</div>
+      <div id="retry-panel" hidden><button id="retry-complete" type="button">Retry capture and intake safely</button></div>
+      <div id="result" aria-live="polite"></div>
+    </section>
+    <aside class="story-stage" aria-labelledby="story-title">
+      <div class="stage-head"><span class="stage-mark" aria-hidden="true">P/</span><span>RECOVERY SIGNAL <b>01</b></span></div>
+      <div class="stage-copy"><p class="stage-kicker">PURCHASE → CASE</p><h2 id="story-title">Paid is the start.<br><em>Proof is the finish.</em></h2><p>Follow one purchase from PayPal capture to a case the merchant can investigate.</p></div>
+      <div class="signal" aria-label="Sandbox purchase to recovery case">
+        <div class="signal-card payment-card"><div class="signal-heading"><span>01 / PAYMENT</span><span class="signal-state">Awaiting checkout</span></div><div class="signal-main"><span class="paypal-glyph" aria-hidden="true">P</span><div><strong>$128.00</strong><small>PayPal sandbox</small></div></div></div>
+        <div class="signal-link" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="signal-card case-card"><div class="signal-heading"><span>02 / PAYTRACE CASE</span><span class="signal-state">Opens after capture</span></div><div class="case-visual"><span class="case-icon" aria-hidden="true">↗</span><div><strong>Evidence first.</strong><small>No access grant during intake.</small></div></div></div>
+      </div>
+      <div class="stage-bottom"><div><span>01</span> Checkout</div><div><span>02</span> Verify payment</div><div><span>03</span> Review case</div></div>
+      <details class="technical-proof"><summary>What this test covers</summary><p>This merchant-operated simulator uses the same validated intake service as the private external-store API. PayTrace rereads the sandbox capture and matches the buyer, course, amount, and currency before opening a case. Access remains unchanged until the usual review and approval.</p></details>
+    </aside>
   </main>
-  <footer>PayTrace Recover · Sandbox test purchase · No live charge</footer>
+  <footer>PayTrace Recover · Merchant-operated sandbox checkout</footer>
 </body>
 </html>
