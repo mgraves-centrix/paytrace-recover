@@ -6,6 +6,7 @@
   <p>
     <a href="https://paytrace-recover-sagitta.azurewebsites.net/judge.html"><strong>Judge walkthrough</strong></a> ·
     <a href="https://paytrace-recover-sagitta.azurewebsites.net/focus.html">Merchant workspace</a> ·
+    <a href="https://paytrace-recover-sagitta.azurewebsites.net/showcase.html">Product screenshots</a> ·
     <a href="docs/JUDGE-TESTING.md">Testing guide</a>
   </p>
   <p>
