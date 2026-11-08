@@ -10,15 +10,19 @@ export function updatePromiseState(current,notifications=[],now=Date.now()){
  const latest=notifications.at(-1);
  return {timing,email:latest?emailStatus(latest.state)[0]:'No email attempt recorded',emailAt:latest?.at||null};
 }
+export function customerCardState(d){
+ const latest=[...(d.messages||[])].reverse().find(message=>message.kind!=='internal');
+ const count=(d.messages||[]).filter(message=>message.kind!=='internal').length;
+ const status=d.help?'Customer needs a response':d.request?'Waiting for customer':latest?.role==='customer'?'Customer replied':latest?.role==='merchant'||latest?.role==='ai-assisted'?'Merchant replied':count?'Case updates recorded':'No conversation yet';
+ const next=d.nextUpdateAt&&Number.isFinite(Date.parse(d.nextUpdateAt))?`Next update ${new Date(d.nextUpdateAt).toLocaleString()}`:'No next update scheduled';
+ return {status,detail:`${count} ${count===1?'message':'messages'} recorded · ${next}`,needsResponse:!!d.help};
+}
 function updateCustomerCard(root,d){
  const card=root.querySelector('.case-customer-card');if(!card)return;
- const status=card.querySelector('.case-customer-status'),detail=card.querySelector('.case-customer-detail');
- const latest=[...(d.messages||[])].reverse().find(message=>message.kind!=='internal');
- status.textContent=d.help?'Customer needs a response':d.request?'Waiting for customer':latest?.role==='customer'?'Customer replied':latest?.role==='merchant'||latest?.role==='ai-assisted'?'Merchant replied':'No conversation yet';
- const count=(d.messages||[]).filter(message=>message.kind!=='internal').length;
- const next=d.nextUpdateAt&&Number.isFinite(Date.parse(d.nextUpdateAt))?`Next update ${new Date(d.nextUpdateAt).toLocaleString()}`:'No next update scheduled';
- detail.textContent=`${count} ${count===1?'message':'messages'} recorded · ${next}`;
- card.classList.toggle('needs-response',!!d.help);
+ const state=customerCardState(d);
+ card.querySelector('.case-customer-status').textContent=state.status;
+ card.querySelector('.case-customer-detail').textContent=state.detail;
+ card.classList.toggle('needs-response',state.needsResponse);
 }
 function mountUpdatePromise(root,panel,caseId,current,notifications=[]){
  root.querySelector('.customer-update-form')?.remove();

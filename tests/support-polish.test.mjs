@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {emailStatus,emailActivityGuidance,resolutionSteps,resolutionMarkup,replyTemplates} from '../dist/support-polish.mjs';
-import {updatePromiseState} from '../dist/focus-support.mjs';
+import {updatePromiseState,customerCardState} from '../dist/focus-support.mjs';
 
 test('resolution distinguishes active access from verification and reopened customer help',()=>{
  const state={entitlement:{active:true}};
@@ -39,4 +39,10 @@ test('customer update timing and email attempt remain separate facts',()=>{
  const state=updatePromiseState('2026-11-01T16:00:00Z',[{state:'accepted-by-provider',at:'2026-11-01T14:00:00Z'}],now);
  assert.equal(state.email,'Accepted by email provider');
  assert.equal(state.timing,'scheduled');
+});
+test('case customer status distinguishes recorded updates from an empty conversation',()=>{
+ assert.equal(customerCardState({messages:[]}).status,'No conversation yet');
+ assert.equal(customerCardState({messages:[{role:'automatic',kind:'status'}]}).status,'Case updates recorded');
+ assert.equal(customerCardState({messages:[{role:'customer',kind:'message'}],help:true}).status,'Customer needs a response');
+ assert.match(customerCardState({messages:[{role:'automatic',kind:'status'}]}).detail,/1 message recorded/);
 });
