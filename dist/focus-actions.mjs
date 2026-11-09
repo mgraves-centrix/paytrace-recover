@@ -33,15 +33,16 @@ export function mountReminderPanel(root,s,onSaved){const panel=root.querySelecto
  form.onsubmit=e=>{e.preventDefault();const date=new Date(due.value);if(!Number.isFinite(date.valueOf())){status.textContent='Choose a valid time.';return;}save(date.toISOString());};form.querySelector('[data-reminder-clear]').onclick=()=>save(null);
 }
 
-export function mountReminders(root,onSelect){
+export function mountReminders(root,onSelect,visibleCases=null){
  const overview=root.querySelector('.overview');if(!overview)return;
  const panel=document.createElement('section');panel.className='reminders-board surface is-empty';overview.after(panel);
  const compact=message=>{panel.classList.add('is-empty');panel.innerHTML=`<div><h2>Follow-up reminders</h2><p role="status">${esc(message)}</p></div>`;};
  compact('Checking reminders…');
  request('/api/support/reminders').then(d=>{
   if(!panel.isConnected)return;
-  const overdue=d.items.filter(x=>x.overdue),upcoming=d.items.filter(x=>!x.overdue);
-  if(!d.items.length){compact('None scheduled. Add a reminder inside a case.');return;}
+  const shown=visibleCases?d.items.filter(item=>visibleCases.has(item.caseId)):d.items;
+  const overdue=shown.filter(x=>x.overdue),upcoming=shown.filter(x=>!x.overdue);
+  if(!shown.length){compact('None scheduled. Add a reminder inside a case.');return;}
   panel.classList.remove('is-empty');
   panel.innerHTML=`<div class="reminder-heading"><div><h2>Follow-up reminders</h2><p>${overdue.length} due now · ${upcoming.length} upcoming</p></div></div><div class="reminder-list">${[...overdue,...upcoming].slice(0,8).map(item=>`<button type="button" data-reminder-case="${esc(item.caseId)}"><strong>${esc(item.customerName)}</strong><span>${item.overdue?'Due now':'Due '+esc(when(item.dueAt))}</span><small>${esc(item.note||'Open case')}</small></button>`).join('')}</div>`;
   panel.querySelectorAll('[data-reminder-case]').forEach(b=>b.onclick=()=>onSelect(b.dataset.reminderCase));

@@ -39,7 +39,7 @@ test('scripted and local evidence cannot be presented as a connected sandbox run
  assert.equal(report.checks.find(c=>c.id==='verification').status,'demo');
  assert.doesNotMatch(caseExperience(s,{backend:true}),/Connected sandbox proof/);
  assert.equal(workspaceOverview([s],{backend:true}).connectedResult,null);
- assert.match(todayMarkup(workspaceOverview([s],{backend:true})),/No connected recovery verified/);
+ assert.match(todayMarkup(workspaceOverview([s],{backend:true})),/Full end-to-end proof pending/);
 });
 
 test('failed Render verification or stale proof removes the connected claim',()=>{

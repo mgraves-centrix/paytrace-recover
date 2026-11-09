@@ -30,7 +30,7 @@ test('compact outcome shows technical proof without claiming buyer confirmation'
  assert.match(html,/confirmation remains separate/);
  assert.match(outcomeSummaryMarkup(s,{uncertain:true}),/verification pending/);
  s.revision++;
- assert.match(outcomeSummaryMarkup(s),/verification pending/);
+ assert.match(outcomeSummaryMarkup(s),/Previously verified · recheck due/);
 });
 
 test('customer summary shows only the latest merchant reply and escapes it',()=>{
