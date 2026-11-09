@@ -51,6 +51,9 @@ test('case layout keeps the decision action first and moves full records into in
   assert.equal(communication.previousElementSibling,f.root.querySelector('.case-layout'));
   assert.equal(communication.nextElementSibling,deep);
   assert.ok(rail.querySelector('.case-customer-card'));
+  assert.equal(rail.querySelector('.case-update-dock').tagName,'DETAILS');
+  assert.equal(rail.querySelector('.case-update-dock').querySelector('.case-customer-card')!==null,true);
+  assert.equal(main.querySelector('.case-replay-disclosure').tagName,'DETAILS');
   assert.equal(f.progress.parent,null);assert.equal(f.purchase.open,true);
   assert.match(f.summary.inserted[0].html,/decision checks ready/);
   assert.match(deep.inserted[0].html,/Illustrative case · not connected/);

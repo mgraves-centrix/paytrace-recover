@@ -61,16 +61,17 @@ export function arrangeCase(root,s){
  while(body.firstChild)main.append(body.firstChild);
  layout.append(rail,main);
  const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Jump to case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Next action</a><a href="#case-evidence"><b>02</b> Evidence & agents</a><a href="#case-update-plan"><b>03</b> Customer update</a><a href="#case-deep-evidence"><b>04</b> Full record</a>';
- const communication=document.createElement('section');communication.id='case-customer-updates';communication.className='case-communication-area';communication.innerHTML='<div class="case-communication-heading"><span class="eyebrow">CUSTOMER CONVERSATION</span><h2>Keep the buyer informed.</h2><p>Review the latest reply, set a progress update, or send a message.</p></div>';
+ const communication=document.createElement('section');communication.id='case-customer-updates';communication.className='case-communication-area';communication.setAttribute('aria-label','Customer conversation');
  const customerCard=document.createElement('section');customerCard.className='case-customer-card';customerCard.setAttribute('aria-label','Customer conversation status');
  const customerLabel=document.createElement('span');customerLabel.className='eyebrow';customerLabel.textContent='CUSTOMER CONVERSATION';
  const customerStatus=document.createElement('strong');customerStatus.className='case-customer-status';customerStatus.textContent='Checking for customer updates…';
  const customerDetail=document.createElement('p');customerDetail.className='case-customer-detail';customerDetail.textContent='Messages and the next update are recorded with this case.';
  const customerLink=document.createElement('a');customerLink.href='#case-customer-updates';customerLink.className='case-customer-link';customerLink.textContent='Open conversation ↗';
- customerCard.append(customerLabel,customerStatus,customerDetail,customerLink);rail.append(customerCard);
+ customerCard.append(customerLabel,customerStatus,customerDetail,customerLink);
  customerLink.addEventListener('click',()=>{const thread=root.querySelector('.case-conversation-disclosure');if(thread)thread.open=true;});
- const updateDock=document.createElement('section');updateDock.className='case-update-dock';updateDock.id='case-update-plan';updateDock.setAttribute('aria-label','Customer update plan');
- body.append(wayfinding,updateDock,layout,communication);
+ const updateDock=document.createElement('details');updateDock.className='case-update-dock';updateDock.id='case-update-plan';
+ const updateSummary=document.createElement('summary');updateSummary.innerHTML='<span class="update-dock-icon" aria-hidden="true">03</span><span class="update-dock-copy"><strong>Customer update</strong><small class="update-dock-summary">Checking the next update…</small></span><span class="update-dock-state">Open plan</span><span class="update-dock-chevron" aria-hidden="true"></span>';updateDock.append(updateSummary);
+ updateDock.append(customerCard);rail.append(updateDock);body.append(wayfinding,layout,communication);
  // The compact progress stepper remains above the case; the longer journey lives in full evidence.
  for(const details of main.querySelectorAll(':scope > details.detail')){const title=details.querySelector('summary')?.textContent||'';if(title.startsWith('Purchase evidence')&&!s.review)details.open=true;}
 }
@@ -91,7 +92,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  if(heading)main.prepend(heading);
  const agents=caseAgentSummary(s);
  if(agents&&(s.agentRun?.status==='running'||s.agentRun?.status==='failed'||s.phase==='review-failed'||s.job?.pending))facts.insertAdjacentHTML('afterend',agents);
- const replay=document.createElement('div');replay.className='case-replay-mount';replay.innerHTML=caseReplayMarkup(s,{uncertain});
+ const replay=document.createElement('details');replay.className='case-replay-mount case-replay-disclosure';const replaySummary=document.createElement('summary');replaySummary.innerHTML='<span class="case-replay-summary-mark" aria-hidden="true">02</span><span><strong>See the evidence story</strong><small>Trace the purchase, agent review, approval, and access proof.</small></span><span class="case-replay-summary-action">Explore</span>';replay.append(replaySummary);replay.insertAdjacentHTML('beforeend',caseReplayMarkup(s,{uncertain}));replay.addEventListener('toggle',()=>{replaySummary.querySelector('.case-replay-summary-action').textContent=replay.open?'Close':'Explore';});
  facts.after(replay);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
@@ -158,7 +159,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  // Before any correction is previewed, the safe next action belongs directly
  // below the decision so it remains visible without scrolling.
  if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
- const customerCard=rail.querySelector(':scope > .case-customer-card');if(customerCard)rail.append(customerCard);
+ const updateDock=rail.querySelector(':scope > .case-update-dock');if(updateDock)rail.append(updateDock);
  const stepper=root.querySelector('.review-shell > .stepper');
  if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);steps.forEach((step,index)=>{if(index===active)step.setAttribute('aria-current','step');else step.removeAttribute?.('aria-current');step.classList.toggle('completed',index<active);});}}
  layout.after(communication);
@@ -166,5 +167,6 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const sectionLinks=[...root.querySelectorAll('.case-wayfinding a')];
  if(sectionLinks.length){const target=sectionLinks.find(link=>link.hash===window.location.hash)||sectionLinks[0];sectionLinks.forEach(link=>{if(link===target)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');link.addEventListener('click',()=>{sectionLinks.forEach(item=>item.removeAttribute('aria-current'));link.setAttribute('aria-current','location');});});}
  root.querySelector('.case-wayfinding a[href="#case-deep-evidence"]')?.addEventListener('click',()=>{deep.open=true;});
+ root.querySelector('.case-wayfinding a[href="#case-update-plan"]')?.addEventListener('click',()=>{const update=root.querySelector('.case-update-dock');if(update)update.open=true;});
  root.querySelectorAll('[data-open-case-evidence]').forEach(link=>link.addEventListener('click',()=>{deep.open=true;const first=deep.querySelector('.case-record-group');if(first)first.open=true;}));
 }
