@@ -22,7 +22,7 @@ export function mountTimeline(root,state,support){
  for(const detail of target.querySelectorAll('details.detail'))if(detail.querySelector('summary')?.textContent.startsWith('Recovery timeline'))detail.remove();
 }
 
-export function mountInbox(root,onSelect){
+export function mountInbox(root,onSelect,visibleCases=null){
  const box=document.createElement('section');box.className='support-inbox communication-inbox';root.querySelector('.overview')?.after(box);if(!box.isConnected)root.prepend(box);
  let items=[],filter='all',query='',loading=false;
  function render(note=''){
@@ -40,6 +40,6 @@ export function mountInbox(root,onSelect){
  box.querySelectorAll('[data-inbox-open]').forEach(button=>button.onclick=()=>onSelect(visible[Number(button.dataset.inboxOpen)].caseId));
  box.querySelector('input').oninput=e=>{query=e.target.value;const position=e.target.selectionStart;render(note);const field=box.querySelector('input');field.focus();try{field.setSelectionRange(position,position);}catch{}};
  }
- async function load(){if(loading)return;loading=true;render();try{const result=await request('/api/support/inbox');if(!box.isConnected)return;if(!Array.isArray(result.items))throw Error('Unexpected inbox response.');items=result.items.sort((a,b)=>Number(b.kind==='help')-Number(a.kind==='help')||(Date.parse(b.at)||0)-(Date.parse(a.at)||0));loading=false;render();}catch{loading=false;if(box.isConnected)render('Could not refresh the inbox. Previously loaded conversations may be out of date.');}}
+ async function load(){if(loading)return;loading=true;render();try{const result=await request('/api/support/inbox');if(!box.isConnected)return;if(!Array.isArray(result.items))throw Error('Unexpected inbox response.');items=(visibleCases?result.items.filter(item=>visibleCases.has(item.caseId)):result.items).sort((a,b)=>Number(b.kind==='help')-Number(a.kind==='help')||(Date.parse(b.at)||0)-(Date.parse(a.at)||0));loading=false;render();}catch{loading=false;if(box.isConnected)render('Could not refresh the inbox. Previously loaded conversations may be out of date.');}}
  load();
 }

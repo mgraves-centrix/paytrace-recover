@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createCase,simulatePayment,investigate,rehearse,approve,applyRepair,verify} from '../dist/core.mjs';
 import {workspaceOverview,workspaceCsv} from '../dist/workspace-model.mjs';
 import {pulseMarkup} from '../dist/workspace-widgets.mjs';
+import {caseLabel,merchantCases,caseProgress} from '../dist/focus-model.mjs';
 const paid=id=>simulatePayment(createCase('match',id));
 const resolved=id=>{const s=paid(id);investigate(s);rehearse(s);approve(s,s.rehearsal.id);applyRepair(s);verify(s);return s;};
 
@@ -12,6 +13,20 @@ test('pulse prioritizes due follow-ups, customer help, and verification without 
 });
 
 test('pulse never calls stale or unavailable proof a current verified outcome',()=>{const a=resolved('A'),b=resolved('B');a.sources={access:{status:'unavailable'}};b.revision++;const data=workspaceOverview([a,b]);assert.equal(data.counts.verified,0);assert.equal(data.counts.sourceIssues,1);assert.equal(data.counts.verificationNeeded,2);});
+
+test('sandbox checkout and historical recovery remain visible without calling stale proof current',()=>{
+ const sample=paid('SAMPLE'),checkout=paid('SANDBOX'),recovered=resolved('DONE');
+ checkout.intakeMode='sandbox';checkout.capture.source='paypal-sandbox';
+ recovered.intakeMode='sandbox';recovered.capture.source='paypal-sandbox';recovered.lastPassingVerification={at:recovered.proof.at};recovered.revision++;
+ const cases=merchantCases([sample,checkout,recovered]),data=workspaceOverview(cases,{backend:true});
+ assert.deepEqual(cases.map(s=>s.id),['SANDBOX','DONE']);
+ assert.equal(data.counts.checkoutComplete,2);
+ assert.equal(data.counts.recoveriesCompleted,1);
+ assert.equal(data.counts.verified,0);
+ assert.match(data.rows.find(row=>row.caseId==='SANDBOX').reasons.join(),/Sandbox checkout complete/);
+ assert.match(caseLabel(recovered),/Previously verified/);
+ assert.equal(caseProgress(recovered).previouslyVerified,true);
+});
 
 test('high priority changes ordering but does not promote a resolved case back into work',()=>{const a=paid('A'),b=paid('B'),c=resolved('C');const data=workspaceOverview([a,b,c],{preferences:[{caseId:'B',priority:'high'},{caseId:'C',priority:'high'}]});assert.equal(data.urgent[0].caseId,'B');assert.ok(!data.urgent.some(r=>r.caseId==='C'));assert.equal(b.writes,0);});
 

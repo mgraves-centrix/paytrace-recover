@@ -1,5 +1,6 @@
 import {reviewIsCurrent} from './core.mjs';
 import {proofIsCurrent} from './operations.mjs';
+import {historicalProofAt} from './focus-model.mjs';
 import {agentDecisionBrief} from './focus-agent-brief.mjs';
 import {replayAgents} from './focus-case-replay.mjs';
 
@@ -43,7 +44,8 @@ export function agentConsensusMarkup(s,{uncertain=false}={}){
 
 export function outcomeProofMarkup(s,{uncertain=false}={}){
  if(!s.approval&&!s.writes&&!s.proof)return '';
- const verified=!uncertain&&proofIsCurrent(s)&&s.evidenceAvailable!==false&&!Object.values(s.sources||{}).some(source=>source?.status==='unavailable');
+ const verified=!uncertain&&!s.paymentHold&&proofIsCurrent(s)&&s.evidenceAvailable!==false&&!Object.values(s.sources||{}).some(source=>source?.status==='unavailable');
+ const completedAt=historicalProofAt(s);
  const paymentCheck=s.proof?.checks?.find(item=>item.label==='Fresh payment record');
  const accessCheck=s.proof?.checks?.find(item=>item.label==='Access belongs to this learner and course');
  const lessonCheck=s.proof?.checks?.find(item=>item.label==='Purchased lesson content retrieved');
@@ -52,5 +54,5 @@ export function outcomeProofMarkup(s,{uncertain=false}={}){
  const payment=stage('01','Payment',verified&&paymentCheck?.ok?'Fresh check passed':'Fresh check pending','The completed capture must still match this purchase.',`<dl>${pair('Source',sample?'Sample payment':'PayPal sandbox')}${pair('Capture',s.capture?.id)}${pair('Check',paymentCheck?.ok?'Passed':paymentCheck?'Failed':'Not run')}${pair('Checked',s.proof?.at?when(s.proof.at):'Not checked')}</dl>`);
  const grant=stage('02',s.writes||s.approval?'Access grant':'Access record',s.writes===1?'One write recorded':s.writes>1?`${s.writes} writes recorded`:s.approval?'Approved · not applied':verified?'Already active · no grant needed':'Current access unconfirmed','An approved write is separate from a passing entitlement check.',`<dl>${pair('Authorization',s.approval?.mode==='policy'?'Merchant policy':s.approval?'Merchant approval':'No grant needed')}${pair('Approved',s.approval?.at?when(s.approval.at):'Not applicable')}${pair('Writes',s.writes)}${pair('Entitlement check',accessCheck?.ok?'Passed':accessCheck?'Failed':'Not run')}</dl>`);
  const lesson=stage('03','Lesson proof',verified&&lessonCheck?.ok?'Protected lesson opened':lessonCheck?'Check did not pass':'Not yet verified','Technical lesson proof does not mean the buyer has confirmed access on their own device.',`<dl>${pair('Content',s.proof?.resource?.contentId||'Not recorded')}${pair('Check',lessonCheck?.ok?'Passed':lessonCheck?'Failed':'Not run')}${pair('Checked',s.proof?.at?when(s.proof.at):'Not checked')}${pair('Method',s.proof?.transport||'Not recorded')}</dl>`);
- return `<section class="case-outcome-proof" aria-label="Recovery outcome proof"><span class="eyebrow">${sample?'ILLUSTRATIVE SAMPLE':'PAYPAL SANDBOX'} · OUTCOME</span><h3>${verified?'Access verified with fresh proof':s.writes?'Access changed; verification pending':s.approval?'Approved; access change pending':'Technical verification needs refresh'}</h3><p>${verified?'Payment, matching entitlement, and protected lesson checks passed. Buyer confirmation remains separate.':'Follow each recorded check. The case stays open until fresh verification passes.'}</p><div class="case-outcome-track">${payment}${grant}${lesson}</div></section>`;
+ return `<section class="case-outcome-proof" aria-label="Recovery outcome proof"><span class="eyebrow">${sample?'ILLUSTRATIVE SAMPLE':'PAYPAL SANDBOX'} · OUTCOME</span><h3>${verified?'Recovery verified · lesson opened':s.paymentHold?'Payment changed · recovery on hold':completedAt&&!uncertain?'Previously verified · recheck due':s.writes?'Access changed; verification pending':s.approval?'Approved; access change pending':'Technical verification needs refresh'}</h3><p>${verified?'Payment, matching entitlement, and protected lesson checks passed. Buyer confirmation remains separate.':s.paymentHold?'The payment changed. Review current payment evidence before any further access change.':completedAt&&!uncertain?`A recovery passed on ${esc(when(completedAt))}. This is a historical result; current access needs a fresh check.`:'Follow each recorded check. The case stays open until fresh verification passes.'}</p><div class="case-outcome-track">${payment}${grant}${lesson}</div></section>`;
 }

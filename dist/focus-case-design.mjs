@@ -156,7 +156,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  if(!s.rehearsal&&summary){const action=rail.querySelector(':scope > .actionbar');if(action)summary.after(action);}
  const updateDock=rail.querySelector(':scope > .case-update-dock');if(updateDock)rail.append(updateDock);
  const stepper=root.querySelector('.review-shell > .stepper');
- if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active'));if(active>=0){stepper.dataset.currentStep=`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);steps.forEach((step,index)=>{if(index===active)step.setAttribute('aria-current','step');else step.removeAttribute?.('aria-current');step.classList.toggle('completed',index<active);});}}
+ if(stepper){const steps=[...stepper.querySelectorAll(':scope > span')],active=steps.findIndex(step=>step.classList.contains('active')),complete=stepper.classList.contains('is-complete');if(active>=0){stepper.dataset.currentStep=complete?'Recovery verified':`${active+1} of ${steps.length}`;stepper.setAttribute('aria-label',complete?'Case progress: recovery verified, all four steps complete':`Case progress: step ${active+1} of ${steps.length}, ${steps[active].textContent.trim()}`);steps.forEach((step,index)=>{if(index===active&&!complete)step.setAttribute('aria-current','step');else step.removeAttribute?.('aria-current');step.classList.toggle('completed',index<active||complete);});}}
  layout.after(communication);
  communication.after(deep);
  const sectionLinks=[...root.querySelectorAll('.case-wayfinding a')];

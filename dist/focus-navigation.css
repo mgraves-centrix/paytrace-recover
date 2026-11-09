@@ -2,6 +2,7 @@
 .workspace-quicklinks{display:flex;align-items:center;gap:8px;min-width:0}
 .workspace-quicklinks a{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:10px 12px;border-radius:7px;font-size:.875rem;font-weight:600;line-height:1.5;text-decoration:none}
 .workspace-quicklinks a:focus-visible{outline:2px solid #73b9ff;outline-offset:2px}
+.workspace-nav button{font-size:.875rem;line-height:1.4}
 @media(min-width:1000px){
  .workspace-subbar{gap:8px}
  .workspace-quicklinks{flex-direction:column;align-items:stretch;padding-top:12px;border-top:1px solid #36516f}
@@ -15,8 +16,13 @@
 }
 @media(max-width:520px){
  .workspace-subbar{grid-template-columns:minmax(0,1fr);padding-bottom:8px}
+ .workspace-nav button{font-size:.875rem;min-height:44px}
  .workspace-subbar #workspace-navigation{display:block;grid-column:1;grid-row:1}
  .workspace-subbar .guide-tools{grid-column:auto;grid-row:auto}
  .workspace-subbar .workspace-quicklinks{grid-column:1;grid-row:2;display:block;margin-top:8px}
  .workspace-quicklinks a{justify-content:center;text-align:center}
+ .recovery-pulse .today-head{padding:17px 18px}
+ .recovery-pulse .today-head h2{max-width:none;margin:7px 0 5px;font-size:1.55rem;line-height:1.14}
+ .recovery-pulse .today-demo-entry{margin-top:12px}
+ .recovery-pulse .today-demo-entry>span,.recovery-pulse .today-head small{display:none}
 }

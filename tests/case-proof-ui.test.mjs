@@ -42,17 +42,19 @@ test('approved outcome distinguishes authorization, write, fresh proof, and buye
  assert.match(outcomeProofMarkup(s),/Access changed; verification pending/);
  verify(s);
  const html=outcomeProofMarkup(s);
- assert.match(html,/Access verified with fresh proof/);
+ assert.match(html,/Recovery verified · lesson opened/);
  assert.equal((html.match(/class="case-outcome-stage"/g)||[]).length,3);
  assert.match(html,/Protected lesson opened/);
  assert.match(html,/Buyer confirmation remains separate/);
  assert.match(outcomeProofMarkup(s,{uncertain:true}),/verification pending/);
+ s.paymentHold={status:'REFUNDED',at:new Date().toISOString()};
+ assert.match(outcomeProofMarkup(s),/Payment changed · recovery on hold/);
 });
 
 test('already restored access shows verification without inventing a grant',()=>{
  const s=simulatePayment(createCase('restored'));investigate(s);verify(s);
  const html=outcomeProofMarkup(s);
- assert.match(html,/Access verified with fresh proof/);
+ assert.match(html,/Recovery verified · lesson opened/);
  assert.match(html,/Already active · no grant needed/);
  assert.match(html,/No grant needed/);
  assert.doesNotMatch(html,/One write recorded/);
