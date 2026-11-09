@@ -71,7 +71,7 @@ test('verified layout presents a compact outcome while retaining the exact previ
   const f=fixture({preview:true}),s=simulatePayment(createCase());investigate(s);rehearse(s);approve(s,s.rehearsal.id);applyRepair(s);verify(s);
   arrangeCase(f.root,s);finishCaseLayout(f.root,s);
   const rail=f.root.querySelector('.case-decision-column'),deep=f.root.querySelector('.case-deep-dive');
-  assert.match(rail.inserted[0].html,/Access checked and available/);
+  assert.match(rail.inserted[0].html,/Access verified with fresh proof/);
   assert.ok(rail.querySelector('.case-change-preview'));
   assert.equal(deep.querySelector('.merchant-decision'),f.decision);
  }finally{globalThis.document=oldDocument;}

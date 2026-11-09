@@ -1,9 +1,9 @@
 import {checks,fingerprint,reviewIsCurrent} from './core.mjs';
-import {proofIsCurrent} from './operations.mjs';
 import {caseAgentSummary} from './focus-case-review.mjs';
 import {caseReplayMarkup} from './focus-case-replay.mjs';
 import {caseOrigin} from './focus-model.mjs';
 import {sandboxScenario} from './sandbox-scenarios.mjs';
+import {purchaseFactsMarkup,agentConsensusMarkup,outcomeProofMarkup} from './focus-case-proof.mjs';
 
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -30,10 +30,7 @@ export function readinessMarkup(s,options={}){
 }
 
 export function outcomeSummaryMarkup(s,{uncertain=false}={}){
- if(uncertain||!proofIsCurrent(s)||s.evidenceAvailable===false||Object.values(s.sources||{}).some(source=>source?.status==='unavailable'))return '';
- const source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':'Sample payment',change=s.writes===0?'No access change needed':s.writes===1?'One approved access grant recorded':`${s.writes} access writes recorded`;
- const checked=s.proof?.at&&Number.isFinite(Date.parse(s.proof.at))?new Date(s.proof.at).toLocaleString():'time unavailable';
- return `<section class="case-outcome-summary" aria-label="Verified recovery summary"><span class="eyebrow">TECHNICAL OUTCOME · ${esc(source)}</span><h3>Access checked and available</h3><p>The saved payment, purchased entitlement, and protected lesson check agree.</p><dl><div><dt>Original issue</dt><dd>${s.writes===0?'Reported access problem; the course service restored access before a PayTrace grant.':'Paid purchase; digital access was missing.'}</dd></div><div><dt>Correction</dt><dd>${esc(change)}</dd></div><div><dt>Lesson proof</dt><dd>Protected lesson opened in the technical check · ${esc(checked)}</dd></div><div><dt>Customer</dt><dd>Ask the buyer to open it on their device; confirmation is separate.</dd></div></dl><a href="#case-customer-updates">See the customer update ↗</a></section>`;
+ return outcomeProofMarkup(s,{uncertain});
 }
 
 // Present the existing controls in a focused layout; authorization stays on the server.
@@ -81,19 +78,17 @@ export function arrangeCase(root,s){
 export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const sheet=root.querySelector('.case-redesign'),main=sheet?.querySelector('.case-evidence-column'),layout=sheet?.querySelector('.case-layout'),communication=sheet?.querySelector('.case-communication-area');
  if(!main||!layout||!communication||!s)return;
- const exact=!!s.capture&&s.capture.status==='COMPLETED'&&s.capture.orderId===s.order.id&&s.capture.userId===s.order.userId&&s.capture.courseId===s.order.courseId&&s.capture.amount===s.order.amount&&s.capture.currency===s.order.currency;
- const access=!!s.entitlement?.active&&s.entitlement.userId===s.order.userId&&s.entitlement.courseId===s.order.courseId&&s.entitlement.captureId===s.capture?.id;
  const facts=document.createElement('section');facts.className='case-first-look';facts.setAttribute('aria-label','Three purchase facts');
- const source=s.capture?.source==='paypal-sandbox'?'PayPal sandbox':s.capture?'Sample record':'No capture';
- const items=[['Payment',s.capture?.status==='COMPLETED'?'Completed':'Not confirmed',source],['Purchase match',exact?'Exact fields agree':'Needs review','Order, learner, course, amount, currency'],['Purchased access',access?'Matching entitlement':'Missing or unconfirmed',s.proof?.passed?'Lesson proof recorded':'Protected lesson not yet proven']];
- for(const [label,value,detail] of items){const card=document.createElement('div');for(const [tag,className,content] of [['span','case-first-look-label',label],['strong','',value],['small','',detail]]){const node=document.createElement(tag);if(className)node.className=className;node.textContent=content;card.append(node);}facts.append(card);}
+ facts.innerHTML=purchaseFactsMarkup(s,{uncertain});
  const heading=main.querySelector('.case-column-title');
  main.prepend(facts);
  if(heading)main.prepend(heading);
  const agents=caseAgentSummary(s);
  if(agents&&(s.agentRun?.status==='running'||s.agentRun?.status==='failed'||s.phase==='review-failed'||s.job?.pending))facts.insertAdjacentHTML('afterend',agents);
+ const consensus=agentConsensusMarkup(s,{uncertain});
+ if(consensus){const panel=document.createElement('div');panel.className='case-agent-consensus-mount';panel.innerHTML=consensus;facts.after(panel);}
  const replay=document.createElement('details');replay.className='case-replay-mount case-replay-disclosure';const replaySummary=document.createElement('summary');replaySummary.innerHTML='<span class="case-replay-summary-mark" aria-hidden="true">02</span><span><strong>See the evidence story</strong><small>Trace the purchase, agent review, approval, and access proof.</small></span><span class="case-replay-summary-action">Explore</span>';replay.append(replaySummary);replay.insertAdjacentHTML('beforeend',caseReplayMarkup(s,{uncertain}));replay.addEventListener('toggle',()=>{replaySummary.querySelector('.case-replay-summary-action').textContent=replay.open?'Close':'Explore';});
- facts.after(replay);
+ (main.querySelector('.case-agent-consensus-mount')||facts).after(replay);
  const preview=main.querySelector('.diff');
  if(preview){const wrap=document.createElement('section');wrap.className='case-change-preview';wrap.setAttribute('aria-label','Exact correction preview');const heading=preview.previousElementSibling,note=preview.nextElementSibling;if(heading?.tagName==='H3')wrap.append(heading);wrap.append(preview);if(note?.classList.contains('footnote'))wrap.append(note);layout.querySelector('.case-decision-column').append(wrap);}
  const deep=document.createElement('details');deep.className='case-deep-dive';deep.id='case-deep-evidence';const title=document.createElement('summary');title.innerHTML='<span><strong>Inspect full evidence and audit</strong><small>Agent findings, source records, workflow, verification, and timeline</small></span><span aria-hidden="true">+</span>';deep.append(title);
@@ -101,7 +96,7 @@ export function finishCaseLayout(root,s,{uncertain=false,backend=false}={}){
  const chapter=sheet.querySelector('.sheet-body > .case-chapter');if(chapter)deep.append(chapter);
  const freshness=sheet.querySelector('.freshness-band');if(freshness)deep.append(freshness);
  const automation=sheet.querySelector('.sheet-body > .automation-card');if(automation)deep.append(automation);
- for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-agent-summary,.case-replay-mount,.case-change-preview'))deep.append(child);
+ for(const child of [...main.children])if(!child.matches('.case-column-title,.case-first-look,.case-agent-summary,.case-agent-consensus-mount,.case-replay-mount,.case-change-preview'))deep.append(child);
  const rail=layout.querySelector('.case-decision-column');
  for(const child of [...rail.children])if(child.matches('.story-brief-panel,.customer-preview-disclosure,.case-priority-panel,.exact-approval'))deep.append(child);
  for(const selector of ['.summary','.merchant-decision','.case-change-preview','.consent','.actionbar']){const child=rail.querySelector(':scope > '+selector);if(child)rail.append(child);}

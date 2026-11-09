@@ -26,11 +26,11 @@ test('readiness follows the saved purchase, review, exact preview and approval',
 test('compact outcome shows technical proof without claiming buyer confirmation',()=>{
  const s=simulatePayment(createCase());investigate(s);rehearse(s);approve(s,s.rehearsal.id);applyRepair(s);verify(s);
  const html=outcomeSummaryMarkup(s);
- assert.match(html,/One approved access grant recorded/);
- assert.match(html,/confirmation is separate/);
- assert.equal(outcomeSummaryMarkup(s,{uncertain:true}),'');
+ assert.match(html,/One write recorded/);
+ assert.match(html,/confirmation remains separate/);
+ assert.match(outcomeSummaryMarkup(s,{uncertain:true}),/verification pending/);
  s.revision++;
- assert.equal(outcomeSummaryMarkup(s),'');
+ assert.match(outcomeSummaryMarkup(s),/verification pending/);
 });
 
 test('customer summary shows only the latest merchant reply and escapes it',()=>{
