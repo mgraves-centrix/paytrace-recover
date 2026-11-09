@@ -60,7 +60,7 @@ export function arrangeCase(root,s){
  if(sources){const wrapper=document.createElement('details');wrapper.className='source-disclosure';const title=document.createElement('summary');title.textContent='Connection checks & freshness';wrapper.append(title,sources);main.append(wrapper);}
  while(body.firstChild)main.append(body.firstChild);
  layout.append(rail,main);
- const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Jump to case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Next action</a><a href="#case-evidence"><b>02</b> Evidence & agents</a><a href="#case-customer-updates"><b>03</b> Conversation</a><a href="#case-deep-evidence"><b>04</b> Full record</a>';
+ const wayfinding=document.createElement('nav');wayfinding.className='case-wayfinding';wayfinding.setAttribute('aria-label','Jump to case sections');wayfinding.innerHTML='<a href="#case-decision"><b>01</b> Next action</a><a href="#case-evidence"><b>02</b> Evidence & agents</a><a href="#case-update-plan"><b>03</b> Customer update</a><a href="#case-deep-evidence"><b>04</b> Full record</a>';
  const communication=document.createElement('section');communication.id='case-customer-updates';communication.className='case-communication-area';communication.innerHTML='<div class="case-communication-heading"><span class="eyebrow">CUSTOMER CONVERSATION</span><h2>Keep the buyer informed.</h2><p>Review the latest reply, set a progress update, or send a message.</p></div>';
  const customerCard=document.createElement('section');customerCard.className='case-customer-card';customerCard.setAttribute('aria-label','Customer conversation status');
  const customerLabel=document.createElement('span');customerLabel.className='eyebrow';customerLabel.textContent='CUSTOMER CONVERSATION';
@@ -69,7 +69,8 @@ export function arrangeCase(root,s){
  const customerLink=document.createElement('a');customerLink.href='#case-customer-updates';customerLink.className='case-customer-link';customerLink.textContent='Open conversation ↗';
  customerCard.append(customerLabel,customerStatus,customerDetail,customerLink);rail.append(customerCard);
  customerLink.addEventListener('click',()=>{const thread=root.querySelector('.case-conversation-disclosure');if(thread)thread.open=true;});
- body.append(wayfinding,layout,communication);
+ const updateDock=document.createElement('section');updateDock.className='case-update-dock';updateDock.id='case-update-plan';updateDock.setAttribute('aria-label','Customer update plan');
+ body.append(wayfinding,updateDock,layout,communication);
  // The compact progress stepper remains above the case; the longer journey lives in full evidence.
  for(const details of main.querySelectorAll(':scope > details.detail')){const title=details.querySelector('summary')?.textContent||'';if(title.startsWith('Purchase evidence')&&!s.review)details.open=true;}
 }

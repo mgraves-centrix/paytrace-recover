@@ -218,6 +218,7 @@ export function createApp(env=process.env,store=openStore(env.DATABASE_PATH||'./
    }
    if(route==='/api/support/reminder'){if(!session.operator)return json(403,{error:'Unlock the operator session first.'});return json(200,{reminder:store.support.reminder(session.id,body.caseId,body.dueAt,body.note)});}
    if(route==='/api/support/update-promise'){if(!session.operator)return json(403,{error:'Unlock the operator session first.'});return json(200,{nextUpdateAt:store.support.updatePromise(session.id,body.caseId,body.dueAt)});}
+   if(route==='/api/support/update-mode'){if(!session.operator)return json(403,{error:'Unlock the operator session first.'});return json(200,store.support.setUpdateMode(session.id,body.caseId,body.mode));}
    if(route==='/api/case/priority'){if(!session.operator)return json(403,{error:'Unlock the operator session to manage case priority.'});const result=store.setCasePriority(session.id,body.caseId,body.priority,body.expectedRevision);store.center.audit(session.id,{actor:member?.label||'owner',role:member?.role||'admin',action:'case.priority',caseId:body.caseId});return json(200,result);}
    if(route==='/api/monitor/scan'){const result=await service.scan(session.id,body);setImmediate(()=>service.autoTriage(session.id).catch(()=>{}));return json(200,result)}
    if(route==='/api/autopilot'){const policy=await service.setAutopilot(session.id,body);if(policy.enabled)setImmediate(()=>service.autoTriage(session.id).catch(()=>{}));return json(200,{policy,ready:service.autopilotReady()});}

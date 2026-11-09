@@ -1,0 +1,21 @@
+.case-update-dock{margin:0 0 18px;scroll-margin-top:18px}
+.case-redesign .case-update-dock .customer-update-form{display:block;margin:0;padding:18px 20px;border:1px solid #bad3ea;border-left:4px solid #0874cf;border-radius:9px;background:#f5f9fd;box-shadow:none}
+.update-plan-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.update-plan-head h3{margin:4px 0 0!important;color:#143a63;font-size:1.125rem!important;line-height:1.3}
+.update-owner-switch{display:flex;flex:none;gap:3px;padding:3px;border:1px solid #b9cfe5;border-radius:9px;background:#e7eff7}
+.update-owner-switch button{min-height:40px;padding:7px 14px;border:0;border-radius:6px;background:transparent;color:#2a5278;font-size:.875rem;font-weight:700;cursor:pointer}
+.update-owner-switch button[aria-pressed=true]{background:#fff;color:#0e5596;box-shadow:0 1px 4px #173b611c}
+.update-owner-switch button:hover{background:#d8e9f7;color:#114977}
+.update-owner-switch button[aria-pressed=true]:hover{background:#fff}
+.update-mode-explainer{max-width:78ch;margin:10px 0 14px!important;color:#3b5b76;font-size:.875rem!important;line-height:1.5}
+.case-update-dock .promise-status{display:grid;gap:4px;padding:12px 14px;border:1px solid #d4e2ef;border-radius:7px;background:#fff}
+.case-update-dock .promise-status strong{color:#143a63;font-size:.875rem}
+.case-update-dock .promise-status span,.case-update-dock .promise-status small{color:#496783;font-size:.8125rem;line-height:1.5}
+.update-manual-fields{display:grid;grid-template-columns:minmax(0,280px) auto;gap:7px 12px;align-items:end;margin-top:14px}
+.update-manual-fields label{grid-column:1/-1;margin:0!important;color:#284e72;font-size:.875rem!important}
+.update-manual-fields input{grid-column:1;min-height:44px;margin:0!important;font-size:1rem}
+.update-manual-fields .support-actions{grid-column:2;align-self:end;margin:0}
+.ai-led .update-manual-fields{display:none}
+.update-conversation-link{display:inline-block;margin-top:12px;color:#075aa8;font-size:.875rem;font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.case-update-dock .promise-feedback{margin:8px 0 0!important;color:#164d81;font-size:.875rem!important}
+@media(max-width:700px){.update-plan-head{align-items:stretch;flex-direction:column}.update-owner-switch{width:100%}.update-owner-switch button{flex:1}.update-manual-fields{grid-template-columns:1fr}.update-manual-fields input,.update-manual-fields .support-actions{grid-column:1}}
