@@ -30,3 +30,17 @@ The course front door now uses a custom SVG still life, an editorial cover, a co
 | Ready/open state | PASS | Local fixture showed the ready lesson; clicking Open lesson rendered the protected response. Fixture data is only for visual testing, not connected verification. |
 | Automated checks | PASS | `npm test` (354 tests), `node --check dist/course.mjs`, `git diff --check`, and `npm run check:review-links` (109 targets). |
 | Accessibility scan, zoom, forced colors, screen reader | NOT TESTED | No automated scanner or screen reader was available in this visual review. No WCAG conformance claim. |
+
+## Learner-site realism pass · 2026-11-10
+
+The course front door now uses real, credited photography and a calmer editorial layout. The invented multi-chapter outline and drawn SVG artwork are gone; the contents show only the implemented first lesson. The purchase/access/lesson path remains visible, while the protected lesson still loads only after a private ready-state check and a click.
+
+| Check | Result | Evidence / limit |
+| --- | --- | --- |
+| Visual identity and hierarchy | PASS | Rendered desktop view: course wordmark, photographic cover, access status, and lesson occupy clear levels without decorative cards. |
+| Responsive composition | PASS for tested sizes | Rendered 390px and 320px views. At 320px, document scroll width was 305px, body text 16px, and the primary action 60px high due to wrapping. |
+| Locked view | PASS | Local fixture showed the progress action, no protected lesson body, and a purchase-status explanation. |
+| Ready and open view | PASS | Local fixture showed Open lesson; clicking displayed the protected response. The fixture is not connected proof. |
+| Photography | PASS | Two self-hosted WebP images, 384 KB combined, selected for recognizable light and shadow; source links and license are recorded in the visual brief and credits appear in the footer. |
+| Automated checks | PASS | `npm test` (354 tests), `node --check dist/course.mjs`, `git diff --check`, and `npm run check:review-links` (109 targets). |
+| Full accessibility and connected buyer visit | NOT TESTED | Automated scan, screen-reader flow, zoom/forced-colors matrix, and a live connected private-session visit were not completed. No WCAG or connected-success claim. |
