@@ -64,6 +64,24 @@ a{color:inherit}
 .course-help h2{font:400 clamp(1.55rem,2.4vw,2.25rem)/1.18 Georgia,serif;letter-spacing:-.025em;margin:0 0 9px}
 .course-help p:last-child{font-size:.94rem;line-height:1.55;color:var(--muted);max-width:63ch;margin:0}
 .course-help .support-action{flex:none}
+.outline-sign-in{margin-top:24px}
+.learner-entry{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(32px,7vw,96px);align-items:start;padding-top:54px;padding-bottom:80px;border-top:1px solid var(--line);scroll-margin-top:24px}
+.entry-intro .course-type{margin:0 0 16px}
+.entry-intro h2{font:400 clamp(2rem,3.4vw,3rem)/1.12 Georgia,serif;letter-spacing:-.035em;margin:0 0 18px;max-width:14ch}
+.entry-intro>p:not(.course-type){font-size:1rem;line-height:1.6;color:var(--muted);max-width:49ch;margin:0}
+.entry-help{border-top:1px solid var(--line);padding-top:23px;margin-top:34px}
+.entry-help strong{font-size:1.05rem}
+.entry-help p{font-size:.92rem;line-height:1.55;color:var(--muted);max-width:48ch;margin:9px 0 16px}
+.entry-form{background:#fff;border:1px solid var(--line);padding:clamp(24px,4vw,42px);box-shadow:0 16px 38px #1d32230c;min-width:0}
+.entry-form .eyebrow{display:block;margin-bottom:24px}
+.entry-form label{display:block;font-size:.91rem;font-weight:700;margin:17px 0 8px}
+.entry-form input{display:block;width:100%;min-width:0;min-height:48px;border:1px solid #82998a;border-radius:2px;padding:11px 13px;background:#fff;color:var(--ink);font:400 1rem/1.5 Arial,Helvetica,sans-serif}
+.entry-form input:hover{border-color:var(--accent)}
+.entry-form .action{width:100%;margin-top:23px}
+.entry-form .action:disabled{opacity:.7}
+.entry-form p{font-size:.88rem;line-height:1.5;color:var(--muted);margin:15px 0 0}
+.entry-form #course-sign-in-status:not(:empty){border-left:3px solid var(--accent);background:#f1f6ef;color:#244c39;padding:12px 14px;margin-top:18px}
+.entry-form #course-sign-in-status.is-error{border-color:#9f4332;background:#fff2ed;color:#823624}
 .classroom{padding-top:50px;padding-bottom:78px}
 .classroom-top{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:32px}
 .classroom-top h1{font:400 clamp(2.7rem,4.5vw,4.2rem)/1.05 Georgia,serif;letter-spacing:-.045em;margin:9px 0 9px}
@@ -122,6 +140,7 @@ footer{border-top:1px solid var(--line);background:#fff}
   .public-hero{gap:32px}
   .course-help{align-items:start;flex-direction:column}
   .course-detail{grid-template-columns:1fr;gap:24px}
+  .learner-entry{grid-template-columns:1fr;gap:27px}
   .classroom-layout{grid-template-columns:1fr}
   .lesson-stage{order:1}
   .course-rail{order:2;position:static;display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -147,6 +166,10 @@ footer{border-top:1px solid var(--line);background:#fff}
   .course-facts>div,.course-facts>div+div{border-left:0;border-bottom:1px solid var(--line);padding:12px 0}
   .course-facts>div:last-child{border-bottom:0}
   .course-detail{padding-top:36px;padding-bottom:54px}
+  .learner-entry{padding-top:38px;padding-bottom:55px}
+  .entry-intro h2{max-width:none}
+  .entry-help{margin-top:26px}
+  .entry-form{padding:23px 20px}
   .detail-lesson{grid-template-columns:1fr}
   .detail-lesson img{height:230px;min-height:0}
   .detail-lesson>div{padding:23px}
@@ -173,7 +196,7 @@ footer{border-top:1px solid var(--line);background:#fff}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media(forced-colors:active){
-  .course-rail,.lesson-stage,.lesson-action,.action,.support-action,.access-badge,.rail-unit,.detail-lesson{border:1px solid CanvasText}
+  .course-rail,.lesson-stage,.lesson-action,.action,.support-action,.access-badge,.rail-unit,.detail-lesson,.entry-form,.entry-form input{border:1px solid CanvasText}
   .public-course,.site-head,footer{background:Canvas;color:CanvasText}
   .action,.support-action{background:ButtonFace;color:ButtonText}
 }
