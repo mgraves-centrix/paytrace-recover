@@ -1,5 +1,11 @@
 # Recording plan — target 2 minutes 40 seconds
 
+## Current review cut
+
+`scripts/build-submission-cut.ps1` produces a 77-second MP4 from the user's local `PayTrace-Cole-Demo.mp4`, with new title cards and a tighter sequence. The first section is a **fictional walkthrough**. A later card explicitly introduces a **separate connected sandbox recording**. The course-view cards are labeled visual previews, not captured proof that the connected buyer visited the new course page. The original clip audio is retained in excerpts; review the full audio and create accurate captions before publishing. The output is written beside the repository under `paytrace-video-submission/` by default, not committed to Git.
+
+The strongest future recording would use one fresh sandbox case to show the new learner course page locked before approval and the same page opening its protected lesson afterward. That recording would replace the visual previews and remove any ambiguity from the final submission video.
+
 This is a script and shot list, not a finished video or evidence that the shots occurred. Record actual application footage with a fictional buyer and PayPal sandbox. Scripted scenes must be labeled. Never show keys, cookies, private URL fragments or unrelated personal information.
 
 | Time | Actual footage | Suggested narration |
