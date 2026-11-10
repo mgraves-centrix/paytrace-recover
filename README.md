@@ -17,13 +17,15 @@
   </p>
 </div>
 
-> **Prototype status:** The public walkthrough uses fictional records and scripted specialists. The Azure app has server-backed PayPal sandbox, model, course-service, and Render integrations, with component and fictional-run checks recorded. **One buyer-approved PayPal capture through model review, approved correction, and protected-lesson verification has not yet been recorded.** [See the dated integration status.](docs/INTEGRATION-STATUS.md)
+> **Prototype status:** The public walkthrough uses fictional records and scripted specialists. The Azure app has server-backed PayPal sandbox, model, course-service, and Render integrations. A separate screen recording shows a saved connected sandbox proof report and customer outcome, but the independent connected acceptance check has not been rerun for this release. [See the dated integration status.](docs/INTEGRATION-STATUS.md)
 
 ## The problem
 
 A customer pays for a course, but the lesson stays locked. The payment platform says “completed”; the course system says “no access.” A merchant needs to know whether those records belong to the same purchase, what went wrong, what change is safe, and whether the customer can actually open the lesson.
 
 PayTrace Recover connects those steps in one case. It proposes the smallest purchase-specific correction, keeps the merchant in control, and treats a successful access write as **unfinished until the lesson is checked**.
+
+The private customer case now links to a learner-facing [course view](dist/course.html). It shows the first lesson locked while access is unverified, then opens the same lesson through the protected customer API after verification. The browser never receives the course-service key. A current sandbox case and a fictional sample are labeled separately.
 
 ## How recovery works
 
