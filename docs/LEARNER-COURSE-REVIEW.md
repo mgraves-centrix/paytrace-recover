@@ -17,3 +17,16 @@ Scope: `/course.html`, the private customer-page link, course case labeling, and
 | Full accessibility conformance | NOT TESTED | No automated axe runner or screen-reader smoke test was available for this route. 200% text enlargement, 400% zoom, forced colors, and text-spacing overrides remain to be manually checked. No WCAG conformance claim is made. |
 
 The video is a review cut. Its course cards are labeled visual previews; the connected footage is a separate recorded case. Replace those previews with a fresh one-case course journey and add checked captions for the final submission.
+
+## Visual refinement · 2026-11-10
+
+The course front door now uses a custom SVG still life, an editorial cover, a compact three-stage access path, and one featured lesson. The unlocked state keeps the same position and changes its status and action. No protected content is included in the page source; the existing private lesson request still controls opening.
+
+| Check | Result | Evidence / limit |
+| --- | --- | --- |
+| Brand and hierarchy | PASS | Rendered local desktop preview: workshop identity, course image, access path, and lesson action read in order. |
+| Mobile composition | PASS for tested sizes | Rendered 390px and 320px views; the image and access path recompose. At 320px the document scroll width was 305px, body text 16px, and primary action 48px. |
+| Locked state | PASS | Local fixture showed a locked lesson and purchase-progress link, without protected body. |
+| Ready/open state | PASS | Local fixture showed the ready lesson; clicking Open lesson rendered the protected response. Fixture data is only for visual testing, not connected verification. |
+| Automated checks | PASS | `npm test` (354 tests), `node --check dist/course.mjs`, `git diff --check`, and `npm run check:review-links` (109 targets). |
+| Accessibility scan, zoom, forced colors, screen reader | NOT TESTED | No automated scanner or screen reader was available in this visual review. No WCAG conformance claim. |
