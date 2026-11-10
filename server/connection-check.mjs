@@ -29,9 +29,18 @@ export async function checkConnection(kind,env=process.env,fetcher=fetch){
    return status===200?result('connected','Render accepted the API key. Workflow dispatch and callbacks still need a case test.'):result('failed',`Render task lookup returned ${status}. Check the API key and task setup.`);
   }
   if(kind==='email'){
-   if(!env.RESEND_API_KEY||!env.EMAIL_FROM)return result('not-configured','Add the email API key and verified sender.');
-   const status=await get('https://api.resend.com/domains',env.RESEND_API_KEY);
-   return status===200?result('connected','Email API key was accepted. Sender verification and delivery still need a separate test.'):result('failed',`Email domain lookup returned ${status}. Check the API key and sender setup.`);
+   if(!env.RESEND_API_KEY||!env.EMAIL_FROM)return result('not-configured','Add RESEND_API_KEY and EMAIL_FROM to the server. Verify the sender domain in Resend.');
+   const sender=String(env.EMAIL_FROM).match(/(?:^|<)\s*[^<>\s@]+@([^<>\s@]+)\s*>?$/);
+   if(!sender)return result('failed','EMAIL_FROM must contain a valid sender address.');
+   const response=await fetcher('https://api.resend.com/domains',{headers:{Authorization:'Bearer '+env.RESEND_API_KEY,Accept:'application/json'},signal:AbortSignal.timeout(12000)});
+   if(response.status===401)return result('failed','Resend rejected the API key. Check the server setting.');
+   if(response.status===403)return result('needs-test','The API key cannot inspect domains. Use a Resend key with domain-read access, or verify delivery with a test email to an inbox you control.');
+   if(!response.ok)return result('failed',`Resend domain lookup returned ${response.status}. Check the API key and sender setup.`);
+   const body=await response.json();
+   if(!Array.isArray(body?.data))return result('unavailable','Resend returned an unexpected domain response. No email was sent.');
+   const domain=body.data.find(d=>d.name?.toLowerCase()===sender[1].toLowerCase());
+   if(!domain||domain.status!=='verified'||domain.capabilities?.sending==='disabled')return result('needs-verification','The configured sender domain is not verified for sending in Resend. No email was sent.');
+   return result('connected','The API key was accepted and the sender domain is verified for sending. Inbox delivery still needs a separate test.');
   }
   return result('failed','Unknown connection.');
  }catch{return result('unavailable','The provider could not be reached. No case or payment was changed.');}

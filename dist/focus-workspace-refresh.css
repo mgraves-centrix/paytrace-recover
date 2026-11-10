@@ -355,6 +355,7 @@ body{background:var(--work-canvas);color:var(--work-ink)}
 .connection-card-actions .connection-test-result:empty{display:none}
 .connection-card-actions .connection-test-result:not(:empty){padding:10px 12px;border:1px solid #d3e3ef;border-radius:7px;background:#f4f9fd}
 .connection-card-actions .connection-test-result[data-state=connected]{border-color:#b8dfd0;background:#edf9f3;color:#1f6652}
+.connection-card-actions .connection-test-result[data-state=needs-verification],.connection-card-actions .connection-test-result[data-state=needs-test]{border-color:#ead8a9;background:#fffaf0;color:#71551a}
 .connection-card-actions .connection-test-result[data-state=failed],.connection-card-actions .connection-test-result[data-state=unavailable]{border-color:#efceb4;background:#fff7ef;color:#805024}
 .connections-content .connection-card[data-connection-kind=email]{grid-column:1/-1;min-height:0;display:grid;grid-template-columns:1fr auto;align-items:center}
 .connections-content .connection-card[data-connection-kind=email] .connection-card-top,.connections-content .connection-card[data-connection-kind=email] h3,.connections-content .connection-card[data-connection-kind=email]>p{grid-column:1}

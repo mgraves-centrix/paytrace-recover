@@ -18,6 +18,16 @@ test('connection checks distinguish configuration, accepted credentials and fail
  let called=0;const fetcher=async(url)=>{called++;assert.match(url,/sandbox\.paypal/);return {ok:true,status:200};};const result=await checkConnection('paypal',{PAYPAL_CLIENT_ID:'id',PAYPAL_CLIENT_SECRET:'secret'},fetcher);assert.equal(result.state,'connected');assert.equal(called,1);assert.ok(!JSON.stringify(result).includes('secret'));
  const failed=await checkConnection('ai',{OPENAI_API_KEY:'secret',OPENAI_MODEL:'missing'},async()=>({status:404}));assert.equal(failed.state,'failed');assert.ok(!JSON.stringify(failed).includes('secret'));
 });
+test('email connector requires a verified sending domain and never sends during setup check',async()=>{
+ assert.equal((await checkConnection('email',{},async()=>{throw Error('unexpected request')})).state,'not-configured');
+ const env={RESEND_API_KEY:'private-test-key',EMAIL_FROM:'PayTrace <updates@example.com>'};
+ let calls=0;
+ const fetcher=async(url,options)=>{calls++;assert.equal(url,'https://api.resend.com/domains');assert.equal(options.method,undefined);assert.equal(options.headers.Authorization,'Bearer private-test-key');return {ok:true,status:200,json:async()=>({data:[{name:'example.com',status:'verified',capabilities:{sending:'enabled'}}]})};};
+ const connected=await checkConnection('email',env,fetcher);assert.equal(connected.state,'connected');assert.equal(calls,1);assert.ok(!JSON.stringify(connected).includes('private-test-key'));
+ const pending=await checkConnection('email',env,async()=>({ok:true,status:200,json:async()=>({data:[{name:'example.com',status:'pending'}]})}));assert.equal(pending.state,'needs-verification');
+ const noAccess=await checkConnection('email',env,async()=>({ok:false,status:403}));assert.equal(noAccess.state,'needs-test');
+ const invalid=await checkConnection('email',{...env,EMAIL_FROM:'invalid'},async()=>{throw Error('unexpected request')});assert.equal(invalid.state,'failed');
+});
 test('course connection check reads a new entitlement without granting access',async()=>{
  const env={COURSE_ACCESS_URL:'https://course.example.test/',COURSE_ACCESS_API_KEY:'private-test-key'};
  assert.equal((await checkConnection('access',{},async()=>{throw Error('must not call')})).state,'not-configured');
